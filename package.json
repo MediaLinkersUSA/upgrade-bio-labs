@@ -1,0 +1,35 @@
+{
+  "name": "upgrade-bio-labs",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "harvest": "tsx scripts/harvest.ts",
+    "images": "tsx scripts/regenerate-images.ts",
+    "contactsheet": "tsx scripts/contact-sheet.ts"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.111.0",
+    "clsx": "^2.1.1",
+    "framer-motion": "^11.15.0",
+    "next": "^15.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "server-only": "^0.0.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "pdf-to-img": "^6.2.0",
+    "pdfjs-dist": "^4.10.38",
+    "sharp": "^0.33.5",
+    "tailwindcss": "^4.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}

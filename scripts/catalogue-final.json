@@ -1,0 +1,1412 @@
+[
+  {
+    "slug": "5-amino-1-mq",
+    "wooId": "657",
+    "name": "5 Amino 1 MQ",
+    "liveCategory": "capsules",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/5-Amino-1-MQ-1.jpg",
+    "strength": "50 MG Per Capsule",
+    "purity": "≥99%",
+    "outOfStock": true,
+    "stockQty": 0,
+    "tiers": {
+      "1-2": 125,
+      "3-5": 118.75,
+      "5+": 112.5
+    },
+    "description": "Disclaimer: This product is for research use only (RUO). Not intended for human or animal consumption and not approved for clinical or therapeutic use.\n\n5-Amino-1MQ is a synthetic small-molecule compound developed for research and laboratory studies. It is designed to selectively target the NNMT enzyme (nicotinamide N-methyltransferase), enabling controlled investigations into metabolic pathways, fat metabolism, and cellular energy regulation.\n\nDescription 5-Amino-1MQ is a research-grade small molecule used in preclinical studies to explore: • NNMT inhibition and downstream metabolic effects • NAD+ modulation and mitochondrial function • Fat oxidation and cellular energy production • Experimental pathways related to obesity, longevity, and body composition The compound is supplied as capsules, tablets, or lyophilized powder, facilitating reproducible dosing in laboratory settings. It enables researchers to study metabolic processes, tissue-level responses, and molecular signaling without therapeutic claims.\n\nDosage/Form 50 mg per capsule or vial; available as capsules/tablets or freeze-dried powder\n\nPurity ≥99% verified by HPLC; additional testing includes endotoxins, sterility, weight verification (~58.35 mg per vial), and TFA content\n\nSolubility Water, DMSO, or ethanol; pH 6.5–7.5 (1 mg/mL in H₂O)\n\nPackaging Sterile, sealed vials or bottles (e.g., 60 capsules) with tamper-evident caps for laboratory safety\n\nEnergy Metabolism Enhanced fat oxidation and energy metabolism in preclinical models\n\nMuscle Preservation Preservation of muscle mass during metabolic stress\n\nMitochondrial Function Increased NAD+ levels in fat cells and improved mitochondrial function\n\nMetabolic Applications Applications in experimental weight management, body composition, and aging pathways\n\nAll batches are third-party verified for purity and quality. Research use is limited to in vitro and preclinical studies, and the compound is not approved for clinical, therapeutic, or human use.",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/COA3109_5AMINO.pdf"
+  },
+  {
+    "slug": "aod-9604",
+    "wooId": "904",
+    "name": "AOD-9604",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/03/AOD-9604-2.jpg",
+    "strength": "5 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 6,
+    "tiers": {
+      "1-2": 65,
+      "3-5": 62,
+      "5+": 59
+    },
+    "description": "AOD-9604 is a synthetic peptide fragment (derived from the C-terminal of human growth hormone) primarily studied for obesity management and weight loss . It works by accelerating fat breakdown (lipolysis) and inhibiting fat formation (lipogenesis) without causing the adverse blood sugar or growth hormone side effects associated with full-length human growth hormone.\n\nKey research and potential uses for AOD-9604 include:",
+    "researchAreas": [
+      {
+        "title": "Fat Loss and Weight Management",
+        "body": "Studies indicate it specifically targets abdominal and visceral adipose tissue, promoting the metabolism of fat for energy. It is often described as a, \"[Fat-Burning HGH Fragment]\" according to Perfect B ."
+      },
+      {
+        "title": "Osteoarthritis Support",
+        "body": "Research has explored its potential benefits in repairing cartilage and supporting joint health, notes Paragon Sports Medicine ."
+      },
+      {
+        "title": "Metabolic Improvement",
+        "body": "It is designed to assist in reducing obesity while maintaining favorable blood sugar levels."
+      },
+      {
+        "title": "Alternative to Hormone Therapy",
+        "body": "Because it does not raise IGF-1 levels or trigger the same side effects as full human growth hormone, it has been studied as a safer alternative for metabolic regulation, explains BHR Center ."
+      }
+    ],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/03/AOD-9604_70-202607-01_COA.pdf"
+  },
+  {
+    "slug": "aod-9604-spray",
+    "wooId": "2186",
+    "name": "AOD-9604 Spray",
+    "liveCategory": "sprays",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/04/AOD-9604-spray.jpg",
+    "strength": "5 MG Bottle",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 2,
+    "tiers": {
+      "1-2": 89,
+      "3-5": 85,
+      "5+": 80
+    },
+    "description": "Each spray delivers 50mcg. Easy and convenient option for your research.",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/04/COA261347-QC261255-Aod-9604.pdf"
+  },
+  {
+    "slug": "ara-290",
+    "wooId": "1982",
+    "name": "ARA-290",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/04/ARA-290.jpg",
+    "strength": "10 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 8,
+    "tiers": {
+      "1-2": 85,
+      "3-5": 81,
+      "5+": 77
+    },
+    "description": "ARA-290 (cibinetide) is primarily being studied as a therapeutic peptide to treat chronic neuropathic pain associated with sarcoidosis and diabetic neuropathy, often targeting small fiber neuropathy (SFN). It operates by activating the innate repair receptor (IRR) to reduce inflammation, promote tissue repair, and provide pain relief without affecting red blood cell production",
+    "researchAreas": [
+      {
+        "title": "Small Fiber Neuropathy (SFN) and Sarcoidosis",
+        "body": "Evaluated for reducing neuropathic symptoms, pain, and numbness in patients with sarcoidosis."
+      },
+      {
+        "title": "Diabetic Neuropathy",
+        "body": "Investigated for relieving pain and improving corneal nerve fiber density in diabetic patients."
+      },
+      {
+        "title": "Diabetic Macular Edema (DMO)",
+        "body": "Studied as a potential treatment for vision improvement in diabetes patients."
+      },
+      {
+        "title": "Inflammatory/Tissue Repair Conditions",
+        "body": "Researched for its ability to reduce renal inflammation and protect against kidney injury. (PubMed Central (PMC) (.gov)"
+      }
+    ],
+    "refs": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC4365069/",
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC3563705/"
+    ],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/04/ARA-290_70-202607-66_COA.pdf"
+  },
+  {
+    "slug": "bac-water-hospira-brand",
+    "wooId": "590",
+    "name": "BAC Water - Hospira brand",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/BAC-Water-Hospira-brand-1.jpg",
+    "strength": "30 ML",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 51,
+    "tiers": {
+      "1-2": 42
+    },
+    "description": "Due to limited supply, no discounts are available on this product.",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": null
+  },
+  {
+    "slug": "bac-water-3ml",
+    "wooId": "3092",
+    "name": "BAC Water 3ml",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/06/BAC-Water-Hospira-brand-1.jpg",
+    "strength": "3ml",
+    "purity": "≥99%",
+    "outOfStock": true,
+    "stockQty": 0,
+    "tiers": {
+      "1-2": 15
+    },
+    "description": "Due to limited supply, no discounts are available on this product.",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/06/Bacteriostatic_Water_BAC-KVR-2026-DD2372.pdf"
+  },
+  {
+    "slug": "bpc-157",
+    "wooId": "492",
+    "name": "BPC-157",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/BPC-157-1.jpg",
+    "strength": "10 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 13,
+    "tiers": {
+      "1-2": 90,
+      "3-5": 85.5,
+      "5+": 81
+    },
+    "description": "BPC-157 is a synthetic peptide derived from gastric juices, extensively studied in preclinical models for its regenerative, anti-inflammatory, and angiogenic (blood vessel growth) properties . Research focuses on treating musculoskeletal injuries (tendons, ligaments, bones), inflammatory bowel disease, gastrointestinal ulcers, and accelerating wound healing.",
+    "researchAreas": [
+      {
+        "title": "Musculoskeletal Regeneration",
+        "body": "Studied for accelerating the healing of injured muscles, tendons, ligaments, and bone, specifically tendon-to-bone reconnection."
+      },
+      {
+        "title": "Gastrointestinal Health",
+        "body": "Originally investigated for its role in stomach lining protection, it is studied for treating inflammatory bowel disease (IBD) and gastric ulcers."
+      },
+      {
+        "title": "Angiogenesis & Wound Healing",
+        "body": "Research shows it promotes blood vessel formation and collagen production, leading to faster skin wound and burn repair."
+      },
+      {
+        "title": "Systemic Anti-inflammatory Effects",
+        "body": "Investigated for reducing inflammation and oxidative stress across various tissues, including potential neuroprotective effects for stroke or traumatic brain injury."
+      },
+      {
+        "title": "Organ Protection",
+        "body": "Studies indicate protective effects on the liver, pancreas, and heart."
+      },
+      {
+        "title": "Drug Antagonist",
+        "body": "Researched for its ability to counteract adverse effects of certain medications (e.g., NSAID damage) and substance toxicity."
+      }
+    ],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/BPCCOA326.pdf"
+  },
+  {
+    "slug": "bpc-157-capsules",
+    "wooId": "661",
+    "name": "BPC-157 Capsules",
+    "liveCategory": "capsules",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/BPC-157-Capsules-1.jpg",
+    "strength": "500 MCG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 7,
+    "tiers": {
+      "1-2": 115,
+      "3-5": 109.25,
+      "5+": 103.5
+    },
+    "description": "BPC-157 is a synthetic pentadecapeptide composed of 15 amino acids, partially derived from the body protection compound found in human gastric juice. This peptide demonstrates remarkable stability and exhibits pleiotropic effects throughout various tissue systems. Mechanistically, BPC-157 appears to modulate the nitric oxide (NO) pathway, interact with growth hormone receptors, and influence several molecular pathways involved in angiogenesis, fibroblast migration, and collagen deposition",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/COA5964BPC157Caps072026.pdf"
+  },
+  {
+    "slug": "bpc-157-spray",
+    "wooId": "617",
+    "name": "BPC-157 Spray",
+    "liveCategory": "sprays",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/BPC-157-Spray-1.jpg",
+    "strength": "5 MG Per Bottle",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 3,
+    "tiers": {
+      "1-2": 89,
+      "3-5": 87,
+      "5+": 85
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/COA3030BPCNasal.pdf"
+  },
+  {
+    "slug": "cagrilintide",
+    "wooId": "498",
+    "name": "Cagrilintide",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/Cagrilintide-1.jpg",
+    "strength": "10 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 5,
+    "tiers": {
+      "1-2": 135,
+      "3-5": 128.25,
+      "5+": 121.5
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/CAGRICOA.pdf"
+  },
+  {
+    "slug": "cartalax-injectable",
+    "wooId": "2783",
+    "name": "Cartalax",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/05/cartalax.jpg",
+    "strength": "20 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 18,
+    "tiers": {
+      "1-2": 65,
+      "3-5": 62,
+      "5+": 59
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/05/Cartalax_70-202604-92_COA.pdf"
+  },
+  {
+    "slug": "cjc-1295-no-dac",
+    "wooId": "501",
+    "name": "CJC 1295 no DAC",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/CJC-1295-no-DAC-1.jpg",
+    "strength": "10 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 8,
+    "tiers": {
+      "1-2": 70,
+      "3-5": 66.5,
+      "5+": 63
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/COA3127_CJC326-1.pdf"
+  },
+  {
+    "slug": "cjc-1295-no-dac-ipamorelin-blend",
+    "wooId": "611",
+    "name": "CJC 1295 no DAC, Ipamorelin Blend",
+    "liveCategory": "peptide-blends",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/CJC-1295-no-DAC-Ipamorelin-Blend-1.jpg",
+    "strength": "5 MG/ 5 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 11,
+    "tiers": {
+      "1-2": 85,
+      "3-5": 80.75,
+      "5+": 76.5
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/CJC-1295_No_DAC_Ipamorelin_70-202607-09_COA.pdf"
+  },
+  {
+    "slug": "dihexa-semax-selank-spray",
+    "wooId": "2182",
+    "name": "Dihexa - Semax - Selank Spray",
+    "liveCategory": "sprays",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/04/Dihexa-Semax-Selank-Spray.jpg",
+    "strength": "5/5/5 MG in each Bottle",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 10,
+    "tiers": {
+      "1-2": 179,
+      "3-5": 176,
+      "5+": 172
+    },
+    "description": "A convenient and easy to use research delivery option.",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/04/COA5969triblend072026.pdf"
+  },
+  {
+    "slug": "dsip",
+    "wooId": "504",
+    "name": "DSIP",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/DSIP-1.jpg",
+    "strength": "5 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 5,
+    "tiers": {
+      "1-2": 60,
+      "3-5": 57,
+      "5+": 54
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/COA3006_dsip.pdf"
+  },
+  {
+    "slug": "dsip-spray",
+    "wooId": "625",
+    "name": "DSIP Spray",
+    "liveCategory": "sprays",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/DSIP-Spray-1.jpg",
+    "strength": "5 MG Per Bottle",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 10,
+    "tiers": {
+      "1-2": 85,
+      "3-5": 82,
+      "5+": 79
+    },
+    "description": "Delta Sleep-Inducing Peptide (DSIP) is primarily studied for its potential to improve sleep quality, induce delta-wave sleep, and treat chronic insomnia . Research also investigates its role in regulating stress (by managing cortisol), reducing pain, enhancing cognitive function, and treating withdrawal syndromes.",
+    "researchAreas": [],
+    "refs": [
+      "https://pubmed.ncbi.nlm.nih.gov/1299794/",
+      "https://pubmed.ncbi.nlm.nih.gov/6391926/"
+    ],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/COA5966DSIP.pdf"
+  },
+  {
+    "slug": "epithalon",
+    "wooId": "507",
+    "name": "EPITHALON",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/EPITHALON-2.jpg",
+    "strength": "10 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 10,
+    "tiers": {
+      "1-2": 55,
+      "3-5": 52.25,
+      "5+": 49.5
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/Epi10_COA_Z_Nov25.pdf"
+  },
+  {
+    "slug": "ghk-cu",
+    "wooId": "511",
+    "name": "GHK-Cu",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/GHK-Cu-1.jpg",
+    "strength": "50 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 6,
+    "tiers": {
+      "1-2": 55,
+      "3-5": 52.25,
+      "5+": 49.5
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/March2026GHKCUCOA.pdf"
+  },
+  {
+    "slug": "ghk-cu-capsules",
+    "wooId": "666",
+    "name": "GHK-Cu Capsules",
+    "liveCategory": "capsules",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/GHK-CuCapsules.jpg",
+    "strength": "2 MG Per Capsule",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 2,
+    "tiers": {
+      "1-2": 55,
+      "3-5": 55,
+      "5+": 55
+    },
+    "description": "Each bottle contains 60 capsules, 2mg in each capsule.\n\nGHK-Cu (glycyl-L-histidyl-L-lysine-copper) is a naturally occurring tripeptide widely studied for its regenerative, anti-aging, and anti-inflammatory properties, particularly in dermatology and wound healing . Key research areas include improving skin elasticity, reducing wrinkles, accelerating wound healing, stimulating hair growth, and potentially reversing cellular aging.\n\nSee the links below for some current available studies.",
+    "researchAreas": [],
+    "refs": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC6073405/",
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC3359723/"
+    ],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/COA3086.pdf"
+  },
+  {
+    "slug": "ghk-cu-spray",
+    "wooId": "1969",
+    "name": "GHK-CU Spray",
+    "liveCategory": "sprays",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/04/GHK-CU-spray.jpg",
+    "strength": "100mg",
+    "purity": "≥99%",
+    "outOfStock": true,
+    "stockQty": 3,
+    "tiers": {
+      "1-2": 85
+    },
+    "description": "Easy and convenient research delivery option, GHK-CU Spray, is a 100mg bottle with 500mcg per spray\n\nGHK-Cu (glycyl-l-histidyl-l-lysine copper) is a naturally occurring peptide being extensively studied for its regenerative, anti-aging, wound healing, and anti-inflammatory properties . Key research areas include skin rejuvenation, improving hair growth, enhancing wound healing in tissues, and potential therapeutic applications for lung diseases and cognitive decline.",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/04/Upgr2604100287GHKCUSPRAY-1.pdf"
+  },
+  {
+    "slug": "glow-blendbpc-157-tb-500-ghk-cu",
+    "wooId": "596",
+    "name": "Glow Blend(BPC-157, TB-500, GHK-Cu)",
+    "liveCategory": "peptide-blends",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/Glow-Blend.jpg",
+    "strength": "10 MG/ 10 MG/ 50 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 15,
+    "tiers": {
+      "1-2": 175,
+      "3-5": 166.25,
+      "5+": 157.5
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/Glow_70-202606-16_COA.pdf"
+  },
+  {
+    "slug": "glutathione",
+    "wooId": "514",
+    "name": "Glutathione",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/Glutathione-1.jpg",
+    "strength": "1500mg",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 5,
+    "tiers": {
+      "1-2": 125,
+      "3-5": 120,
+      "5+": 115
+    },
+    "description": "Glutathione is extensively studied as a potent antioxidant and therapeutic agent to combat oxidative stress in chronic diseases, neurodegeneration, and liver conditions . Key research areas include treating Parkinson’s, Alzheimer’s, fatty liver disease, cystic fibrosis, and reducing inflammation in autoimmune disorders.",
+    "researchAreas": [],
+    "refs": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC4684116/",
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC9616098/",
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC5413479/"
+    ],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/GlutathioneCOA2026.pdf"
+  },
+  {
+    "slug": "glutathione-nasal-spray",
+    "wooId": "630",
+    "name": "Glutathione Nasal Spray",
+    "liveCategory": "sprays",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/Glutathione-Nasal-Spray-1.jpg",
+    "strength": "500 MG Per Bottle",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 5,
+    "tiers": {
+      "1-2": 85,
+      "3-5": 80.75,
+      "5+": 76.5
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/COA3027GlutathioneNasal.pdf"
+  },
+  {
+    "slug": "igf-1-lr3",
+    "wooId": "517",
+    "name": "IGF-1 LR3",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/IGF-1-LR3-1.jpg",
+    "strength": "1 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 5,
+    "tiers": {
+      "1-2": 98,
+      "3-5": 93.1,
+      "5+": 88.2
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/IGF1_COA_N_Feb2026.pdf"
+  },
+  {
+    "slug": "ipamorelin",
+    "wooId": "520",
+    "name": "Ipamorelin",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/Ipamorelin-1.jpg",
+    "strength": "10 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 9,
+    "tiers": {
+      "1-2": 70,
+      "3-5": 66.5,
+      "5+": 63
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/Upgr2512120038.pdf"
+  },
+  {
+    "slug": "kisspeptin-10",
+    "wooId": "523",
+    "name": "KISSPEPTIN-10",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/KISSPEPTIN-10-2.jpg",
+    "strength": "10 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 2,
+    "tiers": {
+      "1-2": 60,
+      "3-5": 57,
+      "5+": 54
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/COA2787Kisspeptin.pdf"
+  },
+  {
+    "slug": "klow-blendbpc-157-tb-500-kpv-ghk-cu",
+    "wooId": "604",
+    "name": "KLOW Blend(BPC-157, TB-500, KPV, GHK-Cu)",
+    "liveCategory": "peptide-blends",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/KLOW-Blend-1.jpg",
+    "strength": "10 MG/ 10 MG/ 10 MG/ 50 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 13,
+    "tiers": {
+      "1-2": 175,
+      "3-5": 166.25,
+      "5+": 157.5
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/Klow_70-202607-20_COA.pdf"
+  },
+  {
+    "slug": "klow-capsulesbpc-157-tb-500-kpv-ghk-cu",
+    "wooId": "671",
+    "name": "KLOW Capsules(BPC-157, TB-500, KPV, GHK-Cu)",
+    "liveCategory": "capsules",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/KLOW-Capsules-1.jpg",
+    "strength": "500 MCG, 1MG Per Capsule",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 3,
+    "tiers": {
+      "1-2": 150,
+      "3-5": 142.5,
+      "5+": 135
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/KLOW-caps_COA_B_Feb2026.pdf"
+  },
+  {
+    "slug": "kpv",
+    "wooId": "526",
+    "name": "KPV",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/KPV-1.jpg",
+    "strength": "10 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 12,
+    "tiers": {
+      "1-2": 75,
+      "3-5": 71.25,
+      "5+": 67.5
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/COA2656KPV.pdf"
+  },
+  {
+    "slug": "kpv-capsules",
+    "wooId": "675",
+    "name": "KPV Capsules",
+    "liveCategory": "capsules",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/KPV-Capsules-1.jpg",
+    "strength": "500 MCG Per Capsule",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 4,
+    "tiers": {
+      "1-2": 90,
+      "3-5": 81,
+      "5+": 72.9
+    },
+    "description": "Each bottle contains 60 capsules, each containing 500mcg\n\nKPV (Lys-Pro-Val) is a tripeptide derived from α-melanocyte-stimulating hormone (α-MSH) that is primarily being studied for its potent anti-inflammatory, antimicrobial, and wound-healing properties . It is considered a promising therapeutic candidate for chronic inflammatory conditions, particularly those affecting the gastrointestinal tract and skin, due to its ability to modulate immune responses without broad immunosuppression.",
+    "researchAreas": [],
+    "refs": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC2431115/"
+    ],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/COA3084.pdf"
+  },
+  {
+    "slug": "kpv-spray",
+    "wooId": "2184",
+    "name": "KPV Spray",
+    "liveCategory": "sprays",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/04/KPV-Spray.jpg",
+    "strength": "10 MG Per Bottle",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 7,
+    "tiers": {
+      "1-2": 89,
+      "3-5": 85,
+      "5+": 80
+    },
+    "description": "Easy and convenient delivery option for your research needs.",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/04/COA261345-QC261253-KPV.pdf"
+  },
+  {
+    "slug": "ll-37",
+    "wooId": "529",
+    "name": "LL-37",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/LL-37-1.jpg",
+    "strength": "5 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 10,
+    "tiers": {
+      "1-2": 95,
+      "3-5": 90.25,
+      "5+": 85.5
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/COA3091_LL-37.pdf"
+  },
+  {
+    "slug": "methylene-blue",
+    "wooId": "693",
+    "name": "Methylene Blue",
+    "liveCategory": "liquids",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/Methylene-Blue-3.jpg",
+    "strength": "12 MG/ML",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 3,
+    "tiers": {
+      "1-2": 32,
+      "3-5": 32,
+      "5+": 32
+    },
+    "description": "Methylene blue is a synthetic compound used as both a vibrant dye (in histology/textiles) and a medical drug . It is FDA-approved to treat methemoglobinemia (a blood disorder) and acts as an antioxidant that enhances mitochondrial efficiency, leading to its, often unregulated, use as a cognitive-boosting \"nootropic\" supplement.",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/MB_COA_B_Mar2026.pdf"
+  },
+  {
+    "slug": "mk-677-capsules",
+    "wooId": "1083",
+    "name": "MK-677 Capsules",
+    "liveCategory": "capsules",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/03/MK-677-Capsules-1.jpg",
+    "strength": "12.5 MG Per Capsule",
+    "purity": "≥99%",
+    "outOfStock": true,
+    "stockQty": 0,
+    "tiers": {
+      "1-2": 45.99,
+      "3-5": 45,
+      "5+": 45
+    },
+    "description": "MK-677 (Ibutamoren) is an investigational, non-peptide growth hormone (GH) secretagogue being studied to treat growth hormone deficiencies, sarcopenia (muscle wasting) in the elderly, and frailty. It stimulates GH and IGF-1 production to increase lean muscle mass, improve bone density, treat catabolic states, and improve sleep quality.",
+    "researchAreas": [],
+    "refs": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC6240568/",
+      "https://pubmed.ncbi.nlm.nih.gov/9467534/"
+    ],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/03/COA3110.pdf"
+  },
+  {
+    "slug": "mots-c",
+    "wooId": "993",
+    "name": "MOTS-C",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/03/MOTS-c-1.jpg",
+    "strength": "10 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 15,
+    "tiers": {
+      "1-2": 75,
+      "3-5": 71.25,
+      "5+": 67.5
+    },
+    "description": "MOTS-c (mitochondrial open reading frame of the 12S rRNA-c) is a mitochondrial-derived peptide being heavily studied for its role in regulating metabolism, enhancing insulin sensitivity, and promoting longevity . Research focuses on its potential to reverse age- and diet-dependent insulin resistance, combat obesity, improve physical performance/exercise capacity, and reduce age-related metabolic decline.",
+    "researchAreas": [
+      {
+        "title": "Metabolic Disease and Diabetes",
+        "body": "MOTS-c increases glucose clearance, acts as an exercise-induced hormone, and has shown promise in reducing obesity and insulin resistance in high-fat diet mouse models."
+      },
+      {
+        "title": "Aging and Longevity",
+        "body": "Studies indicate MOTS-c levels decline with age and that supplementation can restore metabolic homeostasis and protect against age-related decline."
+      },
+      {
+        "title": "Physical Performance and Muscle Function",
+        "body": "Research has shown that MOTS-c treatment can double running capacity in mice and enhance skeletal muscle metabolism. It is being investigated to increase muscle mass and exercise capacity."
+      },
+      {
+        "title": "Cardiovascular Protection",
+        "body": "Studies suggest MOTS-c protects against coronary endothelial cell dysfunction by reducing oxidative stress and inhibiting inflammation."
+      },
+      {
+        "title": "Bone Metabolism",
+        "body": "Research has shown it promotes osteogenic differentiation and protects bone mass."
+      },
+      {
+        "title": "Neuroprotection",
+        "body": "Research shows MOTS-c may reduce neuroinflammation, improve memory recognition, and combat memory deficits."
+      }
+    ],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/03/MOTS-c_70-202607-29_COA.pdf"
+  },
+  {
+    "slug": "mt-ii",
+    "wooId": "980",
+    "name": "MT II",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/03/MT-II.jpg",
+    "strength": "10 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 8,
+    "tiers": {
+      "1-2": 50,
+      "3-5": 47.5,
+      "5+": 45
+    },
+    "description": "Melanotan II (MT-2) is a synthetic peptide analog of a -melanocyte-stimulating hormone (a-MSH) primarily studied for inducing skin tanning, protecting against UV-induced skin damage, and treating sexual dysfunction. Research also explores its potential for appetite regulation, weight loss, and treating neurodegenerative conditions, though it is not FDA-approved and carries significant safety concerns.",
+    "researchAreas": [],
+    "refs": [
+      "https://pubmed.ncbi.nlm.nih.gov/34464955/"
+    ],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/03/Melanotan-2_KVR-2026-723179.pdf"
+  },
+  {
+    "slug": "nad",
+    "wooId": "535",
+    "name": "NAD+",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/NAD-1.jpg",
+    "strength": "500 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 19,
+    "tiers": {
+      "1-2": 60,
+      "3-5": 57,
+      "5+": 54
+    },
+    "description": "NAD+ (nicotinamide adenine dinucleotide) is being heavily studied for its potential to reverse cellular aging, boost metabolism, and treat age-related diseases . Research focuses on restoring declining NAD+ levels to enhance DNA repair, improve mitochondrial function, reduce neuroinflammation, and support cardiovascular health, primarily using precursors like NMN and NR.",
+    "researchAreas": [
+      {
+        "title": "Anti-Aging and Longevity",
+        "body": "Studies explore how NAD+ activates sirtuins and PARPs, enzymes that repair DNA and regulate cellular health, essentially delaying the hallmarks of aging."
+      },
+      {
+        "title": "Neurodegenerative Diseases",
+        "body": "Research suggests NAD+ can protect against Alzheimer's by reducing neuroinflammation, lowering beta-amyloid levels, and improving cognitive function."
+      },
+      {
+        "title": "Metabolic Disorders",
+        "body": "NAD+ is studied for treating obesity, type 2 diabetes, and fatty liver disease by improving insulin sensitivity and enhancing mitochondrial energy production."
+      },
+      {
+        "title": "Cardiovascular Health",
+        "body": "Studies investigate its role in lowering blood pressure, reducing arterial stiffness, and protecting against heart failure."
+      },
+      {
+        "title": "COVID-19 and Immune Support",
+        "body": "Research examines if boosting NAD+ can combat inflammation (cytokine storms) and support immune responses."
+      },
+      {
+        "title": "Addiction and Fatigue",
+        "body": "Emerging research suggests NAD+ may assist in reducing cravings for substances and managing chronic fatigue."
+      }
+    ],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/Upgr2512090073.pdf"
+  },
+  {
+    "slug": "nad-500-spray",
+    "wooId": "635",
+    "name": "NAD+ 500 Spray",
+    "liveCategory": "sprays",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/NAD500-Spray-1.jpg",
+    "strength": "500 MG Per Bottle",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 16,
+    "tiers": {
+      "1-2": 109,
+      "3-5": 109,
+      "5+": 109
+    },
+    "description": "NAD+ Spray, 500mg per bottle, 5mg per spray. An easy and convenient delivery option for your research needs.\n\nNAD+ (nicotinamide adenine dinucleotide) is a vital coenzyme found in all living cells, essential for energy production, DNA repair, and cellular maintenance . Because natural NAD+ levels decline with age, it is a major area of research in medicine and longevity.\n\nMajor areas of clinical and preclinical research include:",
+    "researchAreas": [
+      {
+        "title": "Cellular Aging and Longevity",
+        "body": ""
+      },
+      {
+        "title": "Neurological and Cognitive Health",
+        "body": ""
+      },
+      {
+        "title": "Metabolic Health",
+        "body": ""
+      },
+      {
+        "title": "Cardiovascular Function",
+        "body": ""
+      },
+      {
+        "title": "Addiction and Mental Health",
+        "body": ""
+      }
+    ],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/COA6244.pdf"
+  },
+  {
+    "slug": "oxytocin-spray",
+    "wooId": "639",
+    "name": "Oxytocin Spray",
+    "liveCategory": "sprays",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/Oxytocin-Spray-1.jpg",
+    "strength": "50 MCG per spray",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 9,
+    "tiers": {
+      "1-2": 89,
+      "3-5": 86,
+      "5+": 83
+    },
+    "description": "Oxytocin 5mg spray provides flexibility in your research delivery options. Each spray is 50mcg.\n\nOxytocin is being studied as a therapeutic agent for various psychiatric, neurological, and social disorders due to its role in bonding, stress regulation, and social behavior. Major research areas include intranasal applications for autism spectrum disorder , social anxiety , post-traumatic stress disorder (PTSD), depression, schizophrenia, and binge eating disorders.",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/Oxytocin72026.pdf"
+  },
+  {
+    "slug": "pinealon",
+    "wooId": "1977",
+    "name": "Pinealon",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/04/Pinealon.jpg",
+    "strength": "20 MG",
+    "purity": "≥99%",
+    "outOfStock": true,
+    "stockQty": 8,
+    "tiers": {
+      "1-2": 109,
+      "3-5": 104,
+      "5+": 98
+    },
+    "description": "Pinealon (Glu-Asp-Arg) is a synthetic tripeptide studied primarily for its neuroprotective , cognitive-enhancing , and anti-aging effects on the central nervous system . It is researched to improve memory, attention, and mental performance in the elderly, as well as to combat age-related brain dysfunction, oxidative stress, and neuronal damage",
+    "researchAreas": [
+      {
+        "title": "Neuroprotection & Cognitive Enhancement",
+        "body": "Studies indicate Pinealon can reduce neuronal apoptosis (cell death) and improve memory, attention, and cognitive function, particularly in older individuals. It is often explored for its potential to slow cognitive decline."
+      },
+      {
+        "title": "Brain Cell Resilience",
+        "body": "Research suggests Pinealon increases brain neuron resistance to hypoxia (low oxygen) and minimizes damage from excitotoxicity. It is studied for its ability to reduce reactive oxygen species (ROS) and support neuron survival, say sources like Biotech Peptides and PubMed ."
+      },
+      {
+        "title": "Anti-Aging & Gene Expression",
+        "body": "Pinealon is studied as a \"geroprotector,\" aimed at reducing the rate of aging in patients with organic brain syndrome. It may improve the expression of genes related to brain protein synthesis."
+      },
+      {
+        "title": "Sleep & Mood Regulation",
+        "body": "Studies have suggested Pinealon can help manage shift work disorder, improve sleep quality (including REM sleep), and treat seasonal affective disorder."
+      },
+      {
+        "title": "Mechanism of Action",
+        "body": "It is believed to act on the central nervous system by promoting gene expression, which helps regulate protein production and enhance synaptic plasticity. National Institutes of Health (.gov) +6"
+      }
+    ],
+    "refs": [
+      "https://pubmed.ncbi.nlm.nih.gov/26390612/"
+    ],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/04/Pinealon_70-202604-71_COA.pdf"
+  },
+  {
+    "slug": "pt-141",
+    "wooId": "551",
+    "name": "PT-141",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/PT-141-1.jpg",
+    "strength": "10 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 14,
+    "tiers": {
+      "1-2": 60,
+      "3-5": 57,
+      "5+": 54
+    },
+    "description": "PT-141 (Bremelanotide) is primarily studied and used to treat sexual dysfunction by acting directly on the central nervous system to increase sexual desire. It is FDA-approved for treating acquired, generalized Hypoactive Sexual Desire Disorder (HSDD) in premenopausal women and is studied for treating erectile dysfunction and low libido in men",
+    "researchAreas": [
+      {
+        "title": "Hypoactive Sexual Desire Disorder (HSDD)",
+        "body": "Evaluated for treating low sexual desire not caused by medical/mental health conditions, relationship issues, or drugs."
+      },
+      {
+        "title": "Erectile Dysfunction (ED)",
+        "body": "Studied as a treatment for men who fail to respond to PDE5 inhibitors (like Viagra), as PT-141 works through the nervous system, not just blood flow."
+      },
+      {
+        "title": "Female Sexual Arousal Disorder",
+        "body": "Targeted to help with desire and arousal issues."
+      },
+      {
+        "title": "Mechanism of Action",
+        "body": "Research focuses on its role as a melanocortin receptor agonist (specifically MC4R), which initiates sexual desire in the brain."
+      }
+    ],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/COA3008-1-1.pdf"
+  },
+  {
+    "slug": "pt-141-spray",
+    "wooId": "644",
+    "name": "PT-141 Spray",
+    "liveCategory": "sprays",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/PT-141-Spray-1.jpg",
+    "strength": "10 MG Per Bottle",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 16,
+    "tiers": {
+      "1-2": 118,
+      "3-5": 115,
+      "5+": 112
+    },
+    "description": "PT-141 (Bremelanotide) is primarily studied and researched to treat sexual dysfunction. It acts directly on the central nervous system to increase sexual desire. While our site is for research use only, this peptide is FDA-approved for treating acquired, generalized Hypoactive Sexual Desire Disorder (HSDD) in premenopausal women and is studied for treating erectile dysfunction and low libido in men.",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/COA6265-1.pdf"
+  },
+  {
+    "slug": "rt-3",
+    "wooId": "1617",
+    "name": "RT-3",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/03/GLP-RT3-1.jpg",
+    "strength": "10 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 28,
+    "tiers": {
+      "1-2": 135,
+      "3-5": 128,
+      "5+": 122
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC12190491/"
+    ],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/03/Retatrutide_70-202607-35_COA.pdf"
+  },
+  {
+    "slug": "selank",
+    "wooId": "1261",
+    "name": "SELANK",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/03/SELANK-2.jpg",
+    "strength": "10 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 6,
+    "tiers": {
+      "1-2": 89,
+      "3-5": 86,
+      "5+": 82
+    },
+    "description": "Selank is a synthetic regulatory peptide primarily studied for its potent anxiolytic (anti-anxiety) , antistress , and nootropic (cognitive-enhancing) effects , often acting without the sedative or addictive side effects of benzodiazepines. It is heavily researched for managing Generalized Anxiety Disorder (GAD), neurasthenia , cognitive improvement , and immune modulation .",
+    "researchAreas": [],
+    "refs": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC4757669/",
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC5322660/",
+      "https://pubmed.ncbi.nlm.nih.gov/32342318/"
+    ],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/03/Selank_70-202607-38_COA.pdf"
+  },
+  {
+    "slug": "selank-spray",
+    "wooId": "555",
+    "name": "Selank Spray",
+    "liveCategory": "sprays",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/Selank-Spray-2.jpg",
+    "strength": "5 MG Per Bottle",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 9,
+    "tiers": {
+      "1-2": 89,
+      "3-5": 86,
+      "5+": 83
+    },
+    "description": "Selank Spray will be back in stock in early July 2026.",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/SelankSpray_COA_B_Feb2026-1.pdf"
+  },
+  {
+    "slug": "semax",
+    "wooId": "558",
+    "name": "SEMAX",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/SEMAX-1.jpg",
+    "strength": "10 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 7,
+    "tiers": {
+      "1-2": 60,
+      "3-5": 57,
+      "5+": 54
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/COA2784Semax.pdf"
+  },
+  {
+    "slug": "semax-selank-spray",
+    "wooId": "1233",
+    "name": "Semax / Selank Spray",
+    "liveCategory": "sprays",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/03/Semax-Selank-Spray-3.jpg",
+    "strength": "5mg per bottle",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 5,
+    "tiers": {
+      "1-2": 135,
+      "3-5": 131,
+      "5+": 127
+    },
+    "description": "Selank 5mg / Semax 5mg spray allows for flexibility is administration of your research. Easy to use and convenient.",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/03/COA4217SemaxSelank42026.pdf"
+  },
+  {
+    "slug": "semax-spray",
+    "wooId": "648",
+    "name": "Semax Spray",
+    "liveCategory": "sprays",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/Semax-Spray-1.jpg",
+    "strength": "5mg per bottle",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 22,
+    "tiers": {
+      "1-2": 89,
+      "3-5": 87,
+      "5+": 85
+    },
+    "description": "Semax 5mg spray allows for flexibility of delivery in your research. Each spray is 50mcg.\n\nSemax is a synthetic peptide studied primarily for its neuroprotective , cognitive-enhancing , and nootropic properties . Key areas of research include accelerating stroke recovery, treating Alzheimer’s /Parkinson’s disease, reversing cognitive decline , enhancing memory/focus, reducing anxiety/depression , and facilitating rehabilitation after traumatic brain injuries.",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/COA5971Semax072026.pdf"
+  },
+  {
+    "slug": "sermorelin",
+    "wooId": "561",
+    "name": "SERMORELIN",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/SERMORELIN-2.jpg",
+    "strength": "5 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 7,
+    "tiers": {
+      "1-2": 55,
+      "3-5": 52.25,
+      "5+": 49.5
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/COA2898sermorelin.pdf"
+  },
+  {
+    "slug": "slu-pp-332-capsules",
+    "wooId": "683",
+    "name": "SLU-PP-332 CAPSULES",
+    "liveCategory": "capsules",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/SLU-PP-332-CAPSULES-1.jpg",
+    "strength": "250 MCG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 8,
+    "tiers": {
+      "1-2": 85,
+      "3-5": 85,
+      "5+": 85
+    },
+    "description": "SLU-PP-332 is an experimental drug being studied as an \"exercise mimetic\" to treat metabolic diseases, primarily obesity, diabetes, and related conditions . It acts as an estrogen receptor-related orphan receptor (ERR) agonist, forcing the body to burn more fat and increase energy expenditure as if it were performing high-intensity exercise.",
+    "researchAreas": [
+      {
+        "title": "Obesity and Weight Management",
+        "body": "Studies show it can reduce fat mass in mice by over 10 times without altering food intake or requiring physical training."
+      },
+      {
+        "title": "Metabolic Health",
+        "body": "It improves insulin sensitivity and reduces fat accumulation, showing promise for treating metabolic syndrome."
+      },
+      {
+        "title": "Muscle and Endurance Boost",
+        "body": "It increases mitochondrial function and oxidative fibers in skeletal muscle, improving endurance."
+      },
+      {
+        "title": "Cardioprotection",
+        "body": "Research points to potential benefits in treating heart failure and protecting against kidney dysfunction."
+      }
+    ],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/Upgr2607151036.pdf"
+  },
+  {
+    "slug": "ss-31",
+    "wooId": "579",
+    "name": "SS-31",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/SS-31-1.jpg",
+    "strength": "10 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 2,
+    "tiers": {
+      "1-2": 95,
+      "3-5": 90.25,
+      "5+": 85.5
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/COA2963SS31.pdf"
+  },
+  {
+    "slug": "tb-500",
+    "wooId": "581",
+    "name": "TB-500",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/TB-500-1.jpg",
+    "strength": "10 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 10,
+    "tiers": {
+      "1-2": 75,
+      "3-5": 71.25,
+      "5+": 67.5
+    },
+    "description": "TB-500 is a synthetic peptide (fragment of Thymosin β-4) primarily studied for its potential to accelerate healing, reduce inflammation, and promote tissue regeneration in muscles, ligaments, tendons, and skin . Research focuses on its role in stimulating actin to repair soft tissue, aiding injury recovery, reducing scar tissue, and enhancing angiogenesis (blood vessel formation).",
+    "researchAreas": [],
+    "refs": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC8228050/",
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC12753158/"
+    ],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/COA3123TB500_326.pdf"
+  },
+  {
+    "slug": "tesamorelin",
+    "wooId": "584",
+    "name": "TESAMORELIN",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/TESAMORELIN-1.jpg",
+    "strength": "10 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 9,
+    "tiers": {
+      "1-2": 95,
+      "3-5": 90.25,
+      "5+": 85.5
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/Tesamorelin_70-202605-54_COA.pdf"
+  },
+  {
+    "slug": "tesamorelin-ipamorelin-blend",
+    "wooId": "614",
+    "name": "Tesamorelin, Ipamorelin Blend",
+    "liveCategory": "peptide-blends",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/Tesamorelin-Ipamorelin-Blend-1.jpg",
+    "strength": "10 MG/ 5 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 15,
+    "tiers": {
+      "1-2": 125,
+      "3-5": 118,
+      "5+": 112
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/Tesamorelin_Ipamorelin_70-202607-52_COA.pdf"
+  },
+  {
+    "slug": "tesofensine-capsules",
+    "wooId": "2774",
+    "name": "Tesofensine Capsules",
+    "liveCategory": "capsules",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/05/tesofensine-1.jpg",
+    "strength": "250 MCG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 11,
+    "tiers": {
+      "1-2": 149,
+      "3-5": 145,
+      "5+": 140
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/05/V260511-22-Upgrade-Wellness-Report-001-1.pdf"
+  },
+  {
+    "slug": "the-hair-blendminoxidil-ru-58841-finasteride",
+    "wooId": "688",
+    "name": "The Hair Blend(Minoxidil, RU-58841, Finasteride)",
+    "liveCategory": "liquids",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/The-Hair-Blend-1.jpg",
+    "strength": "10%, 25 MG/ML, 500 MCG/ML",
+    "purity": "≥99%",
+    "outOfStock": true,
+    "stockQty": 0,
+    "tiers": {
+      "1-2": 125,
+      "3-5": 118.75,
+      "5+": 112.5
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/COA3107_Hair.pdf"
+  },
+  {
+    "slug": "thymosin-alpha-1",
+    "wooId": "587",
+    "name": "THYMOSIN ALPHA-1",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/THYMOSIN-ALPHA-1-1.jpg",
+    "strength": "10 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 14,
+    "tiers": {
+      "1-2": 105,
+      "3-5": 99.75,
+      "5+": 94.5
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/TA1COA326-1.pdf"
+  },
+  {
+    "slug": "tz-2",
+    "wooId": "1625",
+    "name": "TZ-2",
+    "liveCategory": "peptides",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/03/GLP-TZ2-1.jpg",
+    "strength": "10 MG",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 6,
+    "tiers": {
+      "1-2": 115,
+      "3-5": 109,
+      "5+": 104
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/03/Tirzepatide_70-202607-57_COA.pdf"
+  },
+  {
+    "slug": "wolverine-blend-spraybpc-157-tb-500",
+    "wooId": "621",
+    "name": "Wolverine Blend Spray(BPC-157, TB-500)",
+    "liveCategory": "sprays",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/Wolverine-Blend-Spray.jpg",
+    "strength": "5 MG, 5 MG Per Bottle",
+    "purity": "≥99%",
+    "outOfStock": false,
+    "stockQty": 6,
+    "tiers": {
+      "1-2": 129,
+      "3-5": 126,
+      "5+": 123
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/COA3083BPCTBNasal.pdf"
+  },
+  {
+    "slug": "wolverine-blendbpc-157-tb-500",
+    "wooId": "599",
+    "name": "Wolverine Blend(BPC-157, TB-500)",
+    "liveCategory": "peptide-blends",
+    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/Wolverine-Blend-1.jpg",
+    "strength": "5 MG/ 5 MG",
+    "purity": "≥99%",
+    "outOfStock": true,
+    "stockQty": 7,
+    "tiers": {
+      "1-2": 95,
+      "3-5": 90.25,
+      "5+": 85.5
+    },
+    "description": "",
+    "researchAreas": [],
+    "refs": [],
+    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/BB20COA326.pdf"
+  }
+]
