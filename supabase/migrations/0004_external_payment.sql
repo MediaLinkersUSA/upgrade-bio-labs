@@ -73,6 +73,12 @@ alter table public.orders
 -- ------------------------------------------------------------- fulfilment
 -- WooCommerce gave the client a status dropdown and somewhere to put a
 -- tracking number. Both have to exist here or that record is simply lost.
+-- The join to WooCommerce. Orders are mirrored there because ShipStation,
+-- UPS Labels and UBL Invoices all read from it; this is how a status change
+-- here finds the right order there.
+alter table public.orders add column if not exists woo_order_id integer;
+create index if not exists orders_woo_id_idx on public.orders (woo_order_id);
+
 alter table public.orders add column if not exists tracking_number  text;
 alter table public.orders add column if not exists tracking_carrier text;
 alter table public.orders add column if not exists shipped_at       timestamptz;

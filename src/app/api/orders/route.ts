@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getProduct } from "@/data/products";
 import { unitPriceAt } from "@/lib/pricing";
-import { computeTotals } from "@/lib/totals";
+import { computeTotals, listUnitPrice } from "@/lib/totals";
 import { findPromo } from "@/lib/promo";
 import {
   checkFirstOrderEligibility,
@@ -13,9 +13,10 @@ import { cookies } from "next/headers";
 import { paymentMethod, generateOrderNumber } from "@/lib/checkout";
 import { shippingMethod } from "@/lib/config";
 import { isSupabaseConfigured } from "@/lib/supabase";
-import { createOrder } from "@/lib/order-store";
+import { createOrder, recordWooId } from "@/lib/order-store";
 import { paymentUrlFor, originFromRequest } from "@/lib/payment";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
+import { mirrorOrderToWoo } from "@/lib/woocommerce";
 
 /**
  * Creates an order. This is the only way an order comes into existence.
@@ -175,6 +176,47 @@ export async function POST(req: Request) {
       { error: "We could not record that order. Please contact us." },
       { status: 500 }
     );
+  }
+
+  // Mirror into WooCommerce, where ShipStation, UPS Labels and UBL Invoices
+  // pick orders up. Awaited so a mirror failure is logged against the request
+  // that caused it, but its result is deliberately ignored: the order is
+  // already recorded above, and a WordPress outage must not cost the sale.
+  const mirrored = await mirrorOrderToWoo({
+    orderNumber,
+    status: method.instant ? "pending_payment" : "awaiting_payment",
+    paymentMethod: method.id,
+    email: String(c.email).trim().toLowerCase(),
+    phone: String(c.phone ?? "").trim() || null,
+    notes: String(c.notes ?? "").trim() || null,
+    firstName: String(c.firstName ?? ""),
+    lastName: String(c.lastName ?? ""),
+    address1: String(c.address1 ?? ""),
+    address2: String(c.address2 ?? ""),
+    city: String(c.city ?? ""),
+    state: String(c.state ?? ""),
+    zip: String(c.zip ?? ""),
+    shippingLabel: `${ship.label} (${ship.eta})`,
+    shippingCents: cents(totals.shipping),
+    // Tier savings are carried per line; only the order-level portion of the
+    // discount becomes a fee line, or it would be subtracted twice.
+    orderDiscountCents: cents(totals.totalDiscount - totals.tierSavings),
+    items: items.map((i) => ({
+      slug: i.product.slug,
+      name: i.product.name,
+      size: i.size,
+      quantity: i.qty,
+      listCents: cents(listUnitPrice(i.product, i.size) * i.qty),
+      lineCents: cents(i.unit * i.qty),
+    })),
+  });
+
+  if (mirrored.ok) {
+    await recordWooId(saved.id, mirrored.wooId);
+  } else {
+    // Left for reconciliation rather than retried inline - the customer is
+    // waiting, and a WordPress that just timed out will time out again.
+    console.error(`[orders] ${orderNumber} not mirrored:`, mirrored.error);
   }
 
   const res = NextResponse.json({

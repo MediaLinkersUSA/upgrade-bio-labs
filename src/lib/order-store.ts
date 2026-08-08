@@ -149,6 +149,40 @@ export async function createOrder(input: OrderInput): Promise<OrderResult> {
   return { ok: true, id: data.id, legacy };
 }
 
+/**
+ * Records the WooCommerce order id against our row.
+ *
+ * This is the join between the two systems: it is what lets a status change
+ * here reach the right order there, and what stops a reconciliation job
+ * mirroring the same order twice.
+ *
+ * Stored in the shipping_address blob when the dedicated column is missing,
+ * same as everything else that predates the migration.
+ */
+export async function recordWooId(id: string, wooId: number): Promise<void> {
+  const db = getSupabaseAdmin();
+  if (!db) return;
+
+  const { error } = await db.from("orders").update({ woo_order_id: wooId }).eq("id", id);
+  if (!isMissingSchema(error)) {
+    if (error) console.error("[woo] could not record id", error.message);
+    return;
+  }
+
+  const { data } = await db
+    .from("orders")
+    .select("shipping_address")
+    .eq("id", id)
+    .maybeSingle();
+
+  await db
+    .from("orders")
+    .update({
+      shipping_address: { ...(data?.shipping_address ?? {}), woo_order_id: wooId },
+    })
+    .eq("id", id);
+}
+
 // -------------------------------------------------------------------- read
 
 export type StoredOrder = {
@@ -163,6 +197,7 @@ export type StoredOrder = {
   discountCents: number;
   shippingCents: number;
   totalCents: number;
+  wooOrderId: number | null;
   createdAt: string;
   items: { name: string; size: string | null; quantity: number; lineCents: number }[];
 };
@@ -211,6 +246,7 @@ export async function getOrder(id: string): Promise<StoredOrder | null> {
     discountCents: data.discount_cents ?? 0,
     shippingCents: data.shipping_cents ?? 0,
     totalCents: data.total_cents ?? 0,
+    wooOrderId: data.woo_order_id ?? addr?.woo_order_id ?? null,
     createdAt: data.created_at,
     items: (data.order_items ?? []).map(
       (i: Record<string, unknown>) => ({

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { isAdmin } from "@/lib/admin-auth";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { isOrderStatus, SHIPPED_STATUSES } from "@/lib/order-status";
+import { getOrder } from "@/lib/order-store";
+import { updateWooStatus } from "@/lib/woocommerce";
 
 /**
  * Updates the fulfilment state of one order. Admin session required.
@@ -108,6 +110,23 @@ export async function PATCH(req: Request) {
   }
   if (!data) {
     return NextResponse.json({ error: "Unknown order." }, { status: 404 });
+  }
+
+  // Push the same change into WooCommerce so the two do not disagree about
+  // what has shipped. One-way and best-effort: their fulfilment tools read Woo,
+  // so Woo being stale matters, but a Woo outage must not block the dashboard.
+  if (patch.status) {
+    const stored = await getOrder(id);
+    if (stored?.wooOrderId) {
+      const pushed = await updateWooStatus(stored.wooOrderId, String(patch.status));
+      if (!pushed) {
+        return NextResponse.json({
+          ok: true,
+          order: data,
+          warning: "Saved here, but WooCommerce did not accept the status change.",
+        });
+      }
+    }
   }
 
   return NextResponse.json({ ok: true, order: data });
