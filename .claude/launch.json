@@ -13,6 +13,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev", "--prefix", "/Users/devinitzikman/sleeps-class"],
       "port": 3777
+    },
+    {
+      "name": "strenght",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "/Users/devinitzikman/strenght", "--", "-p", "3005"],
+      "port": 3005
     }
   ]
 }
