@@ -127,6 +127,11 @@ export type WooMirrorInput = {
    * subtracts the tier saving twice and understates the order.
    */
   orderDiscountCents: number;
+  /** Affiliate attribution, if any. Meta-only - Woo's own totals are untouched;
+   *  the commission is tracked in our own database, not deducted here. */
+  refCode?: string | null;
+  affiliateName?: string | null;
+  commissionCents?: number;
 };
 
 const dollars = (cents: number) => (cents / 100).toFixed(2);
@@ -202,6 +207,13 @@ export async function mirrorOrderToWoo(
       // already mirrored instead of creating them twice.
       { key: "_ubl_order_number", value: input.orderNumber },
       { key: "_ubl_source", value: "storefront" },
+      ...(input.refCode
+        ? [
+            { key: "_ubl_affiliate_code", value: input.refCode },
+            { key: "_ubl_affiliate_name", value: input.affiliateName ?? "" },
+            { key: "_ubl_commission", value: dollars(input.commissionCents ?? 0) },
+          ]
+        : []),
     ],
   };
 

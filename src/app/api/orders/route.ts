@@ -17,6 +17,7 @@ import { createOrder, recordWooId } from "@/lib/order-store";
 import { paymentUrlFor, originFromRequest } from "@/lib/payment";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
 import { mirrorOrderToWoo } from "@/lib/woocommerce";
+import { REF_COOKIE, findAffiliate, computeCommissionCents } from "@/lib/affiliates";
 
 /**
  * Creates an order. This is the only way an order comes into existence.
@@ -119,6 +120,16 @@ export async function POST(req: Request) {
   });
   const ship = shippingMethod(String(body.shippingMethod ?? "standard"));
 
+  // Affiliate attribution, if the visit that led here carried ?ref=. Looked
+  // up here rather than trusted from the cookie value alone, so an inactive
+  // or made-up code simply credits nobody instead of recording a commission
+  // against an affiliate that does not exist.
+  const refCode = jar.get(REF_COOKIE)?.value ?? null;
+  const affiliate = await findAffiliate(refCode);
+  const commissionCents = affiliate
+    ? computeCommissionCents(cents(totals.total), cents(totals.shipping), affiliate.commissionBps)
+    : 0;
+
   const orderNumber = generateOrderNumber();
 
   if (!isSupabaseConfigured()) {
@@ -160,6 +171,9 @@ export async function POST(req: Request) {
     totalCents: cents(totals.total),
     distinctCompounds: totals.distinctCompounds,
     discountRate: totals.discountRate,
+    refCode: affiliate?.code ?? null,
+    affiliateId: affiliate?.id ?? null,
+    commissionCents,
     items: items.map((i) => ({
       slug: i.product.slug,
       name: i.product.name,
@@ -201,6 +215,9 @@ export async function POST(req: Request) {
     // Tier savings are carried per line; only the order-level portion of the
     // discount becomes a fee line, or it would be subtracted twice.
     orderDiscountCents: cents(totals.totalDiscount - totals.tierSavings),
+    refCode: affiliate?.code ?? null,
+    affiliateName: affiliate?.name ?? null,
+    commissionCents,
     items: items.map((i) => ({
       slug: i.product.slug,
       name: i.product.name,

@@ -44,6 +44,10 @@ export type OrderInput = {
   totalCents: number;
   distinctCompounds: number;
   discountRate: number;
+  /** Affiliate attribution, from the ubl_ref cookie. Null on an unreferred order. */
+  refCode: string | null;
+  affiliateId: string | null;
+  commissionCents: number;
   items: {
     slug: string;
     name: string;
@@ -82,11 +86,28 @@ export async function createOrder(input: OrderInput): Promise<OrderResult> {
     order_notes: input.notes,
     shipping_name: input.shippingName,
     shipping_address: input.shippingAddress,
+    ref_code: input.refCode,
+    affiliate_id: input.affiliateId,
+    commission_cents: input.commissionCents,
     ...money,
   };
 
   let { data, error } = await db.from("orders").insert(rich).select("id").single();
   let legacy = false;
+
+  // Affiliate columns (0005) can be missing independently of the rest of the
+  // rich shape (0004) - a store that has run 0004 but not 0005 should still
+  // get the order saved, just without attribution, rather than falling all
+  // the way back to the pre-0004 legacy shape. Retried without those three
+  // keys specifically before assuming the whole rich shape is unavailable.
+  if (isMissingSchema(error)) {
+    const { ref_code, affiliate_id, commission_cents, ...richWithoutAffiliate } = rich;
+    void ref_code; void affiliate_id; void commission_cents;
+    const retry = await db.from("orders").insert(richWithoutAffiliate).select("id").single();
+    if (!isMissingSchema(retry.error)) {
+      ({ data, error } = retry);
+    }
+  }
 
   if (isMissingSchema(error)) {
     legacy = true;
@@ -104,6 +125,9 @@ export async function createOrder(input: OrderInput): Promise<OrderResult> {
         payment_method: input.paymentMethod,
         phone: input.phone ?? "",
         order_notes: input.notes ?? "",
+        ref_code: input.refCode ?? "",
+        affiliate_id: input.affiliateId ?? "",
+        commission_cents: input.commissionCents,
       },
       ...money,
     };
@@ -198,6 +222,9 @@ export type StoredOrder = {
   shippingCents: number;
   totalCents: number;
   wooOrderId: number | null;
+  refCode: string | null;
+  affiliateId: string | null;
+  commissionCents: number;
   createdAt: string;
   items: { name: string; size: string | null; quantity: number; lineCents: number }[];
 };
@@ -247,6 +274,9 @@ export async function getOrder(id: string): Promise<StoredOrder | null> {
     shippingCents: data.shipping_cents ?? 0,
     totalCents: data.total_cents ?? 0,
     wooOrderId: data.woo_order_id ?? addr?.woo_order_id ?? null,
+    refCode: data.ref_code ?? (addr?.ref_code || null),
+    affiliateId: data.affiliate_id ?? (addr?.affiliate_id || null),
+    commissionCents: data.commission_cents ?? Number(addr?.commission_cents ?? 0),
     createdAt: data.created_at,
     items: (data.order_items ?? []).map(
       (i: Record<string, unknown>) => ({

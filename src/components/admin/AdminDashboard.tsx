@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { money } from "@/lib/pricing";
 import {
   ORDER_STATUSES,
@@ -49,7 +49,7 @@ type StockReq = { email: string; product_slug: string; created_at: string };
 type CoaDoc = { product_slug: string; batch: string | null; uploaded_at: string; original_name: string | null };
 type Cat = { slug: string; name: string; format: string; hasLegacyCoa: boolean };
 
-const TABS = ["Orders", "Emails", "COAs"] as const;
+const TABS = ["Orders", "Affiliates", "Emails", "COAs"] as const;
 type Tab = (typeof TABS)[number];
 
 const date = (s: string) =>
@@ -337,6 +337,9 @@ export default function AdminDashboard({
         </section>
       )}
 
+      {/* ------------------------------------------------------- affiliates */}
+      {tab === "Affiliates" && <AffiliatesPanel />}
+
       {/* ---------------------------------------------------------- emails */}
       {tab === "Emails" && (
         <section className="mt-6 grid gap-8 lg:grid-cols-2">
@@ -394,6 +397,204 @@ export default function AdminDashboard({
     </div>
   );
 }
+
+type Affiliate = {
+  id: string;
+  code: string;
+  name: string;
+  email: string | null;
+  commission_bps: number;
+  active: boolean;
+  created_at: string;
+  orders: number;
+  commission_cents: number;
+};
+
+/**
+ * Affiliate roster: who has a ?ref= link, what they earn, and what they've
+ * generated so far. Fetches its own data rather than taking it as a prop from
+ * the server component, since it's the one tab a normal shift never opens.
+ */
+function AffiliatesPanel() {
+  const [affiliates, setAffiliates] = useState<Affiliate[] | null>(null);
+  const [error, setError] = useState("");
+  const [origin, setOrigin] = useState("");
+
+  const [code, setCode] = useState("");
+  const [name, setName] = useState("");
+  const [rate, setRate] = useState("10");
+  const [creating, setCreating] = useState(false);
+  const [formError, setFormError] = useState("");
+
+  async function load() {
+    const res = await fetch("/api/admin/affiliates");
+    const body = await res.json().catch(() => ({}));
+    if (res.ok) setAffiliates(body.affiliates);
+    else setError(body.error ?? "Could not load affiliates.");
+  }
+
+  useEffect(() => {
+    load();
+    setOrigin(window.location.origin);
+  }, []);
+
+  async function create(e: React.FormEvent) {
+    e.preventDefault();
+    setCreating(true);
+    setFormError("");
+    const res = await fetch("/api/admin/affiliates", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code, name, commissionPercent: Number(rate) }),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (res.ok) {
+      setCode("");
+      setName("");
+      setRate("10");
+      await load();
+    } else {
+      setFormError(body.error ?? "Could not create that affiliate.");
+    }
+    setCreating(false);
+  }
+
+  async function toggleActive(a: Affiliate) {
+    setAffiliates((cur) =>
+      cur ? cur.map((x) => (x.id === a.id ? { ...x, active: !a.active } : x)) : cur
+    );
+    const res = await fetch("/api/admin/affiliates", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: a.id, active: !a.active }),
+    });
+    if (!res.ok) load(); // roll back to the real state on failure
+  }
+
+  const totalOwed = useMemo(
+    () => (affiliates ?? []).reduce((s, a) => s + a.commission_cents, 0) / 100,
+    [affiliates]
+  );
+
+  return (
+    <section className="mt-6 grid gap-8 lg:grid-cols-[380px_1fr]">
+      <form onSubmit={create} className="card h-fit p-6">
+        <h2 className="t-title">Add An Affiliate</h2>
+        <p className="mt-1.5 text-[14px] leading-relaxed text-muted">
+          They share links like <code className="rounded bg-surface-2 px-1">{origin || SITE_URL_PLACEHOLDER}/?ref=
+          <span className="text-teal-dark">{code || "code"}</span></code>. Anyone who orders after
+          clicking one is credited to them for 30 days.
+        </p>
+
+        <label htmlFor="aff-code" className="label mb-2 mt-5 block text-muted">Referral Code</label>
+        <input
+          id="aff-code"
+          value={code}
+          onChange={(e) => setCode(e.target.value.replace(/\s+/g, ""))}
+          placeholder="sarah"
+          required
+          className="w-full rounded-sm border border-line bg-surface px-3 py-3 text-[15px]"
+        />
+
+        <label htmlFor="aff-name" className="label mb-2 mt-4 block text-muted">Name</label>
+        <input
+          id="aff-name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Sarah Chen"
+          required
+          className="w-full rounded-sm border border-line bg-surface px-3 py-3 text-[15px]"
+        />
+
+        <label htmlFor="aff-rate" className="label mb-2 mt-4 block text-muted">
+          Commission <span className="normal-case tracking-normal">(% of order, excl. shipping)</span>
+        </label>
+        <input
+          id="aff-rate"
+          type="number"
+          min={0}
+          max={100}
+          step={0.5}
+          value={rate}
+          onChange={(e) => setRate(e.target.value)}
+          className="w-full rounded-sm border border-line bg-surface px-3 py-3 text-[15px]"
+        />
+
+        <button type="submit" disabled={creating} className="btn-primary mt-5 w-full">
+          {creating ? "adding..." : "add affiliate"}
+        </button>
+
+        {formError && <p className="mt-3 text-[13.5px] text-warn">{formError}</p>}
+      </form>
+
+      <div>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="t-title">Affiliates ({affiliates?.length ?? 0})</h2>
+          {affiliates && affiliates.length > 0 && (
+            <span className="text-[14px] text-muted">
+              Total owed: <span className="font-semibold text-ink">{money(totalOwed)}</span>
+            </span>
+          )}
+        </div>
+
+        {error && <p className="text-[14px] text-warn">{error}</p>}
+
+        {affiliates === null ? (
+          <p className="text-[14px] text-muted">Loading...</p>
+        ) : affiliates.length === 0 ? (
+          <p className="rounded-md border border-line-soft bg-surface p-8 text-center text-[15px] text-muted">
+            No affiliates yet. Add one on the left to get a shareable link.
+          </p>
+        ) : (
+          <div className="overflow-x-auto rounded-md border border-line-soft bg-surface">
+            <table className="w-full min-w-[600px] text-left text-[14px]">
+              <thead className="border-b border-line-soft">
+                <tr className="label text-muted">
+                  <th className="px-4 py-3">Affiliate</th>
+                  <th className="px-4 py-3">Rate</th>
+                  <th className="px-4 py-3 text-right">Orders</th>
+                  <th className="px-4 py-3 text-right">Owed</th>
+                  <th className="px-4 py-3">Active</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-line-soft">
+                {affiliates.map((a) => (
+                  <tr key={a.id}>
+                    <td className="px-4 py-3">
+                      <span className="block font-medium">{a.name}</span>
+                      <span className="data block text-[12.5px] text-muted">?ref={a.code}</span>
+                    </td>
+                    <td className="px-4 py-3 text-muted">{(a.commission_bps / 100).toFixed(1)}%</td>
+                    <td className="data px-4 py-3 text-right">{a.orders}</td>
+                    <td className="data px-4 py-3 text-right font-semibold">
+                      {money(a.commission_cents / 100)}
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        type="button"
+                        onClick={() => toggleActive(a)}
+                        className="rounded-full border px-3 py-1 text-[12.5px] font-medium"
+                        style={{
+                          borderColor: a.active ? "var(--color-teal)" : "var(--color-line)",
+                          background: a.active ? "var(--color-wash)" : "transparent",
+                          color: a.active ? "var(--color-teal-dark)" : "var(--color-muted)",
+                        }}
+                      >
+                        {a.active ? "Active" : "Paused"}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+const SITE_URL_PLACEHOLDER = "yoursite.com";
 
 function CoaManager({
   catalog,
