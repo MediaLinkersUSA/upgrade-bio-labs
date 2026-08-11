@@ -20,7 +20,7 @@ export async function POST(req: Request) {
       { status: 503 }
     );
   }
-
+    
   const form = await req.formData();
   const slug = String(form.get("slug") ?? "");
   const batch = String(form.get("batch") ?? "").trim() || null;
