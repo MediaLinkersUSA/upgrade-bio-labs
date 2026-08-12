@@ -2015,6 +2015,50 @@ export const products: Product[] = [
         "unitPrice": 54.0
       }
     ],
+    "sizes": [
+      {
+        "label": "500mg",
+        "doseMg": 500,
+        "doseLabel": "500 MG",
+        "tiers": [
+          {
+            "minQty": 1,
+            "label": "most popular",
+            "unitPrice": 60.0
+          },
+          {
+            "minQty": 3,
+            "unitPrice": 57.0
+          },
+          {
+            "minQty": 5,
+            "label": "best value",
+            "unitPrice": 54.0
+          }
+        ]
+      },
+      {
+        "label": "1000mg",
+        "doseMg": 1000,
+        "doseLabel": "1000 MG",
+        "tiers": [
+          {
+            "minQty": 1,
+            "label": "most popular",
+            "unitPrice": 95.0
+          },
+          {
+            "minQty": 3,
+            "unitPrice": 90.25
+          },
+          {
+            "minQty": 5,
+            "label": "best value",
+            "unitPrice": 85.50
+          }
+        ]
+      }
+    ],
     "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/Upgr2512090073.pdf",
     "inStock": true,
     "short": "Redox cofactor central to sirtuin and mitochondrial energy research.",
