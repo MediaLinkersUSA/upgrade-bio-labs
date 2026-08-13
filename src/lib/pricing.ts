@@ -48,6 +48,27 @@ export const bestTierSaving = (p: Product) => {
 export const bestTierQty = (p: Product) =>
   p.tiers.length ? p.tiers[p.tiers.length - 1].minQty : 1;
 
+/** Deepest saving for an arbitrary ladder, as a whole percent. Lets callers
+ *  that already resolved a specific size's tiers (e.g. a card's inline size
+ *  picker) get the same "save X% at N+" math BuyBox uses, without re-deriving
+ *  it against the wrong (default) ladder. */
+export const bestSavingForTiers = (tiers: Tier[]) => {
+  if (tiers.length < 2) return 0;
+  const base = tiers[0].unitPrice;
+  const best = tiers[tiers.length - 1];
+  const pct = Math.round((1 - best.unitPrice / base) * 100);
+  return pct > 0 ? pct : 0;
+};
+
+/** Lowest per-unit price across a SKU's priced sizes. Used on listing cards
+ *  so a multi-size product can show "From $X" instead of quoting one size's
+ *  price as if it were the default. */
+export const fromPrice = (p: Product) => {
+  const priced = (p.sizes ?? []).filter((s) => s.tiers?.length);
+  if (!priced.length) return p.basePrice;
+  return Math.min(...priced.map((s) => s.tiers![0].unitPrice));
+};
+
 /** Price per mg at the single-unit price. `override` lets a size-variant PDP
  *  pass the selected fill rather than the SKU's default one. */
 export const perMg = (

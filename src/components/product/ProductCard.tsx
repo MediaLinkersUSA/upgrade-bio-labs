@@ -4,7 +4,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import type { Product } from "@/data/types";
-import { bestTierQty, bestTierSaving, displayPrice, money, perMg } from "@/lib/pricing";
+import {
+  bestSavingForTiers,
+  bestTierQty,
+  bestTierSaving,
+  displayPrice,
+  fromPrice,
+  hasPricedSizes,
+  money,
+  perMg,
+} from "@/lib/pricing";
 import { useCart } from "@/components/cart/CartProvider";
 import FormatChip from "@/components/ui/FormatChip";
 import NotifyMe from "./NotifyMe";
@@ -21,8 +30,31 @@ export default function ProductCard({
   const { add } = useCart();
   const [notify, setNotify] = useState(false);
 
-  const saving = bestTierSaving(p);
-  const mg = perMg(p);
+  // Multi-size SKUs get an inline size picker right on the card, mirroring
+  // the PDP's rule: never guess which fill the customer wants. -1 means
+  // nothing chosen yet.
+  const hasSizes = hasPricedSizes(p);
+  const [sizeIdx, setSizeIdx] = useState(-1);
+  const priced = (i: number) => !!p.sizes?.[i]?.tiers?.length;
+  const chosen = hasSizes && sizeIdx >= 0 && priced(sizeIdx);
+  const activeSize = chosen ? p.sizes![sizeIdx] : null;
+  const awaitingSize = hasSizes && !chosen;
+
+  const price = chosen ? activeSize!.tiers![0].unitPrice : hasSizes ? fromPrice(p) : displayPrice(p);
+  const saving = chosen
+    ? bestSavingForTiers(activeSize!.tiers!)
+    : hasSizes
+    ? 0
+    : bestTierSaving(p);
+  const saveQty = chosen ? activeSize!.tiers![activeSize!.tiers!.length - 1].minQty : bestTierQty(p);
+  // Dose is per-size on a multi-size SKU, so it stays hidden until a size is
+  // picked rather than showing whichever fill happens to sit in p.doseMg.
+  const doseMg = hasSizes ? activeSize?.doseMg : p.doseMg;
+  const mg = hasSizes
+    ? chosen
+      ? perMg(p, { basePrice: price, doseMg: activeSize?.doseMg })
+      : null
+    : perMg(p);
   const sub = p.blend?.length ? p.blend.join(" · ") : p.short;
 
   return (
@@ -64,10 +96,10 @@ export default function ProductCard({
         </div>
 
         <dl className="data mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-line-soft pt-2.5 text-faint">
-          {p.doseMg ? (
+          {doseMg ? (
             <div>
               <dt className="sr-only">Total mass</dt>
-              <dd>{p.doseMg}mg</dd>
+              <dd>{doseMg}mg</dd>
             </div>
           ) : p.volumeMl ? (
             <div>
@@ -93,21 +125,61 @@ export default function ProductCard({
         {/* Price and saving chip share a baseline. The chip is nowrap so it
             can never wrap to two lines and drag itself out of alignment. */}
         <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1.5">
-          <p className="t-display-md leading-none">{money(displayPrice(p))}</p>
+          <p className="t-display-md leading-none">
+            {/* "From" only ever labels the low end of a real range - never a
+                specific size's price standing in as if it were the default. */}
+            {awaitingSize && <span className="mr-1 text-[13px] font-normal text-muted">From</span>}
+            {money(price)}
+          </p>
           {saving > 0 && (
             <span className="whitespace-nowrap rounded-full bg-wash px-2.5 py-1 text-[12px] font-semibold leading-none text-teal-dark">
-              Save {saving}% At {bestTierQty(p)}+
+              Save {saving}% At {saveQty}+
             </span>
           )}
         </div>
 
+        {/* Size picker, only for SKUs that genuinely ship in more than one
+            fill. Lets the customer choose without leaving the grid, instead
+            of silently adding whichever size the top-level tiers happen to
+            match. */}
+        {hasSizes && p.inStock && (
+          <label className="block">
+            <span className="sr-only">Size</span>
+            <select
+              value={chosen ? sizeIdx : ""}
+              onChange={(e) => {
+                e.preventDefault();
+                setSizeIdx(Number(e.target.value));
+              }}
+              // Stop the card's wrapping <Link> from swallowing pointer/­focus
+              // events meant for the select.
+              onClick={(e) => e.stopPropagation()}
+              aria-label={`Size for ${p.name}`}
+              className="w-full rounded-sm border bg-surface px-3 py-2.5 text-[14px] font-medium text-ink focus:border-teal focus:outline-none"
+              style={{
+                borderColor: awaitingSize ? "var(--color-teal)" : "var(--color-line)",
+              }}
+            >
+              <option value="" disabled>
+                Select a size
+              </option>
+              {p.sizes!.map((s, i) => (
+                <option key={s.label} value={i} disabled={!priced(i)}>
+                  {priced(i) ? `${s.label} - ${money(s.tiers![0].unitPrice)}` : `${s.label} - Coming Soon`}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+
         {p.inStock ? (
           <button
             type="button"
-            onClick={() => add(p.slug)}
-            className="btn-primary w-full"
+            onClick={() => add(p.slug, 1, activeSize?.label)}
+            disabled={awaitingSize}
+            className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-45"
           >
-            Add To Order · {money(displayPrice(p))}
+            {awaitingSize ? "Select A Size" : `Add To Order · ${money(price)}`}
           </button>
         ) : notify ? (
           <NotifyMe slug={p.slug} name={p.name} onDone={() => setNotify(false)} />
