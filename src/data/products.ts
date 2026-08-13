@@ -1042,19 +1042,19 @@ export const products: Product[] = [
     "goals": [
       "skin"
     ],
-    "doseMg": 100,
-    "doseLabel": "100mg",
+    "doseMg": 30,
+    "doseLabel": "30mg",
     "volumeMl": 15,
     "purity": "≥99%",
-    "basePrice": 85,
+    "basePrice": 65,
     "tiers": [
       {
         "minQty": 1,
-        "unitPrice": 85
+        "unitPrice": 65
       }
     ],
     "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/04/Upgr2604100287GHKCUSPRAY-1.pdf",
-    "inStock": false,
+    "inStock": true,
     "short": "Copper tripeptide in a measured spray format.",
     "description": "A 100mg bottle delivering 500mcg per actuation. GHK-Cu (glycyl-L-histidyl-L-lysine copper) is a naturally occurring copper-binding peptide studied for regenerative, dermal and anti-inflammatory signaling. Research areas include collagen and elastin synthesis, hair-follicle work, wound-bed matrix deposition, and copper delivery in the context of antioxidant enzyme activity.",
     "researchAreas": [],
