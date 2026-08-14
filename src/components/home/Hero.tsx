@@ -64,7 +64,7 @@ export default function Hero() {
             style={rise(2)}
           >
             Every batch tested for identity, purity, and quantity by an
-            independent lab. The COA is published before you buy.
+            independent lab. The COA is published before you buy
           </p>
 
           <div
