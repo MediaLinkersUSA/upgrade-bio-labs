@@ -20,7 +20,6 @@ import { SITE } from "@/lib/config";
 // keeps the animation library out of first load entirely.
 const CartDrawer = dynamic(() => import("@/components/cart/CartDrawer"));
 const AgeGate = dynamic(() => import("@/components/chrome/AgeGate"));
-const ExitIntent = dynamic(() => import("@/components/chrome/ExitIntent"));
 
 // UI face: preloaded, since almost every element above the fold uses it.
 const instrument = Instrument_Sans({
@@ -145,7 +144,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Footer />
           <CartDrawer />
           <AgeGate />
-          <ExitIntent />
         </CartProvider>
       </body>
     </html>
