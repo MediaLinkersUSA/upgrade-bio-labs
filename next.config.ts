@@ -26,18 +26,6 @@ const nextConfig: NextConfig = {
     ],
   },
   experimental: { optimizePackageImports: ["framer-motion"] },
-  async redirects() {
-    return [
-      // Product URLs moved from /products/:slug to /product/:slug. This
-      // permanently forwards the old (already-indexed / bookmarked / linked)
-      // URLs so they don't 404.
-      {
-        source: "/products/:slug",
-        destination: "/product/:slug",
-        permanent: true,
-      },
-    ];
-  },
 };
 
 export default nextConfig;
