@@ -3166,7 +3166,7 @@ export const products: Product[] = [
       }
     ],
     "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/COA3107_Hair.pdf",
-    "inStock": false,
+    "inStock": true,
     "short": "Three-agent topical solution for follicle and androgen-pathway research.",
     "description": "A topical research solution combining three compounds with distinct mechanisms in hair-follicle study: minoxidil as a potassium-channel opener and vasodilator, RU-58841 as a topical androgen-receptor antagonist, and finasteride as a 5-alpha-reductase inhibitor. Supplied as a pre-mixed solution for topical laboratory use.",
     "researchAreas": [

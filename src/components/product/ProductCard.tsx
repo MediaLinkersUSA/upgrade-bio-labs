@@ -60,7 +60,7 @@ export default function ProductCard({
   return (
     <article className="card card-hover group flex h-full flex-col overflow-hidden">
       <Link
-        href={`/products/${p.slug}`}
+        href={`/product/${p.slug}`}
         className="relative block aspect-square overflow-hidden bg-surface"
         tabIndex={-1}
       >
@@ -88,7 +88,7 @@ export default function ProductCard({
       <div className="flex flex-1 flex-col gap-2.5 p-4 pt-3">
         <div>
           <h3 className="t-title">
-            <Link href={`/products/${p.slug}`} className="hover:text-teal-dark">
+            <Link href={`/product/${p.slug}`} className="hover:text-teal-dark">
               {p.name}
             </Link>
           </h3>

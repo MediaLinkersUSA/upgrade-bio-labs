@@ -85,7 +85,7 @@ export default function ReviewsSection() {
                     )}
                     {p && (
                       <Link
-                        href={`/products/${p.slug}`}
+                        href={`/product/${p.slug}`}
                         className="label ml-auto rounded-full bg-surface-2 px-2.5 py-1.5 text-ink hover:bg-wash"
                       >
                         {p.name}

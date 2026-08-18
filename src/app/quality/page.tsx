@@ -108,7 +108,7 @@ export default function QualityPage() {
             >
               <div>
                 <Link
-                  href={`/products/${p.slug}`}
+                  href={`/product/${p.slug}`}
                   className="text-[15px] font-semibold hover:text-teal-dark"
                 >
                   {p.name}
@@ -141,7 +141,7 @@ export default function QualityPage() {
               {withoutCoa.map((p) => (
                 <li key={p.slug}>
                   <Link
-                    href={`/products/${p.slug}`}
+                    href={`/product/${p.slug}`}
                     className="inline-block rounded-full border border-line px-3 py-1.5 text-[13.5px] hover:border-teal"
                   >
                     {p.name}

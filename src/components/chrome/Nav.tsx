@@ -156,7 +156,7 @@ export default function Nav() {
                   {col.items.map((p) => (
                     <li key={p.slug}>
                       <Link
-                        href={`/products/${p.slug}`}
+                        href={`/product/${p.slug}`}
                         className="text-[14px] text-ink hover:text-teal-dark"
                       >
                         {p.name}

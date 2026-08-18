@@ -31,7 +31,7 @@ export async function generateMetadata({
   return {
     title: `${p.name} - ${spec} | Research Use Only`,
     description: p.short,
-    alternates: { canonical: `/products/${p.slug}` },
+    alternates: { canonical: `/product/${p.slug}` },
     openGraph: {
       title: `${p.name} - ${spec}`,
       description: p.short,
@@ -93,7 +93,7 @@ export default async function ProductPage({
     brand: { "@type": "Brand", name: SITE.name },
     offers: {
       "@type": "Offer",
-      url: `${SITE.url}/products/${p.slug}`,
+      url: `${SITE.url}/product/${p.slug}`,
       priceCurrency: "USD",
       price: p.basePrice.toFixed(2),
       availability: p.inStock
@@ -124,7 +124,7 @@ export default async function ProductPage({
         "@type": "ListItem",
         position: 3,
         name: p.name,
-        item: `${SITE.url}/products/${p.slug}`,
+        item: `${SITE.url}/product/${p.slug}`,
       },
     ],
   };

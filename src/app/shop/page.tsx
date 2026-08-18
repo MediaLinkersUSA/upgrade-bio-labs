@@ -19,7 +19,7 @@ const itemList = {
   itemListElement: products.map((p, i) => ({
     "@type": "ListItem",
     position: i + 1,
-    url: `${SITE.url}/products/${p.slug}`,
+    url: `${SITE.url}/product/${p.slug}`,
     name: p.name,
   })),
 };

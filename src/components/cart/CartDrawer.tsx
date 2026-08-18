@@ -277,7 +277,7 @@ export default function CartDrawer() {
                     {cart.items.map(({ product, qty, unit, total, size, key }) => (
                       <li key={key} className="flex gap-3 px-5 py-4">
                         <Link
-                          href={`/products/${product.slug}`}
+                          href={`/product/${product.slug}`}
                           onClick={() => setOpen(false)}
                           className="relative h-16 w-16 shrink-0 overflow-hidden rounded-sm bg-surface-2"
                         >
@@ -292,7 +292,7 @@ export default function CartDrawer() {
                         <div className="min-w-0 flex-1">
                           <div className="flex items-start justify-between gap-2">
                             <Link
-                              href={`/products/${product.slug}`}
+                              href={`/product/${product.slug}`}
                               onClick={() => setOpen(false)}
                               className="text-[15px] font-semibold leading-tight hover:text-teal-dark"
                             >

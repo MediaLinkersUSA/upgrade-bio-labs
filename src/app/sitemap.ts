@@ -22,7 +22,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     ...staticPages,
     ...products.map((p) => ({
-      url: `${SITE.url}/products/${p.slug}`,
+      url: `${SITE.url}/product/${p.slug}`,
       changeFrequency: "weekly" as const,
       priority: p.bestseller ? 0.9 : 0.6,
     })),
