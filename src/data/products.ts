@@ -36,7 +36,7 @@ export const products: Product[] = [
       }
     ],
     "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/COA3109_5AMINO.pdf",
-    "inStock": false,
+    "inStock": true,
     "short": "NNMT inhibitor studied for adipocyte metabolism and NAD salvage.",
     "description": "5-Amino-1MQ is a synthetic small molecule developed for laboratory research. It selectively targets the NNMT enzyme (nicotinamide N-methyltransferase), which makes it a tool for controlled investigation of metabolic pathways, fat metabolism, and cellular energy regulation. Preclinical work examines NNMT inhibition and its downstream metabolic effects.",
     "researchAreas": [],
@@ -1860,7 +1860,7 @@ export const products: Product[] = [
       "https://pmc.ncbi.nlm.nih.gov/articles/PMC6240568/",
       "https://pubmed.ncbi.nlm.nih.gov/9467534/"
     ],
-    "inStock": false,
+    "inStock": true,
     "short": "Oral ghrelin mimetic studied for sustained GH and IGF-1 elevation.",
     "description": "MK-677 (ibutamoren) is a non-peptide growth hormone secretagogue. Research examines its stimulation of endogenous growth hormone and IGF-1, and the downstream endpoints that follow, including lean-mass and bone-density measures and sleep architecture.",
     "researchAreas": [],
