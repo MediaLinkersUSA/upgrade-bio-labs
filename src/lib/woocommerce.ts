@@ -94,6 +94,78 @@ function pickVariation(slug: string, size: string | undefined, qty: number) {
   );
 }
 
+/**
+ * A coupon as WooCommerce (WP Admin > Marketing > Coupons) defines it,
+ * trimmed to the fields the storefront actually needs to decide whether the
+ * code is still good and what it is worth.
+ */
+export type WooCoupon = {
+  id: number;
+  code: string;
+  /** As entered in Woo: 20 means "20%" for a percent coupon, or "$20" for a fixed one. */
+  amount: number;
+  discountType: "percent" | "fixed_cart" | "fixed_product" | string;
+  dateExpiresGmt: string | null;
+  usageLimit: number | null;
+  usageCount: number;
+  /** Dollars. Woo's own minimum/maximum cart spend condition on the coupon. */
+  minimumAmount: number | null;
+  maximumAmount: number | null;
+  description: string;
+};
+
+/**
+ * Looks up a coupon by code, live, straight from WooCommerce.
+ *
+ * Nothing is cached or mirrored locally: the client manages these entirely
+ * from WP Admin, and a code created, edited or deleted there needs to take
+ * effect on the storefront without a deploy. The lookup happens on every
+ * validation attempt (and again, authoritatively, at order placement) rather
+ * than trusting whatever the browser last saw.
+ */
+export async function getWooCoupon(code: string): Promise<WooCoupon | null> {
+  if (!isWooConfigured()) return null;
+  const trimmed = code.trim();
+  if (!trimmed) return null;
+
+  try {
+    const res = await fetch(
+      `${BASE}/wp-json/wc/v3/coupons?code=${encodeURIComponent(trimmed)}`,
+      {
+        headers: { Authorization: authHeader() },
+        // Never cached - a code the client just retired must stop working
+        // immediately, not whenever some CDN or fetch cache decides to expire.
+        cache: "no-store",
+        signal: AbortSignal.timeout(8_000),
+      }
+    );
+    if (!res.ok) {
+      if (res.status !== 404) console.error("[woo] coupon lookup failed", res.status);
+      return null;
+    }
+    const data = await res.json();
+    if (!Array.isArray(data) || !data.length) return null;
+    const c = data[0];
+    return {
+      id: c.id,
+      code: String(c.code ?? trimmed).toUpperCase(),
+      amount: Number(c.amount) || 0,
+      discountType: c.discount_type ?? "percent",
+      dateExpiresGmt: c.date_expires_gmt || null,
+      usageLimit: c.usage_limit == null ? null : Number(c.usage_limit),
+      usageCount: Number(c.usage_count) || 0,
+      minimumAmount: c.minimum_amount ? Number(c.minimum_amount) : null,
+      maximumAmount: c.maximum_amount ? Number(c.maximum_amount) : null,
+      description: String(c.description ?? "").trim(),
+    };
+  } catch (e) {
+    // A WordPress hiccup should reject the code, not crash checkout - same
+    // posture as mirrorOrderToWoo below.
+    console.error("[woo] coupon lookup threw", e);
+    return null;
+  }
+}
+
 export type WooMirrorInput = {
   orderNumber: string;
   status: string;

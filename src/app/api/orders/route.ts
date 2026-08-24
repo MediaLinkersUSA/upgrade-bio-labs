@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { getProduct } from "@/data/products";
 import { unitPriceAt } from "@/lib/pricing";
-import { computeTotals, listUnitPrice } from "@/lib/totals";
-import { findPromo } from "@/lib/promo";
+import { computeTotals, discountableSubtotal, listUnitPrice } from "@/lib/totals";
+import { resolvePromoCode } from "@/lib/promo-resolve";
 import {
   checkFirstOrderEligibility,
   recordRedemption,
@@ -95,17 +95,22 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Your cart is empty." }, { status: 422 });
   }
 
-  // First-order codes are verified here, against the real email. A returning
-  // customer keeps their bundle savings; only the code drops off.
-  const requested = findPromo(body.promoCode);
-  let promoCode = body.promoCode ?? null;
+  // Discount codes are re-resolved here rather than trusted from the client -
+  // this is the same rule the rest of the route follows for money. Covers
+  // both the built-in first-order code and a live WooCommerce coupon lookup
+  // (lib/promo-resolve.ts), so a code retired in WP Admin mid-checkout still
+  // cannot price an order.
+  const subtotalCents = Math.round(discountableSubtotal(items) * 100);
+  const resolvedPromo = await resolvePromoCode(body.promoCode, { subtotalCents });
+  const requested = resolvedPromo.ok ? resolvedPromo.promo : null;
+  let promoRate = requested?.rate ?? 0;
   let promoRejected: string | null = null;
   const jar = await cookies();
   const deviceUsed = !!jar.get(FIRST_ORDER_COOKIE)?.value;
   if (requested?.firstOrderOnly) {
     const check = await checkFirstOrderEligibility(String(c.email), deviceUsed);
     if (!check.eligible) {
-      promoCode = null;
+      promoRate = 0;
       promoRejected = check.reason;
     }
   }
@@ -114,7 +119,7 @@ export async function POST(req: Request) {
   // apply identically however the customer pays.
   const totals = computeTotals({
     items,
-    promoCode,
+    promoRate,
     shippingMethodId: String(body.shippingMethod ?? "standard") as never,
     methodDiscount: method.discount,
   });

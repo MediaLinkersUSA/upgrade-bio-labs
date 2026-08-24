@@ -1,6 +1,6 @@
 import type { Product } from "@/data/types";
 import { stackDiscount, tiersFor, unitPriceAt } from "./pricing";
-import { findPromo, resolveDiscount, type ResolvedDiscount } from "./promo";
+import { resolveDiscount, type ResolvedDiscount } from "./promo";
 import { SHIPPING_THRESHOLD, shippingMethod, type ShippingMethodId } from "./config";
 
 /**
@@ -42,13 +42,37 @@ export type RewardId = (typeof REWARDS)[number]["id"];
 /** The SKU given away at the $250 tier. */
 export const FREE_BAC_SLUG = "bac-water-hospira-brand";
 
+export type CartLine = { product: Product; qty: number; size?: string };
+
 export type TotalsInput = {
-  items: { product: Product; qty: number; size?: string }[];
-  promoCode?: string | null;
+  items: CartLine[];
+  /**
+   * The resolved discount rate for whatever code is applied - a fraction of
+   * the discountable subtotal, already looked up. This calculator does not
+   * care whether the rate came from the built-in first-order code or a
+   * WooCommerce coupon (see lib/promo-resolve.ts): by the time it gets here,
+   * that lookup is done and the only thing that matters is the number, so
+   * the same arithmetic and the same 25% cap apply no matter the source.
+   */
+  promoRate?: number;
   shippingMethodId?: ShippingMethodId;
   /** Flat credit for paying by transfer. */
   methodDiscount?: number;
 };
+
+/**
+ * The subtotal a promo code's rate (or minimum/maximum spend condition)
+ * is measured against: quantity-tier prices, supplies excluded.
+ *
+ * Shared with the promo resolver so a coupon's WooCommerce minimum/maximum
+ * spend is checked against the exact figure the discount itself will be
+ * calculated from, rather than a second, slightly different subtotal.
+ */
+export function discountableSubtotal(items: CartLine[]): number {
+  return items
+    .filter((i) => i.product.format !== "supply")
+    .reduce((s, i) => s + unitPriceAt(i.product, i.qty, i.size) * i.qty, 0);
+}
 
 export type Totals = {
   /** What the goods would cost with no discount of any kind. */
@@ -82,7 +106,7 @@ export const listUnitPrice = (p: Product, size?: string) =>
 
 export function computeTotals({
   items,
-  promoCode,
+  promoRate,
   shippingMethodId = "standard",
   methodDiscount: methodCredit = 0,
 }: TotalsInput): Totals {
@@ -104,13 +128,10 @@ export function computeTotals({
   ).size;
 
   const bundleRate = stackDiscount(distinctCompounds);
-  const promo = findPromo(promoCode);
-  const resolved = resolveDiscount(promo?.rate ?? 0, bundleRate);
+  const resolved = resolveDiscount(promoRate ?? 0, bundleRate);
 
   // Supplies are excluded from the discountable base as well as the count.
-  const discountable = items
-    .filter((i) => !isSupply(i.product))
-    .reduce((s, i) => s + unitPriceAt(i.product, i.qty, i.size) * i.qty, 0);
+  const discountable = discountableSubtotal(items);
   const rateDiscount = +(discountable * resolved.rate).toFixed(2);
 
   // Reward thresholds are measured on what the customer actually pays for

@@ -11,8 +11,8 @@ import {
 import { getProduct } from "@/data/products";
 import type { Product } from "@/data/types";
 import { unitPriceAt } from "@/lib/pricing";
-import { computeTotals, type Totals } from "@/lib/totals";
-import { findPromo, resolveDiscount, type Promo } from "@/lib/promo";
+import { computeTotals, discountableSubtotal, type Totals } from "@/lib/totals";
+import { findPromo } from "@/lib/promo";
 
 const KEY = "ubl_cart_v1";
 const PROMO_KEY = "ubl_promo_v1";
@@ -26,6 +26,14 @@ export interface Line {
 
 /** Cart identity. Two fills of the same compound are two separate lines. */
 const lineKey = (slug: string, size?: string) => `${slug}::${size ?? ""}`;
+
+/**
+ * A code the server has confirmed is good, whatever its source - the
+ * built-in first-order code or a live WooCommerce coupon. The cart only
+ * needs the code and the rate; where it came from is the server's business
+ * (lib/promo-resolve.ts).
+ */
+type AppliedPromo = { code: string; rate: number; label: string; source: "local" | "woo" };
 
 interface CartValue {
   lines: Line[];
@@ -62,7 +70,7 @@ interface CartValue {
   totals: Totals;
 
   /* ---- promotion codes ---- */
-  promo: Promo | null;
+  promo: AppliedPromo | null;
   /** Whatever the customer last typed, valid or not, so the field can echo it. */
   promoInput: string;
   /** Async: the server decides, since only it can see the device cookie. */
@@ -88,6 +96,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const [promoInput, setPromoInput] = useState("");
+  const [restorePromoCode, setRestorePromoCode] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -99,9 +108,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         }
       }
       const savedPromo = localStorage.getItem(PROMO_KEY);
-      // Re-validated on read rather than trusted: a code that has since been
-      // retired must not keep discounting a returning visitor's cart.
-      if (savedPromo && findPromo(savedPromo)) setPromoInput(savedPromo);
+      // Handed off to the effect below rather than trusted here: a code that
+      // has since been retired - in the local table or in WooCommerce - must
+      // not keep discounting a returning visitor's cart, and checking that
+      // needs a round trip to the server.
+      if (savedPromo) setRestorePromoCode(savedPromo);
     } catch {
       /* corrupt storage is not worth blocking the page for */
     }
@@ -161,49 +172,101 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const clear = useCallback(() => setLines([]), []);
 
   const [promoError, setPromoError] = useState<string | null>(null);
+  const [appliedPromo, setAppliedPromo] = useState<AppliedPromo | null>(null);
 
   /**
-   * Applies a code, asking the server first.
+   * Asks the server whether a code is good, without touching the error state
+   * - that is `applyPromo`'s job. Split out so the silent restore-on-mount
+   * path can share the exact same check without flashing an error at a
+   * visitor who did nothing wrong.
    *
-   * The device check lives in an httpOnly cookie the browser cannot read, so
-   * this cannot be decided locally - and deciding it here is the point: a
-   * repeat visitor learns the code is spent while shopping, not at payment.
+   * The device check (for the first-order code) lives in an httpOnly cookie
+   * the browser cannot read, so this cannot be decided locally - and a
+   * WooCommerce coupon cannot be validated locally at all, since it lives in
+   * WordPress. Both go through the same round trip.
    */
-  const applyPromo = useCallback(async (code: string) => {
-    setPromoError(null);
-    try {
-      const res = await fetch("/api/promo/validate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code }),
-      });
-      const data = await res.json();
-      if (!data.ok) {
-        setPromoError(data.message ?? "That code is not recognized.");
-        return { ok: false, message: data.message as string | undefined };
-      }
-      setPromoInput(data.code);
+  const runPromoValidation = useCallback(
+    async (code: string): Promise<{ ok: boolean; message?: string }> => {
+      const items = lines
+        .map((l) => {
+          const product = getProduct(l.slug);
+          return product ? { product, qty: l.qty, size: l.size } : null;
+        })
+        .filter(Boolean) as { product: Product; qty: number; size?: string }[];
+      const subtotalCents = Math.round(discountableSubtotal(items) * 100);
+
       try {
-        localStorage.setItem(PROMO_KEY, data.code);
+        const res = await fetch("/api/promo/validate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code, subtotalCents }),
+        });
+        const data = await res.json();
+        if (!data.ok) {
+          return { ok: false, message: data.message as string | undefined };
+        }
+        setPromoInput(data.code);
+        setAppliedPromo({
+          code: data.code,
+          rate: data.rate,
+          label: data.label ?? data.code,
+          source: data.source === "woo" ? "woo" : "local",
+        });
+        try {
+          localStorage.setItem(PROMO_KEY, data.code);
+        } catch {
+          /* quota or private mode */
+        }
+        return { ok: true };
       } catch {
-        /* quota or private mode */
+        // Network failure should not strand a valid code: fall back to the
+        // local catalogue, and let checkout make the binding decision. A
+        // WooCommerce coupon needs the network and simply cannot be
+        // validated offline.
+        const found = findPromo(code);
+        if (!found) return { ok: false, message: "That code is not recognized." };
+        setPromoInput(found.code);
+        setAppliedPromo({ code: found.code, rate: found.rate, label: found.label, source: "local" });
+        return { ok: true };
       }
-      return { ok: true };
-    } catch {
-      // Network failure should not strand a valid code: fall back to the local
-      // catalogue, and let checkout make the binding decision.
-      const found = findPromo(code);
-      if (!found) {
-        setPromoError("That code is not recognized.");
-        return { ok: false };
+    },
+    [lines]
+  );
+
+  const applyPromo = useCallback(
+    async (code: string) => {
+      setPromoError(null);
+      const result = await runPromoValidation(code);
+      if (!result.ok) setPromoError(result.message ?? "That code is not recognized.");
+      return result;
+    },
+    [runPromoValidation]
+  );
+
+  // Silently re-validates a code restored from localStorage once the cart's
+  // own lines have been restored (runPromoValidation needs them for the
+  // subtotal check). No error is surfaced here - a lapsed code should just
+  // quietly stop applying, not greet a returning visitor with a warning.
+  useEffect(() => {
+    if (!mounted || !restorePromoCode) return;
+    const code = restorePromoCode;
+    setRestorePromoCode(null);
+    runPromoValidation(code).then((r) => {
+      if (!r.ok) {
+        try {
+          localStorage.removeItem(PROMO_KEY);
+        } catch {
+          /* quota or private mode */
+        }
       }
-      setPromoInput(found.code);
-      return { ok: true };
-    }
-  }, []);
+    });
+    // Runs once, right after mount finishes restoring the cart.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted]);
 
   const clearPromo = useCallback(() => {
     setPromoInput("");
+    setAppliedPromo(null);
     setPromoError(null);
     try {
       localStorage.removeItem(PROMO_KEY);
@@ -235,11 +298,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     // and so the 25% cap is enforced in exactly one place.
     const totals = computeTotals({
       items: items.map((i) => ({ product: i.product, qty: i.qty, size: i.size })),
-      promoCode: promoInput,
+      promoRate: appliedPromo?.rate ?? 0,
     });
 
     const bundleRate = totals.resolved.rate === 0 ? 0 : totals.resolved.rate;
-    const promo = findPromo(promoInput);
+    const promo = appliedPromo;
 
     return {
       lines,
@@ -286,6 +349,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     remove,
     clear,
     promoInput,
+    appliedPromo,
     applyPromo,
     clearPromo,
     promoError,
