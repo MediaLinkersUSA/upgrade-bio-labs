@@ -114,6 +114,12 @@ export type WooCoupon = {
   description: string;
 };
 
+/** "" and "0" both mean "not set" in Woo's own admin UI for these fields. */
+const numberOrNull = (v: unknown): number | null => {
+  const n = Number(v);
+  return Number.isFinite(n) && n > 0 ? n : null;
+};
+
 /**
  * Looks up a coupon by code, live, straight from WooCommerce.
  *
@@ -152,10 +158,19 @@ export async function getWooCoupon(code: string): Promise<WooCoupon | null> {
       amount: Number(c.amount) || 0,
       discountType: c.discount_type ?? "percent",
       dateExpiresGmt: c.date_expires_gmt || null,
-      usageLimit: c.usage_limit == null ? null : Number(c.usage_limit),
+      // 0 means "no limit" in Woo's own admin UI and in WC_Discounts' own
+      // validity check (it only enforces the limit when usage_limit > 0), so
+      // this matches that rather than treating 0 as "already exhausted."
+      usageLimit: numberOrNull(c.usage_limit),
       usageCount: Number(c.usage_count) || 0,
-      minimumAmount: c.minimum_amount ? Number(c.minimum_amount) : null,
-      maximumAmount: c.maximum_amount ? Number(c.maximum_amount) : null,
+      // Woo's REST API returns these as the literal string "0" for a coupon
+      // with no minimum/maximum spend set - not "" and not null - because
+      // that is what an empty "Usage restriction" field saves as. A truthy
+      // string check treats "0" as "a limit of $0 is set" and then rejects
+      // every real order, so a positive amount is required before either is
+      // treated as an actual restriction.
+      minimumAmount: numberOrNull(c.minimum_amount),
+      maximumAmount: numberOrNull(c.maximum_amount),
       description: String(c.description ?? "").trim(),
     };
   } catch (e) {
