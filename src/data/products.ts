@@ -1931,17 +1931,7 @@ export const products: Product[] = [
         "tiers": [
           {
             "minQty": 1,
-            "label": "most popular",
             "unitPrice": 19.0
-          },
-          {
-            "minQty": 3,
-            "unitPrice": 18.05
-          },
-          {
-            "minQty": 5,
-            "label": "best value",
-            "unitPrice": 17.1
           }
         ]
       }
