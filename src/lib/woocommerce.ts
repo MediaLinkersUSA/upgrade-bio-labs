@@ -139,7 +139,9 @@ export async function getLiveUnitPrices(slug: string): Promise<Map<string, numbe
     const data = await res.json();
     if (!Array.isArray(data)) return null;
 
-    const prices = new Map<string, number>();
+    // Parsed first, keyed second - the keying has to match pickVariation's own
+    // rule exactly, and that rule depends on how many variations share a band.
+    const parsed: { band: string; sizeOpt?: string; price: number }[] = [];
     for (const v of data) {
       const options: string[] = Array.isArray(v.attributes)
         ? v.attributes
@@ -151,7 +153,32 @@ export async function getLiveUnitPrices(slug: string): Promise<Map<string, numbe
       const price = Number(v.price);
       if (!Number.isFinite(price) || price <= 0) continue;
       const sizeOpt = options.find((o) => !isBand(o));
-      prices.set(`${sizeOpt ? norm(sizeOpt) : ""}::${band}`, price);
+      parsed.push({ band, sizeOpt, price });
+    }
+
+    const byBand = new Map<string, typeof parsed>();
+    for (const p of parsed) {
+      const list = byBand.get(p.band) ?? [];
+      list.push(p);
+      byBand.set(p.band, list);
+    }
+
+    const prices = new Map<string, number>();
+    for (const [band, list] of byBand) {
+      // A single-fill product in Woo's own terms - like pickVariation, the
+      // band alone identifies it, whatever its other attribute says (some
+      // single-fill products still carry a fixed dose/potency attribute that
+      // the storefront never exposes as a choice, e.g. BPC-157 Capsules'
+      // "500 MCG"). Keying this under the size-less "::band" form is what
+      // getLivePricing looks up for a product with no `sizes` in the static
+      // catalog.
+      if (list.length === 1) prices.set(`::${band}`, list[0].price);
+
+      // Always also keyed by size, for multi-fill products - and safe to add
+      // even in the single-fill case above, since nothing looks it up there.
+      for (const p of list) {
+        if (p.sizeOpt) prices.set(`${norm(p.sizeOpt)}::${band}`, p.price);
+      }
     }
     return prices;
   } catch (e) {
