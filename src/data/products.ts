@@ -1902,6 +1902,50 @@ export const products: Product[] = [
         "unitPrice": 67.5
       }
     ],
+    "sizes": [
+      {
+        "label": "10mg",
+        "doseMg": 10,
+        "doseLabel": "10 MG",
+        "tiers": [
+          {
+            "minQty": 1,
+            "label": "most popular",
+            "unitPrice": 75.0
+          },
+          {
+            "minQty": 3,
+            "unitPrice": 71.25
+          },
+          {
+            "minQty": 5,
+            "label": "best value",
+            "unitPrice": 67.5
+          }
+        ]
+      },
+      {
+        "label": "40mg",
+        "doseMg": 40,
+        "doseLabel": "40 MG",
+        "tiers": [
+          {
+            "minQty": 1,
+            "label": "most popular",
+            "unitPrice": 19.0
+          },
+          {
+            "minQty": 3,
+            "unitPrice": 18.05
+          },
+          {
+            "minQty": 5,
+            "label": "best value",
+            "unitPrice": 17.1
+          }
+        ]
+      }
+    ],
     "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/03/MOTS-c_70-202607-29_COA.pdf",
     "inStock": true,
     "bestseller": true,
