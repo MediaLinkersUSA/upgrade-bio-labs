@@ -1,0 +1,63 @@
+import "server-only";
+import type { Product, Tier } from "@/data/types";
+import { getLiveUnitPrices, bandForQty, normalizeOption } from "./woocommerce";
+import { applyLivePricing, type LivePricing } from "./apply-live-pricing";
+
+function repriceTiers(tiers: Tier[], sizeKey: string, live: Map<string, number>): Tier[] {
+  return tiers.map((t) => {
+    const price = live.get(`${sizeKey}::${bandForQty(t.minQty)}`);
+    return price != null ? { ...t, unitPrice: price } : t;
+  });
+}
+
+/**
+ * Live pricing for one product, straight from WooCommerce.
+ *
+ * Walks the product's OWN tiers/sizes - never invents a tier or a size that
+ * is not already defined in data/products.ts - and swaps in a live unit
+ * price wherever a matching WooCommerce variation has one. A tier with no
+ * live match keeps its existing static price rather than being dropped or
+ * shown as $0.
+ *
+ * Returns null when WooCommerce is unreachable, unconfigured, or nothing on
+ * this product matched at all - callers fall back to the static prices already
+ * in data/products.ts, exactly like every other Woo integration in this app.
+ */
+export async function getLivePricing(product: Product): Promise<LivePricing | null> {
+  const live = await getLiveUnitPrices(product.slug);
+  if (!live || !live.size) return null;
+
+  const tiers = repriceTiers(product.tiers, "", live);
+
+  const sizeTiers: Record<string, Tier[]> = {};
+  for (const s of product.sizes ?? []) {
+    if (s.tiers?.length) sizeTiers[s.label] = repriceTiers(s.tiers, normalizeOption(s.label), live);
+  }
+
+  return {
+    basePrice: tiers[0]?.unitPrice ?? product.basePrice,
+    tiers,
+    sizeTiers: Object.keys(sizeTiers).length ? sizeTiers : undefined,
+  };
+}
+
+/** `product`, with live WooCommerce prices applied wherever one was found. */
+export async function withLivePricing(product: Product): Promise<Product> {
+  return applyLivePricing(product, await getLivePricing(product));
+}
+
+/**
+ * Live pricing for several products at once, fetched in parallel - what
+ * /api/live-price serves, and what the order route uses to reprice a whole
+ * cart before it charges anyone.
+ */
+export async function getLivePricingForSlugs(
+  products: Product[]
+): Promise<Record<string, LivePricing>> {
+  const entries = await Promise.all(
+    products.map(async (p) => [p.slug, await getLivePricing(p)] as const)
+  );
+  const out: Record<string, LivePricing> = {};
+  for (const [slug, live] of entries) if (live) out[slug] = live;
+  return out;
+}

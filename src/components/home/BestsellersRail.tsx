@@ -1,8 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Product } from "@/data/types";
 import ProductCard from "@/components/product/ProductCard";
+import { useLivePrices } from "@/lib/use-live-prices";
+import { applyLivePricing } from "@/lib/apply-live-pricing";
 
 /**
  * Horizontal product rail. Scrolls rather than wrapping to a second row, so
@@ -11,7 +13,16 @@ import ProductCard from "@/components/product/ProductCard";
  * Native scroll with snap points, not a carousel library: it keeps trackpad,
  * touch, and keyboard behavior for free and adds nothing to the JS budget.
  */
-export default function BestsellersRail({ products }: { products: Product[] }) {
+export default function BestsellersRail({ products: staticProducts }: { products: Product[] }) {
+  // The home page itself stays statically generated - this fetches
+  // WooCommerce's current prices for the whole row in one request, right
+  // after it renders, and swaps them in.
+  const livePrices = useLivePrices(useMemo(() => staticProducts.map((p) => p.slug), [staticProducts]));
+  const products = useMemo(
+    () => staticProducts.map((p) => applyLivePricing(p, livePrices[p.slug])),
+    [staticProducts, livePrices]
+  );
+
   const railRef = useRef<HTMLUListElement>(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);

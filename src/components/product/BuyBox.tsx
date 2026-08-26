@@ -9,6 +9,8 @@ import NotifyMe from "./NotifyMe";
 import CoaViewer from "./CoaViewer";
 import { GOAL_META, SHIP_CUTOFF, SHIPPING_THRESHOLD } from "@/lib/config";
 import { isTested } from "@/lib/testing";
+import { useLivePrices } from "@/lib/use-live-prices";
+import { applyLivePricing } from "@/lib/apply-live-pricing";
 
 /**
  * Counts a price up or down over 180ms. Small detail, but it is what makes a
@@ -64,7 +66,13 @@ function useCountTo(value: number, ms = 180) {
   return display;
 }
 
-export default function BuyBox({ product: p }: { product: Product }) {
+export default function BuyBox({ product: staticProduct }: { product: Product }) {
+  // The page itself stays statically generated - this fetches WooCommerce's
+  // current price right after it renders and swaps it in with no layout
+  // shift, since only the numbers ever change here, never the structure.
+  const livePrices = useLivePrices([staticProduct.slug]);
+  const p = applyLivePricing(staticProduct, livePrices[staticProduct.slug]);
+
   const { add } = useCart();
   const [tierIdx, setTierIdx] = useState(0);
   // -1 means "nothing chosen yet". Multi-size SKUs deliberately start here so

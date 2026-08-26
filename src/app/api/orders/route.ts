@@ -3,6 +3,7 @@ import { getProduct } from "@/data/products";
 import { unitPriceAt } from "@/lib/pricing";
 import { computeTotals, discountableSubtotal, listUnitPrice } from "@/lib/totals";
 import { resolvePromoCode } from "@/lib/promo-resolve";
+import { withLivePricing } from "@/lib/live-pricing";
 import {
   checkFirstOrderEligibility,
   recordRedemption,
@@ -72,7 +73,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "That email address looks wrong." }, { status: 422 });
   }
 
-  const items = (Array.isArray(body.lines) ? body.lines : [])
+  const staticItems = (Array.isArray(body.lines) ? body.lines : [])
     .map((l) => {
       const p = getProduct(String(l.slug));
       const qty = Math.max(1, Math.min(99, Math.floor(Number(l.qty) || 0)));
@@ -82,18 +83,26 @@ export async function POST(req: Request) {
         p.sizes?.some((s) => s.label === l.size && s.tiers?.length)
           ? l.size
           : undefined;
-      return { product: p, qty, size, unit: unitPriceAt(p, qty, size) };
+      return { product: p, qty, size };
     })
-    .filter(Boolean) as {
-      product: NonNullable<ReturnType<typeof getProduct>>;
-      qty: number;
-      size?: string;
-      unit: number;
-    }[];
+    .filter(Boolean) as { product: NonNullable<ReturnType<typeof getProduct>>; qty: number; size?: string }[];
 
-  if (!items.length) {
+  if (!staticItems.length) {
     return NextResponse.json({ error: "Your cart is empty." }, { status: 422 });
   }
+
+  // Repriced from WooCommerce, live, right before this order is priced -
+  // never from whatever the browser last displayed. The product/shop pages
+  // fetch live prices client-side after they render (see lib/live-pricing.ts
+  // and /api/live-price), which keeps them fast and decoupled from
+  // WordPress; this is the one place that actually has to be right, so it
+  // does the equivalent lookup itself rather than trusting that round trip.
+  const items = await Promise.all(
+    staticItems.map(async (i) => {
+      const product = await withLivePricing(i.product);
+      return { ...i, product, unit: unitPriceAt(product, i.qty, i.size) };
+    })
+  );
 
   // Discount codes are re-resolved here rather than trusted from the client -
   // this is the same rule the rest of the route follows for money. Covers

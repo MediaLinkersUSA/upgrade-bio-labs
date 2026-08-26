@@ -2,11 +2,13 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useMemo } from "react";
-import { products } from "@/data/products";
+import { products as staticProducts } from "@/data/products";
 import type { Format, Product } from "@/data/types";
 import { FORMAT_META, GOAL_META, GOAL_ORDER } from "@/lib/config";
 import ProductCard from "@/components/product/ProductCard";
 import FormatIcon from "@/components/ui/FormatIcon";
+import { useLivePrices } from "@/lib/use-live-prices";
+import { applyLivePricing } from "@/lib/apply-live-pricing";
 
 const FORMATS: Format[] = ["vial", "spray", "capsule", "supply"];
 
@@ -18,7 +20,9 @@ const SORTS = {
 } as const;
 type SortKey = keyof typeof SORTS;
 
-const PRICE_MAX = Math.ceil(Math.max(...products.map((p) => p.basePrice)) / 10) * 10;
+// Based on the static catalog, same as everything else at module scope - it
+// only sets the slider's ceiling, so it does not need to track live prices.
+const PRICE_MAX = Math.ceil(Math.max(...staticProducts.map((p) => p.basePrice)) / 10) * 10;
 
 interface Filters {
   format: Format | null;
@@ -56,6 +60,16 @@ export default function ShopBrowser() {
   const router = useRouter();
   const sp = useSearchParams();
 
+  // The page renders instantly with the static catalog's prices, then this
+  // fetches WooCommerce's current prices for the whole grid in one request
+  // and swaps them in - filtering, sorting, and every card all then work off
+  // the same live numbers, not a mix of live and stale ones.
+  const livePrices = useLivePrices(useMemo(() => staticProducts.map((p) => p.slug), []));
+  const products = useMemo(
+    () => staticProducts.map((p) => applyLivePricing(p, livePrices[p.slug])),
+    [livePrices]
+  );
+
   const filters: Filters = {
     format: (FORMATS.includes(sp.get("format") as Format) ? sp.get("format") : null) as Format | null,
     goal: GOAL_ORDER.includes(sp.get("goal") as never) ? sp.get("goal") : null,
@@ -78,7 +92,7 @@ export default function ShopBrowser() {
 
   const results = useMemo(
     () => sortList(apply(products, filters), filters.sort),
-    [filters]
+    [products, filters]
   );
 
   // For the empty state: which single filter, if dropped, recovers the most?
@@ -110,7 +124,7 @@ export default function ShopBrowser() {
         count: apply(products, { ...filters, inStockOnly: false }).length,
       });
     return candidates.filter((c) => c.count > 0).sort((a, b) => b.count - a.count)[0] ?? null;
-  }, [results.length, filters]);
+  }, [results.length, products, filters]);
 
   const countFor = (f: Format) =>
     apply(products, { ...filters, format: f }).length;

@@ -13,6 +13,8 @@ import type { Product } from "@/data/types";
 import { unitPriceAt } from "@/lib/pricing";
 import { computeTotals, discountableSubtotal, type Totals } from "@/lib/totals";
 import { findPromo } from "@/lib/promo";
+import { useLivePrices } from "@/lib/use-live-prices";
+import { applyLivePricing } from "@/lib/apply-live-pricing";
 
 const KEY = "ubl_cart_v1";
 const PROMO_KEY = "ubl_promo_v1";
@@ -171,6 +173,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
   const clear = useCallback(() => setLines([]), []);
 
+  // Live WooCommerce prices for whatever's in the cart right now, fetched
+  // once after mount and re-fetched as lines change. Falls back to the
+  // static catalog price for anything that fails to resolve, same as every
+  // other consumer of useLivePrices.
+  const livePrices = useLivePrices(lines.map((l) => l.slug));
+  const pricedProduct = useCallback(
+    (slug: string) => {
+      const product = getProduct(slug);
+      return product ? applyLivePricing(product, livePrices[slug]) : undefined;
+    },
+    [livePrices]
+  );
+
   const [promoError, setPromoError] = useState<string | null>(null);
   const [appliedPromo, setAppliedPromo] = useState<AppliedPromo | null>(null);
 
@@ -189,7 +204,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     async (code: string): Promise<{ ok: boolean; message?: string }> => {
       const items = lines
         .map((l) => {
-          const product = getProduct(l.slug);
+          const product = pricedProduct(l.slug);
           return product ? { product, qty: l.qty, size: l.size } : null;
         })
         .filter(Boolean) as { product: Product; qty: number; size?: string }[];
@@ -230,7 +245,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         return { ok: true };
       }
     },
-    [lines]
+    [lines, pricedProduct]
   );
 
   const applyPromo = useCallback(
@@ -278,7 +293,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo<CartValue>(() => {
     const items = lines
       .map((l) => {
-        const product = getProduct(l.slug);
+        const product = pricedProduct(l.slug);
         if (!product) return null;
         // Size-aware: the 20mg fill must not be priced off the 10mg ladder.
         const unit = unitPriceAt(product, l.qty, l.size);
@@ -353,6 +368,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     applyPromo,
     clearPromo,
     promoError,
+    pricedProduct,
   ]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

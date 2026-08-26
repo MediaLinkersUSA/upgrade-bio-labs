@@ -8,7 +8,7 @@ import { testStepsFor } from "@/lib/testing";
 import Gallery from "@/components/product/Gallery";
 import BuyBox from "@/components/product/BuyBox";
 import StickyMobileBar from "@/components/product/StickyMobileBar";
-import ProductCard from "@/components/product/ProductCard";
+import RelatedProducts from "@/components/product/RelatedProducts";
 import ShippingAccordion from "@/components/product/ShippingAccordion";
 import CoaViewer from "@/components/product/CoaViewer";
 
@@ -285,13 +285,7 @@ export default async function ProductPage({
         <section className="section-pad bg-surface">
           <div className="container-site">
             <h2 className="t-display-md mb-6">Pairs Well With</h2>
-            <ul className="grid gap-[18px] sm:grid-cols-2 lg:grid-cols-3">
-              {pairs.map((x) => (
-                <li key={x.slug}>
-                  <ProductCard product={x} sizes="(max-width: 640px) 90vw, 360px" />
-                </li>
-              ))}
-            </ul>
+            <RelatedProducts products={pairs} sizes="(max-width: 640px) 90vw, 360px" />
           </div>
         </section>
       )}

@@ -55,11 +55,30 @@ const PAYMENT_TITLE: Record<string, string> = {
 };
 
 /**
+ * A quantity band ("1-2", "3-5", "5+"), identified by shape rather than
+ * position, because attribute order is not guaranteed by the API.
+ */
+const isBand = (o: string) => /^\d+(-\d+|\+)$/.test(o.trim());
+
+/** The band a given quantity falls in - this store's ladder is always 1-2 /
+ *  3-5 / 5+, so a tier's own minQty maps onto it directly. Exported so
+ *  lib/live-pricing.ts keys its lookups the exact same way this file does -
+ *  "which variation do we bill" and "which variation's price do we show"
+ *  must never be able to drift apart. */
+export const bandForQty = (qty: number) => (qty >= 5 ? "5+" : qty >= 3 ? "3-5" : "1-2");
+
+// ALL whitespace is stripped, not merely collapsed. Our labels are written
+// "20mg" and theirs "20 MG"; collapsing spaces leaves "20mg" against "20 mg"
+// and the two never match, which silently selects the wrong fill's variation.
+// Exported for the same reason as bandForQty above.
+export const normalizeOption = (s: string) => s.replace(/\s+/g, "").toLowerCase();
+const norm = normalizeOption;
+
+/**
  * Picks the variation matching a line's fill and quantity.
  *
  * Their variations carry two attributes - the fill ("10 MG") and a quantity
- * band ("1-2", "3-5", "5+") - and the band is identified by shape rather than
- * position, because attribute order is not guaranteed by the API.
+ * band ("1-2", "3-5", "5+").
  *
  * Returns undefined rather than guessing when nothing matches: a wrong
  * variation silently decrements the wrong stock, which is worse than a line
@@ -69,14 +88,7 @@ function pickVariation(slug: string, size: string | undefined, qty: number) {
   const product = WOO_PRODUCTS[slug];
   if (!product?.variations.length) return undefined;
 
-  const band = qty >= 5 ? "5+" : qty >= 3 ? "3-5" : "1-2";
-  const isBand = (o: string) => /^\d+(-\d+|\+)$/.test(o.trim());
-
-  // ALL whitespace is stripped, not merely collapsed. Our labels are written
-  // "20mg" and theirs "20 MG"; collapsing spaces leaves "20mg" against "20 mg"
-  // and the two never match, which silently selects the wrong fill's variation
-  // and decrements the wrong stock.
-  const norm = (s: string) => s.replace(/\s+/g, "").toLowerCase();
+  const band = bandForQty(qty);
 
   const candidates = product.variations.filter((v) =>
     v.options.some((o) => isBand(o) && o.trim() === band)
@@ -92,6 +104,60 @@ function pickVariation(slug: string, size: string | undefined, qty: number) {
   return candidates.find((v) =>
     v.options.some((o) => !isBand(o) && norm(o) === norm(size))
   );
+}
+
+/**
+ * Live per-(fill, quantity-band) unit prices for a product, fetched fresh
+ * from WooCommerce's variations endpoint.
+ *
+ * Keyed the same way pickVariation matches a line, so "which variation do we
+ * bill" and "which variation's price do we show" can never disagree: a size
+ * key (normalized, "" for single-fill products) plus the literal band string
+ * ("1-2" / "3-5" / "5+"), e.g. "20mg::3-5".
+ *
+ * Never cached - this exists specifically so a price changed in WordPress
+ * shows up immediately, not on the next deploy or the next cache window.
+ */
+export async function getLiveUnitPrices(slug: string): Promise<Map<string, number> | null> {
+  if (!isWooConfigured()) return null;
+  const product = WOO_PRODUCTS[slug];
+  if (!product) return null;
+
+  try {
+    const res = await fetch(
+      `${BASE}/wp-json/wc/v3/products/${product.id}/variations?per_page=100`,
+      {
+        headers: { Authorization: authHeader() },
+        cache: "no-store",
+        signal: AbortSignal.timeout(8_000),
+      }
+    );
+    if (!res.ok) {
+      console.error("[woo] live price lookup failed", slug, res.status);
+      return null;
+    }
+    const data = await res.json();
+    if (!Array.isArray(data)) return null;
+
+    const prices = new Map<string, number>();
+    for (const v of data) {
+      const options: string[] = Array.isArray(v.attributes)
+        ? v.attributes
+            .map((a: { option?: unknown }) => String(a?.option ?? "").trim())
+            .filter(Boolean)
+        : [];
+      const band = options.find((o) => isBand(o));
+      if (!band) continue; // no quantity dimension on this variation - skip it
+      const price = Number(v.price);
+      if (!Number.isFinite(price) || price <= 0) continue;
+      const sizeOpt = options.find((o) => !isBand(o));
+      prices.set(`${sizeOpt ? norm(sizeOpt) : ""}::${band}`, price);
+    }
+    return prices;
+  } catch (e) {
+    console.error("[woo] live price lookup threw", slug, e);
+    return null;
+  }
 }
 
 /**

@@ -6,9 +6,14 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { Product } from "@/data/types";
 import { money } from "@/lib/pricing";
 import { useCart } from "@/components/cart/CartProvider";
+import { useLivePrices } from "@/lib/use-live-prices";
+import { applyLivePricing } from "@/lib/apply-live-pricing";
 
 /** Below 1024px the buy box unsticks, so this takes over past the hero. */
-export default function StickyMobileBar({ product: p }: { product: Product }) {
+export default function StickyMobileBar({ product: staticProduct }: { product: Product }) {
+  const livePrices = useLivePrices([staticProduct.slug]);
+  const p = applyLivePricing(staticProduct, livePrices[staticProduct.slug]);
+
   const { add } = useCart();
   const [show, setShow] = useState(false);
   const reduce = useReducedMotion();

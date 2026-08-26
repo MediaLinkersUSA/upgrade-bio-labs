@@ -1,13 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { compounds, getProduct } from "@/data/products";
 import { money, stackDiscount } from "@/lib/pricing";
 import { GOAL_META, GOAL_ORDER } from "@/lib/config";
 import { useCart } from "@/components/cart/CartProvider";
 import FormatIcon from "@/components/ui/FormatIcon";
 import type { Format } from "@/data/types";
+import { useLivePrices } from "@/lib/use-live-prices";
+import { applyLivePricing } from "@/lib/apply-live-pricing";
 
 const PRESETS = [
   { label: "Recovery Stack", slugs: ["bpc-157", "tb-500", "kpv"] },
@@ -26,17 +28,31 @@ export default function StackBuilder() {
   const [fFormat, setFFormat] = useState<Format | "all">("all");
   const [fGoal, setFGoal] = useState<string>("all");
 
+  // The page itself stays statically generated - this fetches WooCommerce's
+  // current prices for every compound in the picker in one request, right
+  // after it renders, so the subtotal here matches what a shopper would
+  // actually pay once they click through and check out.
+  const livePrices = useLivePrices(useMemo(() => compounds().map((p) => p.slug), []));
+  const pricedCompounds = useMemo(
+    () => compounds().map((p) => applyLivePricing(p, livePrices[p.slug])),
+    [livePrices]
+  );
+  const pricedProduct = useCallback(
+    (slug: string) => pricedCompounds.find((p) => p.slug === slug),
+    [pricedCompounds]
+  );
+
   const chosen = slots.filter(Boolean) as string[];
   const distinct = new Set(chosen).size;
   const rate = stackDiscount(distinct);
 
-  const subtotal = chosen.reduce((s, sl) => s + (getProduct(sl)?.basePrice ?? 0), 0);
+  const subtotal = chosen.reduce((s, sl) => s + (pricedProduct(sl)?.basePrice ?? 0), 0);
   const discount = +(subtotal * rate).toFixed(2);
   const pay = subtotal - discount;
 
   const options = useMemo(() => {
     const term = q.trim().toLowerCase();
-    return compounds()
+    return pricedCompounds
       .filter((p) => p.inStock)
       .filter((p) => (fFormat === "all" ? true : p.format === fFormat))
       .filter((p) => (fGoal === "all" ? true : p.goals.includes(fGoal as never)))
@@ -48,7 +64,7 @@ export default function StackBuilder() {
       )
       .filter((p) => !chosen.includes(p.slug))
       .slice(0, 24);
-  }, [q, fFormat, fGoal, chosen]);
+  }, [pricedCompounds, q, fFormat, fGoal, chosen]);
 
   const setSlot = (i: number, slug: string | null) =>
     setSlots((prev) => prev.map((s, n) => (n === i ? slug : s)));
