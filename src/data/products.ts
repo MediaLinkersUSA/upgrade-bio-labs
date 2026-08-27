@@ -1657,7 +1657,7 @@ export const products: Product[] = [
     "refs": [
       "https://pmc.ncbi.nlm.nih.gov/articles/PMC2431115/"
     ],
-    "inStock": true,
+    "inStock": false,
     "short": "500mcg per capsule, 60 count. Oral inflammatory-signaling research.",
     "description": "Each bottle contains 60 capsules at 500mcg per capsule. KPV (Lys-Pro-Val) is the C-terminal tripeptide fragment of alpha-melanocyte-stimulating hormone. Research focuses on anti-inflammatory, antimicrobial and wound-repair signaling, with particular interest in gastrointestinal and dermal models, and on its ability to modulate immune signaling without broad immunosuppression.",
     "researchAreas": [],
