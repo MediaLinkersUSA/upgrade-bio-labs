@@ -1965,7 +1965,7 @@ export const products: Product[] = [
         "tiers": [
           {
             "minQty": 1,
-            "unitPrice": 19.0
+            "unitPrice": 190.0
           }
         ]
       }
