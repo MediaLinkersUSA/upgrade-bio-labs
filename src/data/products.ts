@@ -1331,6 +1331,40 @@ export const products: Product[] = [
         "unitPrice": 63.0
       }
     ],
+    "sizes": [
+      {
+        "label": "10mg",
+        "doseMg": 10,
+        "doseLabel": "10 MG",
+        "tiers": [
+          {
+            "minQty": 1,
+            "label": "most popular",
+            "unitPrice": 70.0
+          },
+          {
+            "minQty": 3,
+            "unitPrice": 66.5
+          },
+          {
+            "minQty": 5,
+            "label": "best value",
+            "unitPrice": 63.0
+          }
+        ]
+      },
+      {
+        "label": "5mg",
+        "doseMg": 5,
+        "doseLabel": "5 MG",
+        "tiers": [
+          {
+            "minQty": 1,
+            "unitPrice": 49.0
+          }
+        ]
+      }
+    ],
     "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/Upgr2512120038.pdf",
     "inStock": true,
     "short": "Selective ghrelin receptor agonist studied for pulsatile GH release.",
