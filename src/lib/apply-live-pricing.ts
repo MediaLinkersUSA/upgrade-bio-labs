@@ -12,6 +12,10 @@ export type LivePricing = {
   basePrice: number;
   tiers: Tier[];
   sizeTiers?: Record<string, Tier[]>;
+  /** Absent (not fetched, or the fetch failed) leaves the static inStock in
+   *  data/products.ts untouched - only a confirmed instock/outofstock value
+   *  from WooCommerce overrides it. */
+  inStock?: boolean;
 };
 
 /**
@@ -38,5 +42,6 @@ export function applyLivePricing(product: Product, live: LivePricing | null | un
     tiers: live.tiers,
     sizes,
     basePrice: live.basePrice,
+    inStock: live.inStock ?? product.inStock,
   };
 }
