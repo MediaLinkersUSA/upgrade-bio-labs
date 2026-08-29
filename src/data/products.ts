@@ -200,7 +200,7 @@ export const products: Product[] = [
       "https://pmc.ncbi.nlm.nih.gov/articles/PMC4365069/",
       "https://pmc.ncbi.nlm.nih.gov/articles/PMC3563705/"
     ],
-    "inStock": false,
+    "inStock": true,
     "short": "Erythropoietin-derived peptide studied for neuropathic and tissue repair.",
     "description": "ARA-290 (cibinetide) is a synthetic peptide that acts on the innate repair receptor (IRR). Research examines its effect on inflammatory signaling and tissue repair in neuropathy models, including small fiber neuropathy, and notes that IRR activation is separate from erythropoietic activity.",
     "researchAreas": [
@@ -1213,7 +1213,7 @@ export const products: Product[] = [
       }
     ],
     "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/02/COA3027GlutathioneNasal.pdf",
-    "inStock": true,
+    "inStock": false,
     "short": "500mg glutathione per bottle, pre-mixed for measured actuation.",
     "description": "Glutathione supplied as a pre-mixed spray at 500mg per bottle. Glutathione is the principal intracellular antioxidant and redox buffer; research on non-oral delivery routes centers on the poor oral bioavailability of the intact tripeptide.",
     "researchAreas": [
