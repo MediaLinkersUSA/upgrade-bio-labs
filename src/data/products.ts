@@ -200,7 +200,7 @@ export const products: Product[] = [
       "https://pmc.ncbi.nlm.nih.gov/articles/PMC4365069/",
       "https://pmc.ncbi.nlm.nih.gov/articles/PMC3563705/"
     ],
-    "inStock": true,
+    "inStock": false,
     "short": "Erythropoietin-derived peptide studied for neuropathic and tissue repair.",
     "description": "ARA-290 (cibinetide) is a synthetic peptide that acts on the innate repair receptor (IRR). Research examines its effect on inflammatory signaling and tissue repair in neuropathy models, including small fiber neuropathy, and notes that IRR activation is separate from erythropoietic activity.",
     "researchAreas": [
