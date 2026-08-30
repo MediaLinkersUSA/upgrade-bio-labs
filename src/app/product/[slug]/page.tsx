@@ -5,7 +5,7 @@ import { getProduct, products } from "@/data/products";
 import { reviewsFor } from "@/data/reviews";
 import { SITE } from "@/lib/config";
 import { testStepsFor } from "@/lib/testing";
-import { withLivePricing, withLivePricingForAll } from "@/lib/live-pricing";
+import { withCachedPricingForAll } from "@/lib/price-cache";
 import Gallery from "@/components/product/Gallery";
 import BuyBox from "@/components/product/BuyBox";
 import StickyMobileBar from "@/components/product/StickyMobileBar";
@@ -15,20 +15,14 @@ import CoaViewer from "@/components/product/CoaViewer";
 
 export const dynamicParams = false;
 
-// Re-rendered server-side on this schedule rather than per visitor (that
-// would hit WooCommerce on every page view) or never (the static build,
-// which is what caused prices to flash-update client-side after the page
-// had already shown a stale number). A visitor who lands mid-window sees a
-// price that is at most this many seconds old, but it is baked into the
-// HTML they receive - nothing changes in front of them.
-//
-// 2 hours, not seconds: WooCommerce is only checked twelve times a day per
-// product this way, not on every visit. A price change doesn't have to wait
-// out the full window though - the "Update Prices" button in /admin calls
-// revalidatePath() and forces every product/shop page to regenerate on the
-// next request, immediately. This schedule is the backstop for whenever
-// nobody presses it, not the primary way prices are expected to update.
-export const revalidate = 7200;
+// Re-rendered server-side on this schedule. Cheap now: pages read from
+// Supabase's price_cache, not WooCommerce directly (see lib/price-cache.ts)
+// - a customer's page load was never the thing that needed a long window,
+// WooCommerce's own response time was. This window just avoids a redundant
+// Supabase round trip on every single request; the "Update Prices" button
+// still forces an immediate refresh (both the sync AND this page cache) for
+// whenever someone doesn't want to wait.
+export const revalidate = 300;
 
 export function generateStaticParams() {
   return products.map((p) => ({ slug: p.slug }));
@@ -80,14 +74,11 @@ export default async function ProductPage({
    * judged on the same live status the shopper is about to see, not the
    * build-time snapshot.
    *
-   * The candidate pool is capped BEFORE any live fetch happens, not after.
-   * A same-goal backfill pool can easily run to a dozen-plus products, and
-   * live-pricing every one of them - 2 WooCommerce requests each, all in
-   * flight at once - was enough concurrent load to make WordPress itself the
-   * bottleneck, dragging page loads out to the 8s per-request timeout. Only 3
-   * slots are ever shown, so at most a small backfill buffer beyond the
-   * curated list is ever worth fetching - it is extremely unlikely that more
-   * than a few of even a short list are simultaneously out of stock.
+   * The candidate pool is still capped, though the original reason (avoiding
+   * a burst of concurrent WooCommerce requests) no longer applies now that
+   * this reads from Supabase - a fast, cheap read regardless of pool size.
+   * Kept anyway since only 3 slots are ever shown; no reason to compute more
+   * than a small buffer beyond the curated list.
    */
   const MAX_BACKFILL = 6;
   const candidateSlugs = (() => {
@@ -107,10 +98,11 @@ export default async function ProductPage({
 
   // The main product and its cross-sell candidates are unrelated lookups -
   // fetched together, not one after the other, so this page's total wait is
-  // however long the SLOWER of the two takes, not their sum.
-  const [p, candidates] = await Promise.all([
-    withLivePricing(raw),
-    withLivePricingForAll(candidateSlugs.map(getProduct).filter((x): x is NonNullable<typeof x> => !!x)),
+  // however long the SLOWER of the two takes, not their sum. Both now read
+  // from Supabase (lib/price-cache.ts), never from WooCommerce directly.
+  const [[p], candidates] = await Promise.all([
+    withCachedPricingForAll([raw]),
+    withCachedPricingForAll(candidateSlugs.map(getProduct).filter((x): x is NonNullable<typeof x> => !!x)),
   ]);
 
   const pairs = (() => {
