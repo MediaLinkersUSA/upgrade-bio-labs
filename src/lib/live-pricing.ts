@@ -1,6 +1,6 @@
 import "server-only";
 import type { Product, Tier } from "@/data/types";
-import { getLiveUnitPrices, bandForQty, normalizeOption } from "./woocommerce";
+import { getLiveUnitPrices, getLiveStockStatus, bandForQty, normalizeOption } from "./woocommerce";
 import { applyLivePricing, type LivePricing } from "./apply-live-pricing";
 
 function repriceTiers(tiers: Tier[], sizeKey: string, live: Map<string, number>): Tier[] {
@@ -24,26 +24,51 @@ function repriceTiers(tiers: Tier[], sizeKey: string, live: Map<string, number>)
  * in data/products.ts, exactly like every other Woo integration in this app.
  */
 export async function getLivePricing(product: Product): Promise<LivePricing | null> {
-  const live = await getLiveUnitPrices(product.slug);
-  if (!live || !live.size) return null;
+  // Fetched in parallel and merged independently: stock lives on the parent
+  // product and has no dependency on the quantity-band variation structure
+  // pricing needs, so a product with "malformed" price variations (see
+  // getLiveUnitPrices) can still get a correct live stock status, and vice
+  // versa. Only when NEITHER resolves does the caller fall back entirely to
+  // the static catalog.
+  const [live, liveStock] = await Promise.all([
+    getLiveUnitPrices(product.slug),
+    getLiveStockStatus(product.slug),
+  ]);
 
-  const tiers = repriceTiers(product.tiers, "", live);
+  const hasPricing = Boolean(live && live.size);
+  if (!hasPricing && liveStock === null) return null;
+
+  const tiers = hasPricing ? repriceTiers(product.tiers, "", live!) : product.tiers;
 
   const sizeTiers: Record<string, Tier[]> = {};
-  for (const s of product.sizes ?? []) {
-    if (s.tiers?.length) sizeTiers[s.label] = repriceTiers(s.tiers, normalizeOption(s.label), live);
+  if (hasPricing) {
+    for (const s of product.sizes ?? []) {
+      if (s.tiers?.length) sizeTiers[s.label] = repriceTiers(s.tiers, normalizeOption(s.label), live!);
+    }
   }
 
   return {
     basePrice: tiers[0]?.unitPrice ?? product.basePrice,
     tiers,
     sizeTiers: Object.keys(sizeTiers).length ? sizeTiers : undefined,
+    inStock: liveStock ?? undefined,
   };
 }
 
 /** `product`, with live WooCommerce prices applied wherever one was found. */
 export async function withLivePricing(product: Product): Promise<Product> {
   return applyLivePricing(product, await getLivePricing(product));
+}
+
+/**
+ * `products`, each with live WooCommerce prices applied wherever one was
+ * found - for a whole page (the shop grid, a related-products row) rather
+ * than a single PDP. Built on getLivePricingForSlugs so it shares the same
+ * one-fetch-per-product-in-parallel behaviour, not a serial loop.
+ */
+export async function withLivePricingForAll(products: Product[]): Promise<Product[]> {
+  const live = await getLivePricingForSlugs(products);
+  return products.map((p) => applyLivePricing(p, live[p.slug]));
 }
 
 /**

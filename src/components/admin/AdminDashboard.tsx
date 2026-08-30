@@ -183,6 +183,23 @@ export default function AdminDashboard({
   catalog: Cat[];
 }) {
   const [tab, setTab] = useState<Tab>("Orders");
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshedAt, setRefreshedAt] = useState<string | null>(null);
+  const [refreshError, setRefreshError] = useState<string | null>(null);
+
+  const updatePrices = async () => {
+    setRefreshing(true);
+    setRefreshError(null);
+    try {
+      const res = await fetch("/api/admin/revalidate-prices", { method: "POST" });
+      if (!res.ok) throw new Error();
+      setRefreshedAt(new Date().toLocaleTimeString());
+    } catch {
+      setRefreshError("Couldn't reach the server - try again.");
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const revenue = useMemo(
     () => orders.reduce((s, o) => s + (o.total_cents ?? 0), 0) / 100,
@@ -202,16 +219,35 @@ export default function AdminDashboard({
           <p className="label text-teal-dark">Upgrade Bio Labs</p>
           <h1 className="t-display-lg mt-1">Dashboard</h1>
         </div>
-        <button
-          type="button"
-          onClick={async () => {
-            await fetch("/api/admin/login", { method: "DELETE" });
-            window.location.reload();
-          }}
-          className="btn-ghost"
-        >
-          Sign Out
-        </button>
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="text-right">
+            <button
+              type="button"
+              onClick={updatePrices}
+              disabled={refreshing}
+              className="btn-ghost"
+              title="Fetches the latest prices and stock status from WooCommerce for every product, right now, instead of waiting for the normal 2-hour refresh."
+            >
+              {refreshing ? "Updating…" : "Update Prices"}
+            </button>
+            {refreshedAt && !refreshError && (
+              <p className="mt-1 text-[12px] text-muted">Updated {refreshedAt}</p>
+            )}
+            {refreshError && (
+              <p className="mt-1 text-[12px] text-warn">{refreshError}</p>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={async () => {
+              await fetch("/api/admin/login", { method: "DELETE" });
+              window.location.reload();
+            }}
+            className="btn-ghost"
+          >
+            Sign Out
+          </button>
+        </div>
       </header>
 
       {!supabaseReady && (

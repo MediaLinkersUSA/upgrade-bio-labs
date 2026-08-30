@@ -4,6 +4,7 @@ import ShopBrowser from "@/components/shop/ShopBrowser";
 import ShopSkeleton from "@/components/shop/ShopSkeleton";
 import { products } from "@/data/products";
 import { SITE } from "@/lib/config";
+import { withLivePricingForAll } from "@/lib/live-pricing";
 
 export const metadata: Metadata = {
   title: "Shop all research peptides",
@@ -11,6 +12,13 @@ export const metadata: Metadata = {
     "All 60 research peptides in vials, sprays, and capsules. Filter by format, research goal, and price. Every batch third-party tested with a published COA.",
   alternates: { canonical: "/shop" },
 };
+
+// Same reasoning as the product page: re-rendered on this schedule so every
+// visitor's HTML already has live prices/stock baked in, rather than a
+// static grid that visibly updates itself after the fact. 2 hours is the
+// backstop; the "Update Prices" button in /admin forces an immediate
+// refresh via revalidatePath() for whenever someone doesn't want to wait.
+export const revalidate = 7200;
 
 const itemList = {
   "@context": "https://schema.org",
@@ -33,7 +41,8 @@ const breadcrumb = {
   ],
 };
 
-export default function ShopPage() {
+export default async function ShopPage() {
+  const priced = await withLivePricingForAll(products);
   return (
     <>
       <script
@@ -48,7 +57,7 @@ export default function ShopPage() {
           shell-rendered. The fallback mirrors the real grid so hydration does
           not shift the page. */}
       <Suspense fallback={<ShopSkeleton />}>
-        <ShopBrowser />
+        <ShopBrowser products={priced} />
       </Suspense>
     </>
   );

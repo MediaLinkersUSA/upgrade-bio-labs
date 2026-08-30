@@ -107,6 +107,48 @@ function pickVariation(slug: string, size: string | undefined, qty: number) {
 }
 
 /**
+ * Live stock status for a product, fetched fresh from WooCommerce's parent
+ * product endpoint (stock is tracked at the product level, not per
+ * variation, in this catalog).
+ *
+ * Returns null - never false - when the lookup can't be trusted: Woo
+ * unconfigured, the slug missing from WOO_PRODUCTS, the request failing, or
+ * an unrecognised stock_status value. Callers fall back to the static
+ * `inStock` already in data/products.ts on null, the same "static wins over
+ * a bad signal" rule getLiveUnitPrices already follows - a network hiccup
+ * must never be the reason an in-stock product looks unavailable.
+ *
+ * Never cached, for the same reason as getLiveUnitPrices: a status changed
+ * in WP Admin should show up on the next fetch, not the next deploy.
+ */
+export async function getLiveStockStatus(slug: string): Promise<boolean | null> {
+  if (!isWooConfigured()) return null;
+  const product = WOO_PRODUCTS[slug];
+  if (!product) return null;
+
+  try {
+    const res = await fetch(`${BASE}/wp-json/wc/v3/products/${product.id}`, {
+      headers: { Authorization: authHeader() },
+      cache: "no-store",
+      signal: AbortSignal.timeout(8_000),
+    });
+    if (!res.ok) {
+      console.error("[woo] live stock lookup failed", slug, res.status);
+      return null;
+    }
+    const data = await res.json();
+    // "onbackorder" counts as in-stock: the customer can still order it, and
+    // WooCommerce itself lets checkout proceed for that status.
+    if (data.stock_status === "instock" || data.stock_status === "onbackorder") return true;
+    if (data.stock_status === "outofstock") return false;
+    return null; // unrecognised value - don't guess
+  } catch (e) {
+    console.error("[woo] live stock lookup threw", slug, e);
+    return null;
+  }
+}
+
+/**
  * Live per-(fill, quantity-band) unit prices for a product, fetched fresh
  * from WooCommerce's variations endpoint.
  *
