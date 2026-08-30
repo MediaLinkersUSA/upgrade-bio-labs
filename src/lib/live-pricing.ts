@@ -72,17 +72,31 @@ export async function withLivePricingForAll(products: Product[]): Promise<Produc
 }
 
 /**
- * Live pricing for several products at once, fetched in parallel - what
- * /api/live-price serves, and what the order route uses to reprice a whole
- * cart before it charges anyone.
+ * Live pricing for several products at once - what /api/live-price serves,
+ * what the order route uses to reprice a whole cart before it charges
+ * anyone, and what the shop grid and a product page's cross-sell candidates
+ * use to live-price many products together.
+ *
+ * Fetched in bounded batches, not one giant Promise.all over the whole
+ * list: firing every product's 2 WooCommerce requests simultaneously - up
+ * to 130 at once for the full ~65-product catalog - was enough concurrent
+ * load to make WordPress itself the bottleneck, serializing behind its own
+ * PHP worker pool and dragging every page's load time out toward the
+ * per-request timeout. BATCH_SIZE trades a bit of total wall time for
+ * keeping WooCommerce responsive under a realistic concurrent load.
  */
+const BATCH_SIZE = 10;
+
 export async function getLivePricingForSlugs(
   products: Product[]
 ): Promise<Record<string, LivePricing>> {
-  const entries = await Promise.all(
-    products.map(async (p) => [p.slug, await getLivePricing(p)] as const)
-  );
   const out: Record<string, LivePricing> = {};
-  for (const [slug, live] of entries) if (live) out[slug] = live;
+  for (let i = 0; i < products.length; i += BATCH_SIZE) {
+    const batch = products.slice(i, i + BATCH_SIZE);
+    const entries = await Promise.all(
+      batch.map(async (p) => [p.slug, await getLivePricing(p)] as const)
+    );
+    for (const [slug, live] of entries) if (live) out[slug] = live;
+  }
   return out;
 }
