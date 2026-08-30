@@ -21,7 +21,14 @@ export const dynamicParams = false;
 // had already shown a stale number). A visitor who lands mid-window sees a
 // price that is at most this many seconds old, but it is baked into the
 // HTML they receive - nothing changes in front of them.
-export const revalidate = 45;
+//
+// 2 hours, not seconds: WooCommerce is only checked twelve times a day per
+// product this way, not on every visit. A price change doesn't have to wait
+// out the full window though - the "Update Prices" button in /admin calls
+// revalidatePath() and forces every product/shop page to regenerate on the
+// next request, immediately. This schedule is the backstop for whenever
+// nobody presses it, not the primary way prices are expected to update.
+export const revalidate = 7200;
 
 export function generateStaticParams() {
   return products.map((p) => ({ slug: p.slug }));
