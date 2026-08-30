@@ -64,7 +64,6 @@ export default async function ProductPage({
   const { slug } = await params;
   const raw = getProduct(slug);
   if (!raw) notFound();
-  const p = await withLivePricing(raw);
 
   /**
    * Cross-sells, filtered to what can actually be bought.
@@ -80,27 +79,42 @@ export default async function ProductPage({
    * but was just marked out of stock in WooCommerce (or vice versa) should be
    * judged on the same live status the shopper is about to see, not the
    * build-time snapshot.
+   *
+   * The candidate pool is capped BEFORE any live fetch happens, not after.
+   * A same-goal backfill pool can easily run to a dozen-plus products, and
+   * live-pricing every one of them - 2 WooCommerce requests each, all in
+   * flight at once - was enough concurrent load to make WordPress itself the
+   * bottleneck, dragging page loads out to the 8s per-request timeout. Only 3
+   * slots are ever shown, so at most a small backfill buffer beyond the
+   * curated list is ever worth fetching - it is extremely unlikely that more
+   * than a few of even a short list are simultaneously out of stock.
    */
-  const pairs = await (async () => {
-    const candidateSlugs = new Set([
-      ...(p.pairsWith ?? []),
-      // Backfill pool: same-goal products, so there's always enough to pick
-      // three from even if every curated pair is out of stock.
-      ...products
-        .filter((o) =>
-          o.format === "supply"
-            ? p.presentation === "lyophilized"
-            : o.goals.some((g) => p.goals.includes(g))
-        )
-        .map((o) => o.slug),
-    ]);
-    candidateSlugs.delete(p.slug);
+  const MAX_BACKFILL = 6;
+  const candidateSlugs = (() => {
+    const curated = p.pairsWith ?? [];
+    const backfillPool = products
+      .filter(
+        (o) =>
+          o.slug !== raw.slug &&
+          !curated.includes(o.slug) &&
+          (o.format === "supply"
+            ? raw.presentation === "lyophilized"
+            : o.goals.some((g) => raw.goals.includes(g)))
+      )
+      .map((o) => o.slug);
+    return [...curated, ...backfillPool.slice(0, MAX_BACKFILL)];
+  })();
 
-    const candidates = await withLivePricingForAll(
-      [...candidateSlugs].map(getProduct).filter((x): x is NonNullable<typeof x> => !!x)
-    );
+  // The main product and its cross-sell candidates are unrelated lookups -
+  // fetched together, not one after the other, so this page's total wait is
+  // however long the SLOWER of the two takes, not their sum.
+  const [p, candidates] = await Promise.all([
+    withLivePricing(raw),
+    withLivePricingForAll(candidateSlugs.map(getProduct).filter((x): x is NonNullable<typeof x> => !!x)),
+  ]);
+
+  const pairs = (() => {
     const bySlug = new Map(candidates.map((c) => [c.slug, c]));
-
     const curated = (p.pairsWith ?? [])
       .map((s) => bySlug.get(s))
       .filter((x): x is NonNullable<typeof x> => !!x && x.inStock);
