@@ -5,6 +5,7 @@ import { getProduct, products } from "@/data/products";
 import { reviewsFor } from "@/data/reviews";
 import { SITE } from "@/lib/config";
 import { testStepsFor } from "@/lib/testing";
+import { withLivePricing, withLivePricingForAll } from "@/lib/live-pricing";
 import Gallery from "@/components/product/Gallery";
 import BuyBox from "@/components/product/BuyBox";
 import StickyMobileBar from "@/components/product/StickyMobileBar";
@@ -13,6 +14,14 @@ import ShippingAccordion from "@/components/product/ShippingAccordion";
 import CoaViewer from "@/components/product/CoaViewer";
 
 export const dynamicParams = false;
+
+// Re-rendered server-side on this schedule rather than per visitor (that
+// would hit WooCommerce on every page view) or never (the static build,
+// which is what caused prices to flash-update client-side after the page
+// had already shown a stale number). A visitor who lands mid-window sees a
+// price that is at most this many seconds old, but it is baked into the
+// HTML they receive - nothing changes in front of them.
+export const revalidate = 45;
 
 export function generateStaticParams() {
   return products.map((p) => ({ slug: p.slug }));
@@ -46,8 +55,9 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const p = getProduct(slug);
-  if (!p) notFound();
+  const raw = getProduct(slug);
+  if (!raw) notFound();
+  const p = await withLivePricing(raw);
 
   /**
    * Cross-sells, filtered to what can actually be bought.
@@ -58,25 +68,39 @@ export default async function ProductPage({
    * recommending things with no Add To Cart button. Stock is filtered at render
    * rather than edited out of the data, so the list heals itself when the
    * client restocks.
+   *
+   * Filtered and live-priced together: a candidate that's in the static file
+   * but was just marked out of stock in WooCommerce (or vice versa) should be
+   * judged on the same live status the shopper is about to see, not the
+   * build-time snapshot.
    */
-  const pairs = (() => {
-    const curated = (p.pairsWith ?? [])
-      .map(getProduct)
-      .filter((x): x is NonNullable<typeof x> => !!x && x.inStock && x.slug !== p.slug);
+  const pairs = await (async () => {
+    const candidateSlugs = new Set([
+      ...(p.pairsWith ?? []),
+      // Backfill pool: same-goal products, so there's always enough to pick
+      // three from even if every curated pair is out of stock.
+      ...products
+        .filter((o) =>
+          o.format === "supply"
+            ? p.presentation === "lyophilized"
+            : o.goals.some((g) => p.goals.includes(g))
+        )
+        .map((o) => o.slug),
+    ]);
+    candidateSlugs.delete(p.slug);
 
+    const candidates = await withLivePricingForAll(
+      [...candidateSlugs].map(getProduct).filter((x): x is NonNullable<typeof x> => !!x)
+    );
+    const bySlug = new Map(candidates.map((c) => [c.slug, c]));
+
+    const curated = (p.pairsWith ?? [])
+      .map((s) => bySlug.get(s))
+      .filter((x): x is NonNullable<typeof x> => !!x && x.inStock);
     if (curated.length >= 3) return curated.slice(0, 3);
 
-    // Backfill from the same research goal so the row is never short, and
-    // never padded with something unrelated.
     const seen = new Set([p.slug, ...curated.map((c) => c.slug)]);
-    const backfill = products.filter(
-      (o) =>
-        o.inStock &&
-        !seen.has(o.slug) &&
-        (o.format === "supply"
-          ? p.presentation === "lyophilized"
-          : o.goals.some((g) => p.goals.includes(g)))
-    );
+    const backfill = candidates.filter((c) => c.inStock && !seen.has(c.slug));
     return [...curated, ...backfill].slice(0, 3);
   })();
 
