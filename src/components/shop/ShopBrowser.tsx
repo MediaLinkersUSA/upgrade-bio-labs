@@ -7,8 +7,6 @@ import type { Format, Product } from "@/data/types";
 import { FORMAT_META, GOAL_META, GOAL_ORDER } from "@/lib/config";
 import ProductCard from "@/components/product/ProductCard";
 import FormatIcon from "@/components/ui/FormatIcon";
-import { useLivePrices } from "@/lib/use-live-prices";
-import { applyLivePricing } from "@/lib/apply-live-pricing";
 
 const FORMATS: Format[] = ["vial", "spray", "capsule", "supply"];
 
@@ -56,19 +54,9 @@ function sortList(list: Product[], sort: SortKey) {
   }
 }
 
-export default function ShopBrowser() {
+export default function ShopBrowser({ products }: { products: Product[] }) {
   const router = useRouter();
   const sp = useSearchParams();
-
-  // The page renders instantly with the static catalog's prices, then this
-  // fetches WooCommerce's current prices for the whole grid in one request
-  // and swaps them in - filtering, sorting, and every card all then work off
-  // the same live numbers, not a mix of live and stale ones.
-  const livePrices = useLivePrices(useMemo(() => staticProducts.map((p) => p.slug), []));
-  const products = useMemo(
-    () => staticProducts.map((p) => applyLivePricing(p, livePrices[p.slug])),
-    [livePrices]
-  );
 
   const filters: Filters = {
     format: (FORMATS.includes(sp.get("format") as Format) ? sp.get("format") : null) as Format | null,
