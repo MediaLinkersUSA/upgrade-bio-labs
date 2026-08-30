@@ -91,7 +91,7 @@ export default async function ProductPage({
    */
   const MAX_BACKFILL = 6;
   const candidateSlugs = (() => {
-    const curated = p.pairsWith ?? [];
+    const curated = raw.pairsWith ?? [];
     const backfillPool = products
       .filter(
         (o) =>
