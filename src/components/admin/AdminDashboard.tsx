@@ -191,11 +191,20 @@ export default function AdminDashboard({
     setRefreshing(true);
     setRefreshError(null);
     try {
+      // A full catalog sync against a slow WooCommerce server can take a
+      // while - this is expected now (see revalidate-prices/route.ts) and
+      // does not block any customer, only this admin request.
       const res = await fetch("/api/admin/revalidate-prices", { method: "POST" });
-      if (!res.ok) throw new Error();
-      setRefreshedAt(new Date().toLocaleTimeString());
-    } catch {
-      setRefreshError("Couldn't reach the server - try again.");
+      const body = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(body?.error ?? "");
+      const parts = [
+        `${body?.synced ?? "?"} synced`,
+        body?.failed ? `${body.failed} failed` : null,
+        body?.tookMs ? `${(body.tookMs / 1000).toFixed(1)}s` : null,
+      ].filter(Boolean);
+      setRefreshedAt(`${new Date().toLocaleTimeString()} (${parts.join(", ")})`);
+    } catch (e) {
+      setRefreshError(e instanceof Error && e.message ? e.message : "Couldn't reach the server - try again.");
     } finally {
       setRefreshing(false);
     }
@@ -226,9 +235,9 @@ export default function AdminDashboard({
               onClick={updatePrices}
               disabled={refreshing}
               className="btn-ghost"
-              title="Fetches the latest prices and stock status from WooCommerce for every product, right now, instead of waiting for the normal 2-hour refresh."
+              title="Fetches the latest prices and stock status from WooCommerce for every product and saves them to the database the site reads from. Can take up to a minute or two - it's syncing the whole catalog, not just this page."
             >
-              {refreshing ? "Updating…" : "Update Prices"}
+              {refreshing ? "Updating… (may take a minute)" : "Update Prices"}
             </button>
             {refreshedAt && !refreshError && (
               <p className="mt-1 text-[12px] text-muted">Updated {refreshedAt}</p>
