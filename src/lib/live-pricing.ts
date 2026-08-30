@@ -61,6 +61,17 @@ export async function withLivePricing(product: Product): Promise<Product> {
 }
 
 /**
+ * `products`, each with live WooCommerce prices applied wherever one was
+ * found - for a whole page (the shop grid, a related-products row) rather
+ * than a single PDP. Built on getLivePricingForSlugs so it shares the same
+ * one-fetch-per-product-in-parallel behaviour, not a serial loop.
+ */
+export async function withLivePricingForAll(products: Product[]): Promise<Product[]> {
+  const live = await getLivePricingForSlugs(products);
+  return products.map((p) => applyLivePricing(p, live[p.slug]));
+}
+
+/**
  * Live pricing for several products at once, fetched in parallel - what
  * /api/live-price serves, and what the order route uses to reprice a whole
  * cart before it charges anyone.
