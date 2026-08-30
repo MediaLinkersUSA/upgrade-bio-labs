@@ -15,8 +15,10 @@ export const metadata: Metadata = {
 
 // Same reasoning as the product page: re-rendered on this schedule so every
 // visitor's HTML already has live prices/stock baked in, rather than a
-// static grid that visibly updates itself after the fact.
-export const revalidate = 45;
+// static grid that visibly updates itself after the fact. 2 hours is the
+// backstop; the "Update Prices" button in /admin forces an immediate
+// refresh via revalidatePath() for whenever someone doesn't want to wait.
+export const revalidate = 7200;
 
 const itemList = {
   "@context": "https://schema.org",
