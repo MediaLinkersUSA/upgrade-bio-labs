@@ -1,8 +1,8 @@
 import type { Product } from "@/data/types";
 import { products } from "@/data/products";
 import { getSupabaseAdmin } from "./supabase";
-import { getLivePricingForSlugs, type LivePricing } from "./live-pricing";
-import { applyLivePricing } from "./apply-live-pricing";
+import { getLivePricingForSlugs } from "./live-pricing";
+import { applyLivePricing, type LivePricing } from "./apply-live-pricing";
 
 /**
  * Pulls live price/stock for the whole catalog from WooCommerce and writes
@@ -105,7 +105,7 @@ export function withCachedPricing(product: Product, cached: CachedPricing | unde
   return applyLivePricing(product, cached ?? null);
 }
 
-export async function withCachedPricingForAll(products: Product[]): Promise<Product[]> {
-  const cached = await getCachedPricing(products.map((p) => p.slug));
-  return products.map((p) => withCachedPricing(p, cached[p.slug]));
+export async function withCachedPricingForAll(list: Product[]): Promise<Product[]> {
+  const cached = await getCachedPricing(list.map((p) => p.slug));
+  return list.map((p) => withCachedPricing(p, cached[p.slug]));
 }
