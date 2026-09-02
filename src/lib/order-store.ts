@@ -48,6 +48,9 @@ export type OrderInput = {
   refCode: string | null;
   affiliateId: string | null;
   commissionCents: number;
+  /** "How did you hear about us?" - optional at checkout, both null if skipped. */
+  heardAbout: string | null;
+  heardAboutDetail: string | null;
   items: {
     slug: string;
     name: string;
@@ -89,21 +92,31 @@ export async function createOrder(input: OrderInput): Promise<OrderResult> {
     ref_code: input.refCode,
     affiliate_id: input.affiliateId,
     commission_cents: input.commissionCents,
+    heard_about: input.heardAbout,
+    heard_about_detail: input.heardAboutDetail,
     ...money,
   };
 
   let { data, error } = await db.from("orders").insert(rich).select("id").single();
   let legacy = false;
 
-  // Affiliate columns (0005) can be missing independently of the rest of the
-  // rich shape (0004) - a store that has run 0004 but not 0005 should still
-  // get the order saved, just without attribution, rather than falling all
-  // the way back to the pre-0004 legacy shape. Retried without those three
-  // keys specifically before assuming the whole rich shape is unavailable.
+  // Affiliate columns (0005) and heard_about columns (0008) can each be
+  // missing independently of the rest of the rich shape - a store that has
+  // run some but not all migrations should still get the order saved, just
+  // without whichever columns aren't there yet, rather than falling all the
+  // way back to the pre-0004 legacy shape. Retried without those five keys
+  // specifically before assuming the whole rich shape is unavailable.
   if (isMissingSchema(error)) {
-    const { ref_code, affiliate_id, commission_cents, ...richWithoutAffiliate } = rich;
-    void ref_code; void affiliate_id; void commission_cents;
-    const retry = await db.from("orders").insert(richWithoutAffiliate).select("id").single();
+    const {
+      ref_code,
+      affiliate_id,
+      commission_cents,
+      heard_about,
+      heard_about_detail,
+      ...richWithoutOptional
+    } = rich;
+    void ref_code; void affiliate_id; void commission_cents; void heard_about; void heard_about_detail;
+    const retry = await db.from("orders").insert(richWithoutOptional).select("id").single();
     if (!isMissingSchema(retry.error)) {
       ({ data, error } = retry);
     }
@@ -128,6 +141,8 @@ export async function createOrder(input: OrderInput): Promise<OrderResult> {
         ref_code: input.refCode ?? "",
         affiliate_id: input.affiliateId ?? "",
         commission_cents: input.commissionCents,
+        heard_about: input.heardAbout ?? "",
+        heard_about_detail: input.heardAboutDetail ?? "",
       },
       ...money,
     };
