@@ -313,6 +313,45 @@ export default function CheckoutForm({
                 style={{ borderColor: "var(--color-line)" }}
               />
             </div>
+
+            <div>
+              <label htmlFor="heardAbout" className="label mb-1.5 block text-muted">
+                How did you hear about us? (Optional)
+              </label>
+              <select
+                id="heardAbout"
+                value={values.heardAbout ?? ""}
+                onChange={(e) => set("heardAbout", e.target.value)}
+                className={input}
+                style={{ borderColor: "var(--color-line)" }}
+              >
+                <option value="">Select one</option>
+                <option value="Google Search">Google Search</option>
+                <option value="Social Media">Social Media</option>
+                <option value="Word of Mouth">Word of Mouth</option>
+                <option value="Previous Customer">Previous Customer</option>
+                <option value="Online Advertisement">Online Advertisement</option>
+                <option value="Event / Trade Show">Event / Trade Show</option>
+                <option value="Rep.">Rep.</option>
+                <option value="Other">Other</option>
+              </select>
+
+              {/* Rep. and Other both need a name/specifics - same free-text
+                  follow-up, just a different prompt, so one field covers
+                  both rather than two near-identical inputs. */}
+              {(values.heardAbout === "Other" || values.heardAbout === "Rep.") && (
+                <input
+                  id="heardAboutDetail"
+                  type="text"
+                  value={values.heardAboutDetail ?? ""}
+                  onChange={(e) => set("heardAboutDetail", e.target.value)}
+                  placeholder={values.heardAbout === "Rep." ? "Rep's name" : "Please specify"}
+                  aria-label={values.heardAbout === "Rep." ? "Rep's name" : "Please specify how you heard about us"}
+                  className={`${input} mt-2`}
+                  style={{ borderColor: "var(--color-line)" }}
+                />
+              )}
+            </div>
           </div>
         </section>
 
