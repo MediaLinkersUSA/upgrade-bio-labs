@@ -156,6 +156,15 @@ export async function POST(req: Request) {
     );
   }
 
+  // Optional at checkout. The detail field only means something alongside
+  // "Other" or "Rep." - dropped otherwise so a stray value can't linger from
+  // a prior selection the customer changed their mind about.
+  const heardAbout = String(c.heardAbout ?? "").trim() || null;
+  const heardAboutDetail =
+    heardAbout === "Other" || heardAbout === "Rep."
+      ? String(c.heardAboutDetail ?? "").trim() || null
+      : null;
+
   // Adapts to whichever schema the database currently has - see order-store.
   const saved = await createOrder({
     orderNumber,
@@ -188,6 +197,8 @@ export async function POST(req: Request) {
     refCode: affiliate?.code ?? null,
     affiliateId: affiliate?.id ?? null,
     commissionCents,
+    heardAbout,
+    heardAboutDetail,
     items: items.map((i) => ({
       slug: i.product.slug,
       name: i.product.name,
@@ -216,7 +227,19 @@ export async function POST(req: Request) {
     paymentMethod: method.id,
     email: String(c.email).trim().toLowerCase(),
     phone: String(c.phone ?? "").trim() || null,
-    notes: String(c.notes ?? "").trim() || null,
+    // "How did you hear about us?" rides along here specifically because
+    // this field becomes WooCommerce's customer_note, which is what its own
+    // native order-confirmation email actually displays - there is no
+    // separate email-sending code in this app to attach it to instead.
+    notes:
+      [
+        String(c.notes ?? "").trim(),
+        heardAbout
+          ? `Heard about us: ${heardAbout}${heardAboutDetail ? ` (${heardAboutDetail})` : ""}`
+          : null,
+      ]
+        .filter(Boolean)
+        .join(" | ") || null,
     firstName: String(c.firstName ?? ""),
     lastName: String(c.lastName ?? ""),
     address1: String(c.address1 ?? ""),
