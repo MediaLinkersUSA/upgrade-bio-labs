@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { SITE } from "@/lib/config";
 
 export const metadata: Metadata = {
@@ -35,12 +34,22 @@ const TIERS = [
 export default function PartnerPage() {
   return (
     <div className="container-site py-12">
-      <h1 className="t-display-lg">Partner With Us</h1>
-      <p className="mt-3 max-w-[58ch] text-[16px] leading-relaxed text-muted">
-        Three ways to work with us beyond a standard order. Every route keeps the
-        same testing standard: identity, purity and quantity on every batch, plus
-        endotoxin and heavy metals on vials, documented before it ships.
-      </p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="t-display-lg">Partner With Us</h1>
+          <p className="mt-3 max-w-[58ch] text-[16px] leading-relaxed text-muted">
+            Three ways to work with us beyond a standard order. Every route keeps the
+            same testing standard: identity, purity and quantity on every batch, plus
+            endotoxin and heavy metals on vials, documented before it ships.
+          </p>
+        </div>
+        <a
+          href="https://old.upgradebiolabs.com/research-community/"
+          className="btn-primary shrink-0"
+        >
+          Apply or Login To Partner Program <span aria-hidden>&rarr;</span>
+        </a>
+      </div>
 
       <ul className="mt-10 grid gap-5 md:grid-cols-3">
         {TRACKS.map((t) => (
@@ -90,9 +99,9 @@ export default function PartnerPage() {
         </p>
 
         <div className="mt-8">
-          <Link href="/contact" className="btn-primary">
-            Apply To Join <span aria-hidden>&rarr;</span>
-          </Link>
+          <a href="https://old.upgradebiolabs.com/research-community/" className="btn-primary">
+            Apply or Login To Partner Program <span aria-hidden>&rarr;</span>
+          </a>
           <p className="mt-3 text-[14px] text-muted">
             Or email{" "}
             <a href={`mailto:${SITE.email}`} className="text-teal-dark hover:underline">
