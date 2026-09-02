@@ -24,6 +24,9 @@ type Order = {
   shipping_address?: Record<string, string> | null;
   /** Present after migration 0004. */
   tracking_number?: string | null;
+  /** Present after migration 0008. */
+  heard_about?: string | null;
+  heard_about_detail?: string | null;
   order_items?: { product_name: string; quantity: number; line_cents: number }[];
 };
 
@@ -44,6 +47,11 @@ const METHOD_LABEL: Record<string, string> = {
   zelle: "Zelle",
   cashapp: "CashApp",
 };
+
+const heardAboutLabel = (o: Order) =>
+  o.heard_about
+    ? `${o.heard_about}${o.heard_about_detail ? ` (${o.heard_about_detail})` : ""}`
+    : null;
 type Sub = { email: string; source: string; created_at: string };
 type StockReq = { email: string; product_slug: string; created_at: string };
 type CoaDoc = { product_slug: string; batch: string | null; uploaded_at: string; original_name: string | null };
@@ -320,6 +328,7 @@ export default function AdminDashboard({
                       // Excel by someone who never sees the codebase.
                       status: statusLabel(o.status),
                       tracking: o.tracking_number ?? "",
+                      heard_about: heardAboutLabel(o) ?? "",
                       total: (o.total_cents / 100).toFixed(2),
                       items: (o.order_items ?? [])
                         .map((i) => `${i.quantity}x ${i.product_name}`)
@@ -363,6 +372,11 @@ export default function AdminDashboard({
                       <td className="px-4 py-3">
                         <span className="block font-medium">{o.shipping_name ?? "-"}</span>
                         <span className="block text-[13px] text-muted">{o.email}</span>
+                        {heardAboutLabel(o) && (
+                          <span className="mt-0.5 block text-[12px] text-faint">
+                            Heard about us: {heardAboutLabel(o)}
+                          </span>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-muted">
                         {(o.order_items ?? []).map((i) => `${i.quantity}x ${i.product_name}`).join(", ") || "-"}
