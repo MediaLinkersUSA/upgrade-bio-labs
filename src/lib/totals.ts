@@ -15,20 +15,14 @@ import { SHIPPING_THRESHOLD, shippingMethod, type ShippingMethodId } from "./con
  */
 
 /**
- * Hard ceiling on percentage discounts, as a fraction of list value.
- *
- * Client instruction: nobody should ever get more than 25% off. Without this,
- * discounts compound - a 5-unit order takes the 10% quantity price, then 25%
- * off that from the first-order code, then $5 for paying by Zelle, and lands
- * at 33.6% off list.
- *
- * Scope: this caps money off product (quantity tiers + bundle/promo + the
- * payment-method credit). Free shipping and the free bacteriostatic water are
- * order incentives rather than a percentage off goods, and are deliberately
- * outside the cap - otherwise unlocking the $250 reward would silently claw
- * back part of the customer's coupon.
+ * Removed at the client's request (previously a hard 25% ceiling on
+ * percentage discounts - quantity tiers + bundle/promo + payment-method
+ * credit - so a stacked order could never exceed 25% off list). Discounts
+ * now compound freely: a large quantity-tier discount, a promo/coupon code,
+ * and the Zelle/CashApp credit can add up past 25% off list on the same
+ * order. If unexpected margin erosion shows up, this is the first place to
+ * look.
  */
-export const MAX_DISCOUNT_RATE = 0.25;
 
 /** Order-value rewards, cheapest first. Drives the cart's progress ladder. */
 export const REWARDS = [
@@ -148,17 +142,8 @@ export function computeTotals({
       ? +listUnitPrice(bacLine.product, bacLine.size).toFixed(2)
       : 0;
 
-  // --- the cap ---------------------------------------------------------
-  const listDiscountable = items
-    .filter((i) => !isSupply(i.product))
-    .reduce((s, i) => s + listUnitPrice(i.product, i.size) * i.qty, 0);
-
   const rawProductDiscount = tierSavings + rateDiscount + methodCredit;
-  const ceiling = +(listDiscountable * MAX_DISCOUNT_RATE).toFixed(2);
-  const cappedProductDiscount = Math.min(rawProductDiscount, ceiling);
-  const capped = rawProductDiscount > ceiling + 0.001;
-
-  const totalDiscount = +(cappedProductDiscount + freeItemCredit).toFixed(2);
+  const totalDiscount = +(rawProductDiscount + freeItemCredit).toFixed(2);
 
   // --- shipping --------------------------------------------------------
   const ship = shippingMethod(shippingMethodId);
@@ -178,7 +163,7 @@ export function computeTotals({
     freeItemCredit,
     methodDiscount: methodCredit,
     totalDiscount,
-    capped,
+    capped: false,
     shipping,
     total,
     distinctCompounds,
