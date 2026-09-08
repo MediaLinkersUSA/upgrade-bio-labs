@@ -1,5 +1,4 @@
 import Hero from "@/components/home/Hero";
-import SaleBanner from "@/components/home/SaleBanner";
 import ReviewsSection from "@/components/home/ReviewsSection";
 import BestsellersSection from "@/components/home/BestsellersSection";
 import FormatSection from "@/components/home/FormatSection";
@@ -25,7 +24,6 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
       <Hero />
-      <SaleBanner />
       <ReviewsSection />
       {/* Formats before products: a first-time visitor has to understand that
           the same compound comes three ways before a product grid means
