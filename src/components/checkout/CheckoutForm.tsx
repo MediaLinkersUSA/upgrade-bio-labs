@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useCart } from "@/components/cart/CartProvider";
+import CardBrandIcons from "@/components/checkout/CardBrandIcons";
 import { money } from "@/lib/pricing";
 import {
   SHIPPING_THRESHOLD,
@@ -551,6 +552,7 @@ export default function CheckoutForm({
                         )}
                       </span>
                       <span className="text-[14.5px] font-medium">{m.label}</span>
+                      {m.id === "card" && <CardBrandIcons />}
                     </button>
                     {on && (
                       <p className="mt-1.5 px-1 text-[13px] leading-relaxed text-muted">
