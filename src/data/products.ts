@@ -3702,7 +3702,7 @@ export const products: Product[] = [
     "doseLabel": "1.7 fl oz / 50 ml",
     "volumeMl": 50,
     "purity": "99%",
-    "basePrice": 79.00,
+    "basePrice": 79.0,
     "tiers": [
       {
         "minQty": 1,
