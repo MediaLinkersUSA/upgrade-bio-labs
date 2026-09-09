@@ -3686,11 +3686,7 @@ export const products: Product[] = [
     "copySource": "authored",
     "image": "/products/vial-storage-case.webp",
     "sourceImage": "/products/vial-storage-case.webp"
-  }
-  /* GHK-Cu Cream — not live yet, price/stock pending client confirmation.
-     Uncomment this object (and remove the trailing comma above, on the
-     "vial-storage-case" closing brace) to bring it back.  */
-  ,
+  },
   {
     "slug": "ghk-cu-cream",
     "name": "GHK-Cu Cream",
@@ -3723,7 +3719,6 @@ export const products: Product[] = [
     "image": "/products/ghk-cu-cream.webp",
     "sourceImage": "/products/ghk-cu-cream.webp"
   }
-
 ];
 
 export const byFormat = (f: Product["format"]) => products.filter((p) => p.format === f);
