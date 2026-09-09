@@ -288,16 +288,17 @@ export default function ShopBrowser({ products }: { products: Product[] }) {
 
         {/* Grid */}
         <div>
-          <p className="mb-4 flex flex-wrap items-center gap-2 font-mono text-[13px] text-muted">
+          <p className="mb-4 flex flex-wrap items-center gap-2.5 font-mono text-[13px] text-muted">
             {results.length} {results.length === 1 ? "result" : "results"}
             {filters.search && (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-line-soft bg-surface px-2.5 py-1 text-[12px] text-ink">
+              <span className="inline-flex items-center gap-2 rounded-full border border-teal/40 bg-wash py-1.5 pl-3.5 pr-1.5 text-[13.5px] font-medium text-teal-dark">
                 for &ldquo;{filters.search}&rdquo;
                 <button
                   type="button"
                   onClick={() => setParam("search", null)}
-                  aria-label="Clear search"
-                  className="text-muted hover:text-ink"
+                  aria-label="Clear search and show all products"
+                  title="Clear search and show all products"
+                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal-dark text-[15px] leading-none text-white hover:bg-navy"
                 >
                   &times;
                 </button>
