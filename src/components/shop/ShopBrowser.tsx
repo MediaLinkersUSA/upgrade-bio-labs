@@ -31,8 +31,17 @@ interface Filters {
   search: string | null;
 }
 
+/**
+ * Strips everything but letters/digits before comparing, so punctuation a
+ * shopper doesn't think of as meaningful - the hyphen in "BPC-157", the
+ * slash in "Semax / Selank" - doesn't stand between them and a result.
+ * "BPC157", "bpc 157", and "BPC-157" all normalize to the same string.
+ */
+const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+
 function apply(list: Product[], f: Partial<Filters>) {
-  const q = f.search?.trim().toLowerCase();
+  const trimmed = f.search?.trim();
+  const q = trimmed ? normalize(trimmed) : null;
   return list
     .filter((p) => (f.format ? p.format === f.format : true))
     .filter((p) => (f.goal ? p.goals.includes(f.goal as never) : true))
@@ -40,9 +49,9 @@ function apply(list: Product[], f: Partial<Filters>) {
     .filter((p) => (f.inStockOnly ? p.inStock : true))
     .filter((p) =>
       q
-        ? p.name.toLowerCase().includes(q) ||
-          p.short.toLowerCase().includes(q) ||
-          (p.blend ?? []).some((b) => b.toLowerCase().includes(q))
+        ? normalize(p.name).includes(q) ||
+          normalize(p.short).includes(q) ||
+          (p.blend ?? []).some((b) => normalize(b).includes(q))
         : true
     );
 }
