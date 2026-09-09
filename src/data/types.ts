@@ -67,6 +67,13 @@ export interface Product {
   refs?: string[]; // literature links shown on the PDP
   inStock: boolean;
   bestseller?: boolean;
+  /**
+   * Added for ghk-cu-cream, currently false there and unread anywhere in the
+   * app - the type only needed adding to unblock the build. If the intent is
+   * an actual "price hidden, contact us" display, that UI still needs to be
+   * built (BuyBox.tsx, ProductCard.tsx) before this field does anything.
+   */
+  priceHidden?: boolean;
   short: string;
   description: string;
   researchAreas: ResearchArea[];
