@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { byFormat, bestsellers, products } from "@/data/products";
 import { GOAL_META, GOAL_ORDER } from "@/lib/config";
 import { useCart } from "@/components/cart/CartProvider";
@@ -29,12 +30,43 @@ const COLUMNS = (["vial", "spray", "capsule"] as const).map((f) => ({
 }));
 
 export default function Nav() {
+  const router = useRouter();
   const { count, mounted, setOpen } = useCart();
   const [mega, setMega] = useState(false);
   const [mobile, setMobile] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchBoxRef = useRef<HTMLDivElement>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => () => { if (closeTimer.current) clearTimeout(closeTimer.current); }, []);
+
+  // Opens focused, and closes on an outside click or Escape - the three
+  // things a person expects from a search popover regardless of the site.
+  useEffect(() => {
+    if (!searchOpen) return;
+    searchInputRef.current?.focus();
+    const onClick = (e: MouseEvent) => {
+      if (searchBoxRef.current && !searchBoxRef.current.contains(e.target as Node)) {
+        setSearchOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setSearchOpen(false);
+    document.addEventListener("mousedown", onClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [searchOpen]);
+
+  const submitSearch = (e: FormEvent) => {
+    e.preventDefault();
+    const q = searchValue.trim();
+    setSearchOpen(false);
+    router.push(q ? `/shop?search=${encodeURIComponent(q)}` : "/shop");
+  };
 
   const openMega = () => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
@@ -80,16 +112,47 @@ export default function Nav() {
             for, so they carry a visible bordered chip rather than sitting as
             bare icons. Search and menu stay quiet so the pair reads first. */}
         <div className="flex items-center gap-1.5">
-          <Link
-            href="/shop"
-            aria-label="Search the catalog"
-            className="rounded-full p-2.5 text-muted hover:bg-surface hover:text-ink"
-          >
-            <svg width="20" height="20" viewBox="0 0 18 18" fill="none" aria-hidden>
-              <circle cx="8" cy="8" r="5.2" stroke="currentColor" strokeWidth="1.5" />
-              <path d="M12 12l3.4 3.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-          </Link>
+          <div ref={searchBoxRef} className="relative">
+            <button
+              type="button"
+              onClick={() => setSearchOpen((v) => !v)}
+              aria-label="Search the catalog"
+              aria-expanded={searchOpen}
+              className="rounded-full p-2.5 text-muted hover:bg-surface hover:text-ink"
+            >
+              <svg width="20" height="20" viewBox="0 0 18 18" fill="none" aria-hidden>
+                <circle cx="8" cy="8" r="5.2" stroke="currentColor" strokeWidth="1.5" />
+                <path d="M12 12l3.4 3.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            </button>
+
+            {searchOpen && (
+              <form
+                onSubmit={submitSearch}
+                className="absolute right-0 top-full mt-2 flex w-[min(280px,80vw)] items-center gap-1.5 rounded-full border border-line bg-surface p-1.5 pl-4 shadow-lift"
+              >
+                <input
+                  ref={searchInputRef}
+                  type="search"
+                  value={searchValue}
+                  onChange={(e) => setSearchValue(e.target.value)}
+                  placeholder="Search products..."
+                  aria-label="Search products"
+                  className="min-w-0 flex-1 bg-transparent text-[14.5px] text-ink outline-none placeholder:text-faint"
+                />
+                <button
+                  type="submit"
+                  aria-label="Search"
+                  className="shrink-0 rounded-full bg-navy p-2 text-white hover:bg-teal-dark"
+                >
+                  <svg width="15" height="15" viewBox="0 0 18 18" fill="none" aria-hidden>
+                    <circle cx="8" cy="8" r="5.2" stroke="currentColor" strokeWidth="1.6" />
+                    <path d="M12 12l3.4 3.4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                  </svg>
+                </button>
+              </form>
+            )}
+          </div>
           <a
             href="https://old.upgradebiolabs.com/my-account/"
             aria-label="Account"
