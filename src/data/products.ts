@@ -49,65 +49,65 @@ export const products: Product[] = [
     "image": "/products/5-amino-1-mq.webp",
     "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/5-Amino-1-MQ-1.jpg"
   },
-  {
-    "slug": "aod-9604",
-    "name": "AOD-9604",
-    "format": "vial",
-    "presentation": "lyophilized",
-    "goals": [
-      "metabolic"
-    ],
-    "doseMg": 5,
-    "doseLabel": "5 MG",
-    "purity": "≥99%",
-    "basePrice": 65.0,
-    "tiers": [
-      {
-        "minQty": 1,
-        "label": "most popular",
-        "unitPrice": 65.0
-      },
-      {
-        "minQty": 3,
-        "unitPrice": 61.75
-      },
-      {
-        "minQty": 5,
-        "label": "best value",
-        "unitPrice": 58.5
-      }
-    ],
-    "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/03/AOD-9604_70-202607-01_COA.pdf",
-    "inStock": true,
-    "short": "hGH(177-191) fragment studied for lipolysis without GH-axis activity.",
-    "description": "AOD-9604 is a synthetic peptide fragment derived from the C-terminal region of human growth hormone. Research examines its effect on lipolysis and lipogenesis in metabolic models, and notes that it does not carry the blood-glucose or growth-hormone activity of the full-length molecule.",
-    "researchAreas": [
-      {
-        "title": "Lipolysis",
-        "body": "Studied for the mobilization of stored fat, with particular attention to abdominal and visceral adipose depots."
-      },
-      {
-        "title": "Lipogenesis",
-        "body": "Investigated for inhibition of new fat formation in metabolic models."
-      },
-      {
-        "title": "Glucose Handling",
-        "body": "Examined for the absence of the blood-glucose effects associated with full-length growth hormone."
-      },
-      {
-        "title": "Cartilage And Joint Models",
-        "body": "Explored for effects on cartilage matrix in preclinical joint-repair work."
-      }
-    ],
-    "pairsWith": [
-      "aod-9604-spray",
-      "tesamorelin",
-      "bac-water-hospira-brand"
-    ],
-    "copySource": "authored",
-    "image": "/products/aod-9604.webp",
-    "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/03/AOD-9604-2.jpg"
-  },
+  // {
+  //   "slug": "aod-9604",
+  //   "name": "AOD-9604",
+  //   "format": "vial",
+  //   "presentation": "lyophilized",
+  //   "goals": [
+  //     "metabolic"
+  //   ],
+  //   "doseMg": 5,
+  //   "doseLabel": "5 MG",
+  //   "purity": "≥99%",
+  //   "basePrice": 65.0,
+  //   "tiers": [
+  //     {
+  //       "minQty": 1,
+  //       "label": "most popular",
+  //       "unitPrice": 65.0
+  //     },
+  //     {
+  //       "minQty": 3,
+  //       "unitPrice": 61.75
+  //     },
+  //     {
+  //       "minQty": 5,
+  //       "label": "best value",
+  //       "unitPrice": 58.5
+  //     }
+  //   ],
+  //   "coaUrl": "https://upgradebiolabs.com/wp-content/uploads/2026/03/AOD-9604_70-202607-01_COA.pdf",
+  //   "inStock": true,
+  //   "short": "hGH(177-191) fragment studied for lipolysis without GH-axis activity.",
+  //   "description": "AOD-9604 is a synthetic peptide fragment derived from the C-terminal region of human growth hormone. Research examines its effect on lipolysis and lipogenesis in metabolic models, and notes that it does not carry the blood-glucose or growth-hormone activity of the full-length molecule.",
+  //   "researchAreas": [
+  //     {
+  //       "title": "Lipolysis",
+  //       "body": "Studied for the mobilization of stored fat, with particular attention to abdominal and visceral adipose depots."
+  //     },
+  //     {
+  //       "title": "Lipogenesis",
+  //       "body": "Investigated for inhibition of new fat formation in metabolic models."
+  //     },
+  //     {
+  //       "title": "Glucose Handling",
+  //       "body": "Examined for the absence of the blood-glucose effects associated with full-length growth hormone."
+  //     },
+  //     {
+  //       "title": "Cartilage And Joint Models",
+  //       "body": "Explored for effects on cartilage matrix in preclinical joint-repair work."
+  //     }
+  //   ],
+  //   "pairsWith": [
+  //     "aod-9604-spray",
+  //     "tesamorelin",
+  //     "bac-water-hospira-brand"
+  //   ],
+  //   "copySource": "authored",
+  //   "image": "/products/aod-9604.webp",
+  //   "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/03/AOD-9604-2.jpg"
+  // },
   {
     "slug": "aod-9604-spray",
     "name": "AOD-9604 Spray",
