@@ -28,14 +28,23 @@ interface Filters {
   max: number;
   inStockOnly: boolean;
   sort: SortKey;
+  search: string | null;
 }
 
 function apply(list: Product[], f: Partial<Filters>) {
+  const q = f.search?.trim().toLowerCase();
   return list
     .filter((p) => (f.format ? p.format === f.format : true))
     .filter((p) => (f.goal ? p.goals.includes(f.goal as never) : true))
     .filter((p) => (f.max != null ? p.basePrice <= f.max : true))
-    .filter((p) => (f.inStockOnly ? p.inStock : true));
+    .filter((p) => (f.inStockOnly ? p.inStock : true))
+    .filter((p) =>
+      q
+        ? p.name.toLowerCase().includes(q) ||
+          p.short.toLowerCase().includes(q) ||
+          (p.blend ?? []).some((b) => b.toLowerCase().includes(q))
+        : true
+    );
 }
 
 function sortList(list: Product[], sort: SortKey) {
@@ -64,6 +73,7 @@ export default function ShopBrowser({ products }: { products: Product[] }) {
     max: Number(sp.get("max")) || PRICE_MAX,
     inStockOnly: sp.get("stock") === "1",
     sort: (Object.keys(SORTS).includes(sp.get("sort") ?? "") ? sp.get("sort") : "bestselling") as SortKey,
+    search: sp.get("search")?.trim() || null,
   };
 
   /** All filter state lives in the URL, so a filtered view is shareable and
@@ -256,7 +266,7 @@ export default function ShopBrowser({ products }: { products: Product[] }) {
             In Stock Only
           </label>
 
-          {(filters.format || filters.goal || filters.inStockOnly || filters.max < PRICE_MAX) && (
+          {(filters.format || filters.goal || filters.inStockOnly || filters.max < PRICE_MAX || filters.search) && (
             <button
               type="button"
               onClick={() => router.replace("/shop", { scroll: false })}
@@ -269,8 +279,21 @@ export default function ShopBrowser({ products }: { products: Product[] }) {
 
         {/* Grid */}
         <div>
-          <p className="mb-4 font-mono text-[13px] text-muted">
+          <p className="mb-4 flex flex-wrap items-center gap-2 font-mono text-[13px] text-muted">
             {results.length} {results.length === 1 ? "result" : "results"}
+            {filters.search && (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-line-soft bg-surface px-2.5 py-1 text-[12px] text-ink">
+                for &ldquo;{filters.search}&rdquo;
+                <button
+                  type="button"
+                  onClick={() => setParam("search", null)}
+                  aria-label="Clear search"
+                  className="text-muted hover:text-ink"
+                >
+                  &times;
+                </button>
+              </span>
+            )}
           </p>
 
           {results.length === 0 ? (
