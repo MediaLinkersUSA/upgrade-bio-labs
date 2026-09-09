@@ -46,7 +46,7 @@ export default function GoalsSection() {
                     aria-hidden
                   />
                   <div className="relative p-6">
-                    <h3 className="t-title text-white">{meta.title}</h3>
+                    <h3 className="t-title text-white">{meta.title} Research</h3>
                     <p className="mt-1 text-[14px] text-white/80">{meta.sub}</p>
                     <span className="label mt-3 inline-flex items-center gap-1.5 text-white/90">
                       {count} compounds
