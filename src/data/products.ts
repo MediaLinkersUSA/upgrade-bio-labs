@@ -3706,11 +3706,11 @@ export const products: Product[] = [
     "tiers": [
       {
         "minQty": 1,
-        "unitPrice": 0
+        "unitPrice": 79.0
       }
     ],
-    "inStock": false,
-    "priceHidden": true,
+    "inStock": true,
+    "priceHidden": false,
     "short": "Daily face cream with 99% pure GHK-Cu copper tripeptide and a PAL-150 peptide complex.",
     "description": "1.7 fl oz / 50 ml frosted glass bottle with white cap.\n\n* GHK-Cu Copper Tri-Peptide-1 99% - PREMIUM COSMETIC GRADE\n* PAL-150 Peptide Complex (Palmitoyl Tripeptide-1 + Palmitoyl Tetrapeptide-7)\n\nMeet your new daily ritual for deeply nourished, radiant-looking skin. This luxurious face cream is infused with Copper Tripeptide-1, Peptides, Hyaluronic Acid, Panthenol, and antioxidant-rich botanical oils to leave skin feeling soft, smooth, and refreshed with a healthy-looking glow.\n\nCrafted with Shea Butter, Cocoa Butter, Jojoba Oil, Pomegranate Seed Oil, Rosehip Oil, and Prickly Pear Oil, this ultra-hydrating formula helps replenish moisture while delivering a silky, velvety finish. A touch of Methylene Blue and Green Tea Extract gives this cream a modern, elevated edge designed for those who want premium skincare with a clean, sophisticated feel.\n\nLightly scented with natural Orange Peel Oil, this rich yet elegant moisturizer melts effortlessly into the skin, making it perfect for both day and night hydration.\n\nKey Ingredients:\n* PURE 99% GKU-Cu Copper Peptide\n* Peptide Complex\n* Hyaluronic Acid\n* Methylene Blue\n* Organic Coconut Oil\n* Jojoba Oil\n* Organic Green Tea",
     "researchAreas": [],
