@@ -3596,6 +3596,127 @@ export const products: Product[] = [
     "copySource": "authored",
     "image": "/products/wolverine-blendbpc-157-tb-500.webp",
     "sourceImage": "https://upgradebiolabs.com/wp-content/uploads/2026/02/Wolverine-Blend-1.jpg"
+  },
+  {
+    "slug": "dihexa-capsules",
+    "name": "Dihexa Capsules",
+    "format": "capsule",
+    "goals": [
+      "cognitive"
+    ],
+    "doseMg": 3000,
+    "doseLabel": "50 MG Per Capsule",
+    "countCt": 60,
+    "purity": "≥99%",
+    "basePrice": 125.0,
+    "tiers": [
+      {
+        "minQty": 1,
+        "unitPrice": 125.0
+      }
+    ],
+    "inStock": true,
+    "short": "Angiotensin IV analog studied for HGF/c-Met signaling in oral capsule form.",
+    "description": "Dihexa supplied as 50mg capsules, 60 count per bottle. Dihexa is an angiotensin IV analog studied for hepatocyte growth factor (HGF) and c-Met receptor signaling in synaptogenesis and dendritic spine formation research.",
+    "researchAreas": [
+      {
+        "title": "Synaptogenesis",
+        "body": "Studied for HGF/c-Met signaling and dendritic spine formation."
+      }
+    ],
+    "pairsWith": [
+      "dihexa-semax-selank-spray",
+      "5-amino-1-mq",
+      "bac-water-hospira-brand"
+    ],
+    "copySource": "authored",
+    "image": "/products/dihexa-capsules.webp",
+    "sourceImage": "/products/dihexa-capsules.webp"
+  },
+  {
+    "slug": "vial-slider-container",
+    "name": "Vial Slider Container",
+    "format": "supply",
+    "goals": [],
+    "doseLabel": "Holds 5 x 3ml Vials",
+    "purity": "N/A",
+    "basePrice": 20.0,
+    "tiers": [
+      {
+        "minQty": 1,
+        "unitPrice": 20.0
+      }
+    ],
+    "inStock": true,
+    "short": "Slide-out travel tray for 5 standard 3ml vials.",
+    "description": "A slide-out storage tray sized for five standard 3ml vials, with a snap-shut cover. Convenient for keeping research vials organized and protected while traveling.",
+    "researchAreas": [],
+    "pairsWith": [
+      "bac-water-3ml",
+      "bpc-157",
+      "vial-storage-case"
+    ],
+    "copySource": "authored",
+    "image": "/products/vial-slider-container.webp",
+    "sourceImage": "/products/vial-slider-container.webp"
+  },
+  {
+    "slug": "vial-storage-case",
+    "name": "Vial Storage Case",
+    "format": "supply",
+    "goals": [],
+    "doseLabel": "Holds 4 Vials",
+    "purity": "N/A",
+    "basePrice": 15.0,
+    "tiers": [
+      {
+        "minQty": 1,
+        "unitPrice": 15.0
+      }
+    ],
+    "inStock": true,
+    "short": "Compact hinged case for 4 vials.",
+    "description": "A compact hinged storage case with four molded vial slots and a secure clasp. Great for traveling with your research vials.",
+    "researchAreas": [],
+    "pairsWith": [
+      "bac-water-3ml",
+      "bpc-157",
+      "vial-slider-container"
+    ],
+    "copySource": "authored",
+    "image": "/products/vial-storage-case.webp",
+    "sourceImage": "/products/vial-storage-case.webp"
+  },
+  {
+    "slug": "ghk-cu-cream",
+    "name": "GHK-Cu Cream",
+    "format": "supply",
+    "presentation": "topical",
+    "goals": [
+      "skin"
+    ],
+    "doseLabel": "1.7 fl oz / 50 ml",
+    "volumeMl": 50,
+    "purity": "99%",
+    "basePrice": 45.0,
+    "tiers": [
+      {
+        "minQty": 1,
+        "unitPrice": 45.0
+      }
+    ],
+    "inStock": false,
+    "short": "Daily face cream with 99% pure GHK-Cu copper tripeptide and a PAL-150 peptide complex.",
+    "description": "1.7 fl oz / 50 ml frosted glass bottle with white cap.\n\n* GHK-Cu Copper Tri-Peptide-1 99% - PREMIUM COSMETIC GRADE\n* PAL-150 Peptide Complex (Palmitoyl Tripeptide-1 + Palmitoyl Tetrapeptide-7)\n\nMeet your new daily ritual for deeply nourished, radiant-looking skin. This luxurious face cream is infused with Copper Tripeptide-1, Peptides, Hyaluronic Acid, Panthenol, and antioxidant-rich botanical oils to leave skin feeling soft, smooth, and refreshed with a healthy-looking glow.\n\nCrafted with Shea Butter, Cocoa Butter, Jojoba Oil, Pomegranate Seed Oil, Rosehip Oil, and Prickly Pear Oil, this ultra-hydrating formula helps replenish moisture while delivering a silky, velvety finish. A touch of Methylene Blue and Green Tea Extract gives this cream a modern, elevated edge designed for those who want premium skincare with a clean, sophisticated feel.\n\nLightly scented with natural Orange Peel Oil, this rich yet elegant moisturizer melts effortlessly into the skin, making it perfect for both day and night hydration.\n\nKey Ingredients:\n* PURE 99% GKU-Cu Copper Peptide\n* Peptide Complex\n* Hyaluronic Acid\n* Methylene Blue\n* Organic Coconut Oil\n* Jojoba Oil\n* Organic Green Tea",
+    "researchAreas": [],
+    "pairsWith": [
+      "ghk-cu",
+      "ghk-cu-capsules",
+      "ghk-cu-spray"
+    ],
+    "copySource": "authored",
+    "image": "/products/ghk-cu-cream.webp",
+    "sourceImage": "/products/ghk-cu-cream.webp"
   }
 ];
 
