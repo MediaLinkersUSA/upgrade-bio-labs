@@ -153,8 +153,12 @@ export default function Nav() {
               </form>
             )}
           </div>
+           {/* Account button — disabled for now (was pointing at the old
+              WooCommerce site's /my-account/, no destination on the new
+              site yet). href set to "#" so nothing breaks if this gets
+              uncommented before a real account page exists.
           <a
-            href="https://old.upgradebiolabs.com/my-account/"
+            href="#"
             aria-label="Account"
             className="hidden items-center gap-2 rounded-full border border-line bg-surface px-3.5 py-2.5 text-ink transition-colors hover:border-teal hover:text-teal-dark sm:flex"
           >
@@ -164,6 +168,7 @@ export default function Nav() {
             </svg>
             <span className="hidden text-[14.5px] font-semibold lg:inline">Account</span>
           </a>
+             */}
           <button
             type="button"
             onClick={() => setOpen(true)}
