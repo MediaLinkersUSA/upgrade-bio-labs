@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Product } from "@/data/types";
 import { money, perMg, tierLabel } from "@/lib/pricing";
 import { useCart } from "@/components/cart/CartProvider";
+import { trackEcommerce } from "@/lib/analytics";
 import FormatChip from "@/components/ui/FormatChip";
 import NotifyMe from "./NotifyMe";
 import CoaViewer from "./CoaViewer";
@@ -283,7 +284,21 @@ export default function BuyBox({ product: p }: { product: Product }) {
       {p.inStock ? (
         <button
           type="button"
-          onClick={() => add(p.slug, qty, activeSize?.label)}
+          onClick={() => {
+            add(p.slug, qty, activeSize?.label);
+            trackEcommerce("add_to_cart", {
+              currency: "USD",
+              value: lineTotal,
+              items: [
+                {
+                  item_id: p.slug,
+                  item_name: p.name,
+                  price: tier.unitPrice,
+                  quantity: qty,
+                },
+              ],
+            });
+          }}
           disabled={awaitingSize}
           aria-describedby={awaitingSize ? `size-${p.slug}` : undefined}
           className="btn-primary mt-5 w-full disabled:cursor-not-allowed disabled:opacity-45"
