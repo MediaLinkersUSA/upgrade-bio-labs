@@ -122,11 +122,36 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${instrument.variable} ${DISPLAY.variable}`}>
       <head>
+        {/* Server-side GTM via Stape, per bhs.upgradebiolabs.com (see the
+            CNAME added Sept 2026: bhs.upgradebiolabs.com -> usd.stape.io).
+            Placed first in <head>, ahead of the redesign-ack script, since
+            that's what Google's own setup instructions specify - "as high
+            in the head as possible." */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://bhs.upgradebiolabs.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-P52QJ8W4');`,
+          }}
+        />
         {/* Must run before paint: it decides whether the redesign notice is
             visible, and deciding that after hydration shifts the page. */}
         <script dangerouslySetInnerHTML={{ __html: redesignAckScript }} />
       </head>
       <body>
+        {/* Google's own instructions: immediately after the opening <body>
+            tag, ahead of everything else that follows. */}
+        <noscript>
+          <iframe
+            src="https://bhs.upgradebiolabs.com/ns.html?id=GTM-P52QJ8W4"
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+            title="Google Tag Manager"
+          />
+        </noscript>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
