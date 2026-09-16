@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ClearCartOnMount from "@/components/cart/ClearCartOnMount";
+import PurchaseTracker from "@/components/cart/PurchaseTracker";
 import { getOrder } from "@/lib/order-store";
 import { money } from "@/lib/pricing";
 import { SHIP_CUTOFF, SITE } from "@/lib/config";
@@ -43,6 +44,7 @@ export default async function ThankYouPage({
       {/* They have paid, or are on the hook for a transfer. Either way the
           cart is spent and leaving it full invites a duplicate order. */}
       <ClearCartOnMount />
+      {order && <PurchaseTracker order={order} />}
 
       <div className="mx-auto max-w-[62ch]">
         <div className="text-center">
