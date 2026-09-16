@@ -230,6 +230,7 @@ export type StoredOrder = {
   paymentMethod: string;
   status: string;
   email: string | null;
+  phone: string | null;
   shippingName: string | null;
   shippingAddress: Record<string, string> | null;
   subtotalCents: number;
@@ -241,7 +242,14 @@ export type StoredOrder = {
   affiliateId: string | null;
   commissionCents: number;
   createdAt: string;
-  items: { name: string; size: string | null; quantity: number; lineCents: number }[];
+  items: {
+    slug: string | null;
+    name: string;
+    size: string | null;
+    quantity: number;
+    unitCents: number;
+    lineCents: number;
+  }[];
 };
 
 /**
@@ -282,6 +290,7 @@ export async function getOrder(id: string): Promise<StoredOrder | null> {
     paymentMethod: data.payment_method ?? addr?.payment_method ?? "card",
     status: data.status ?? "pending_payment",
     email: data.email ?? null,
+    phone: data.phone ?? null,
     shippingName: data.shipping_name ?? null,
     shippingAddress: addr,
     subtotalCents: data.subtotal_cents ?? 0,
@@ -295,9 +304,11 @@ export async function getOrder(id: string): Promise<StoredOrder | null> {
     createdAt: data.created_at,
     items: (data.order_items ?? []).map(
       (i: Record<string, unknown>) => ({
+        slug: (i.product_slug as string | null) ?? null,
         name: String(i.product_name ?? ""),
         size: (i.size as string | null) ?? null,
         quantity: Number(i.quantity ?? 0),
+        unitCents: Number(i.unit_cents ?? 0),
         lineCents: Number(i.line_cents ?? 0),
       })
     ),
