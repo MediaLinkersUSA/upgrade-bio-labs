@@ -2,9 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useCart } from "@/components/cart/CartProvider";
 import CardBrandIcons from "@/components/checkout/CardBrandIcons";
+import { trackEcommerce } from "@/lib/analytics";
 import { money } from "@/lib/pricing";
 import {
   SHIPPING_THRESHOLD,
@@ -66,6 +67,24 @@ export default function CheckoutForm({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [touched, setTouched] = useState(false);
+
+  // Waits for `mounted` for the same reason ClearCartOnMount does: cart.items
+  // reads empty until localStorage has been read back into state, and this
+  // page can be the first one loaded in a session.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!cart.mounted || !cart.items.length) return;
+    trackEcommerce("begin_checkout", {
+      currency: "USD",
+      value: cart.total,
+      items: cart.items.map((i) => ({
+        item_id: i.product.slug,
+        item_name: i.product.name,
+        price: i.unit,
+        quantity: i.qty,
+      })),
+    });
+  }, [cart.mounted]);
 
   const methods = offlineAvailable
     ? PAYMENT_METHODS
@@ -490,7 +509,20 @@ export default function CheckoutForm({
                     type="button"
                     role="radio"
                     aria-checked={on}
-                    onClick={() => setShipId(m.id)}
+                    onClick={() => {
+                      setShipId(m.id);
+                      trackEcommerce("add_shipping_info", {
+                        currency: "USD",
+                        value: cart.total,
+                        shipping_tier: m.label,
+                        items: cart.items.map((i) => ({
+                          item_id: i.product.slug,
+                          item_name: i.product.name,
+                          price: i.unit,
+                          quantity: i.qty,
+                        })),
+                      });
+                    }}
                     className="flex w-full items-center gap-3 rounded-sm px-3.5 py-3 text-left transition-colors"
                     style={{
                       border: on
@@ -531,7 +563,20 @@ export default function CheckoutForm({
                       type="button"
                       role="radio"
                       aria-checked={on}
-                      onClick={() => setMethod(m.id)}
+                      onClick={() => {
+                        setMethod(m.id);
+                        trackEcommerce("add_payment_info", {
+                          currency: "USD",
+                          value: cart.total,
+                          payment_type: m.id,
+                          items: cart.items.map((i) => ({
+                            item_id: i.product.slug,
+                            item_name: i.product.name,
+                            price: i.unit,
+                            quantity: i.qty,
+                          })),
+                        });
+                      }}
                       className="flex w-full items-center gap-3 rounded-sm px-3.5 py-3 text-left transition-colors"
                       style={{
                         border: on
