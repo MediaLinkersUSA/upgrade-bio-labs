@@ -8,6 +8,7 @@ import { testStepsFor } from "@/lib/testing";
 import { withCachedPricingForAll } from "@/lib/price-cache";
 import Gallery from "@/components/product/Gallery";
 import BuyBox from "@/components/product/BuyBox";
+import ViewItemTracker from "@/components/product/ViewItemTracker";
 import StickyMobileBar from "@/components/product/StickyMobileBar";
 import RelatedProducts from "@/components/product/RelatedProducts";
 import ShippingAccordion from "@/components/product/ShippingAccordion";
@@ -189,6 +190,7 @@ export default async function ProductPage({
         </nav>
 
         <div id="pdp-hero" className="grid items-start gap-14 lg:grid-cols-[1fr_480px]">
+          <ViewItemTracker product={p} />
           <Gallery product={p} />
           <BuyBox product={p} />
         </div>
