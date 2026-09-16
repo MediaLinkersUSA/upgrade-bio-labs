@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useCart } from "./CartProvider";
+import { trackEcommerce } from "@/lib/analytics";
 import { getProduct, compounds } from "@/data/products";
 import { money } from "@/lib/pricing";
 import { REWARDS } from "@/lib/totals";
@@ -49,6 +50,24 @@ export default function CartDrawer() {
       document.removeEventListener("keydown", onKey);
     };
   }, [open, setOpen]);
+
+  // Fires once per open, not on every re-render while open - `open` is the
+  // only dependency on purpose, reading cart.items/total from the closure at
+  // the moment it opens rather than staying reactive to later changes.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!open) return;
+    trackEcommerce("view_cart", {
+      currency: "USD",
+      value: cart.total,
+      items: cart.items.map((i) => ({
+        item_id: i.product.slug,
+        item_name: i.product.name,
+        price: i.unit,
+        quantity: i.qty,
+      })),
+    });
+  }, [open]);
 
   /** The bar spans zero to the highest reward, so every threshold has a spot. */
   const TOP_REWARD = REWARDS[REWARDS.length - 1].threshold;
@@ -300,7 +319,21 @@ export default function CartDrawer() {
                             </Link>
                             <button
                               type="button"
-                              onClick={() => cart.remove(product.slug, size)}
+                              onClick={() => {
+                                trackEcommerce("remove_from_cart", {
+                                  currency: "USD",
+                                  value: unit * qty,
+                                  items: [
+                                    {
+                                      item_id: product.slug,
+                                      item_name: product.name,
+                                      price: unit,
+                                      quantity: qty,
+                                    },
+                                  ],
+                                });
+                                cart.remove(product.slug, size);
+                              }}
                               aria-label={`Remove ${product.name}${size ? `, ${size}` : ""}`}
                               className="shrink-0 text-muted hover:text-ink"
                             >
