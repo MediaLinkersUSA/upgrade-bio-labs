@@ -3690,7 +3690,7 @@ export const products: Product[] = [
   {
     "slug": "ghk-cu-cream",
     "name": "GHK-Cu Cream",
-    "format": "supply",
+    "format": "vial",
     "presentation": "topical",
     "goals": [
       "skin"
