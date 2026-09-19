@@ -1856,5 +1856,23 @@ export const WOO_PRODUCTS: Record<string, WooProduct> = {
         ]
       }
     ]
+  },
+  "ghk-cu-cream": {
+    "id": 4348,
+    "name": "GHK-Cu Cream",
+    "variations": [
+      {
+        "id": 4349,
+        "price": 79,
+        "options": [
+          "50ml"
+        ]
+      }
+    ]
+  },
+  "vial-slider-container": {
+    "id": 4254,
+    "name": "Vial Slider Container",
+    "variations": []
   }
 };
