@@ -1874,5 +1874,15 @@ export const WOO_PRODUCTS: Record<string, WooProduct> = {
     "id": 4254,
     "name": "Vial Slider Container",
     "variations": []
+  },
+  "dihexa-capsules": {
+    "id": 4351,
+    "name": "Dihexa Capsules",
+    "variations": []
+  },
+  "vial-storage-case": {
+    "id": 4352,
+    "name": "Vial Storage Case",
+    "variations": []
   }
 };
