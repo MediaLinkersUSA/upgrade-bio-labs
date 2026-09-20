@@ -2,647 +2,564 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import { useCart } from "@/components/cart/CartProvider";
-import CardBrandIcons from "@/components/checkout/CardBrandIcons";
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useCart } from "./CartProvider";
 import { trackEcommerce } from "@/lib/analytics";
+import { getProduct, compounds } from "@/data/products";
 import { money } from "@/lib/pricing";
-import {
-  SHIPPING_THRESHOLD,
-  SHIPPING_METHODS,
-  shippingMethod,
-  shippingCost,
-  SITE,
-  type ShippingMethodId,
-} from "@/lib/config";
-import {
-  PAYMENT_METHODS,
-  US_STATES,
-  paymentMethod,
-  type PaymentMethodId,
-} from "@/lib/checkout";
+import { REWARDS } from "@/lib/totals";
+import FormatChip from "@/components/ui/FormatChip";
 
-/**
- * On-site checkout, mirroring the live WooCommerce page.
- *
- * Details are collected here and every method posts to the same endpoint,
- * which records the order. What differs is only where the customer goes next:
- * a card order is handed to the external payment site, a transfer order lands
- * on its payment instructions.
- */
+const BUMP_SLUG = "bac-water-hospira-brand";
 
-type Field = { label: string; name: string; required?: boolean; type?: string; auto?: string };
-
-const FIELDS: Field[][] = [
-  [
-    { label: "First name", name: "firstName", required: true, auto: "given-name" },
-    { label: "Last name", name: "lastName", required: true, auto: "family-name" },
-  ],
-  [{ label: "Street address", name: "address1", required: true, auto: "address-line1" }],
-  [
-    {
-      label: "Apartment, suite, unit, etc.",
-      name: "address2",
-      auto: "address-line2",
-    },
-  ],
-  [{ label: "Town / City", name: "city", required: true, auto: "address-level2" }],
-];
-
-export default function CheckoutForm({
-  /** False only when there is no database at all, in which case a transfer
-   *  order has nowhere to be recorded and is hidden rather than offered and
-   *  then failing at the last step. */
-  offlineAvailable = true,
-}: {
-  offlineAvailable?: boolean;
-}) {
+export default function CartDrawer() {
   const cart = useCart();
-  const [method, setMethod] = useState<PaymentMethodId>("card");
-  const [shipId, setShipId] = useState<ShippingMethodId>("standard");
-  const [values, setValues] = useState<Record<string, string>>({ state: "" });
-  const [notes, setNotes] = useState("");
-  const [promoDraft, setPromoDraft] = useState("");
-  const [promoError, setPromoError] = useState(false);
+  const { open, setOpen } = cart;
+  const reduce = useReducedMotion();
+  const panelRef = useRef<HTMLDivElement>(null);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [touched, setTouched] = useState(false);
 
-  // Waits for `mounted` for the same reason ClearCartOnMount does: cart.items
-  // reads empty until localStorage has been read back into state, and this
-  // page can be the first one loaded in a session.
+  // Lock scroll and trap focus while open.
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") return setOpen(false);
+      if (e.key !== "Tab") return;
+      const focusables = panelRef.current?.querySelectorAll<HTMLElement>(
+        'a[href],button:not([disabled]),input,select,textarea,[tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusables?.length) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    panelRef.current?.querySelector<HTMLElement>("button")?.focus();
+    return () => {
+      document.body.style.overflow = prev;
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open, setOpen]);
+
+  // Fires once per open, not on every re-render while open - `open` is the
+  // only dependency on purpose, reading cart.items/total from the closure at
+  // the moment it opens rather than staying reactive to later changes.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (!cart.mounted || !cart.items.length) return;
-    trackEcommerce("begin_checkout", {
-      currency: "USD",
-      value: cart.total,
-      items: cart.items.map((i) => ({
-        item_id: i.product.slug,
-        item_name: i.product.name,
-        price: i.unit,
-        quantity: i.qty,
-      })),
+    if (!open) return;
+    trackEcommerce("view_cart", {
+      ecommerce: {
+        currency: "USD",
+        value: cart.total,
+        items: cart.items.map((i) => ({
+          item_id: i.product.slug,
+          item_name: i.product.name,
+          price: i.unit,
+          quantity: i.qty,
+        })),
+      },
     });
-  }, [cart.mounted]);
+  }, [open]);
 
-  const methods = offlineAvailable
-    ? PAYMENT_METHODS
-    : PAYMENT_METHODS.filter((m) => m.instant);
-  const active = paymentMethod(method);
-  const ship = shippingMethod(shipId);
+  /** The bar spans zero to the highest reward, so every threshold has a spot. */
+  const TOP_REWARD = REWARDS[REWARDS.length - 1].threshold;
+  const spent = Math.max(0, cart.totals.subtotal - cart.totals.rateDiscount);
+  const ladderPct = Math.min(100, Math.round((spent / TOP_REWARD) * 100));
+  const bump = getProduct(BUMP_SLUG);
+  const hasBump = cart.items.some((i) => i.product.slug === BUMP_SLUG);
+  const hasVial = cart.items.some((i) => i.product.format === "vial");
 
-  // The cart's own total assumes standard ground, so shipping is recomputed
-  // here against whatever the customer actually picked.
-  const afterDiscount = cart.subtotal - cart.discount;
-  const shippingPrice = shippingCost(ship, afterDiscount);
-  // The payment-method discount comes off last, and can never drag a total
-  // below zero on a small order.
-  const beforeMethod = afterDiscount + shippingPrice;
-  const methodDiscount = Math.min(active.discount, beforeMethod);
-  const total = Math.max(0, beforeMethod - methodDiscount);
+  /**
+   * What to suggest to close the free-shipping gap.
+   *
+   * Cheapest-that-fits alone produced nonsense: a BPC-157 cart was told to add
+   * DSIP, a sleep peptide, purely because it happened to cost the right amount.
+   * A suggestion that ignores what is already in the basket reads as random and
+   * gets ignored. So the SKUs each cart item explicitly pairs with are
+   * considered first, and price is only the tie-breaker within that set.
+   */
+  const gapFiller = (() => {
+    const inCart = new Set(cart.items.map((i) => i.product.slug));
+    const affordable = (p: { inStock: boolean; basePrice: number; slug: string }) =>
+      p.inStock && !inCart.has(p.slug) && p.basePrice >= cart.remainingForFreeShipping;
 
-  const missing = useMemo(() => {
-    const req = ["firstName", "lastName", "address1", "city", "state", "zip", "email"];
-    return req.filter((k) => !(values[k] ?? "").trim());
-  }, [values]);
+    // Cross-sells the catalogue already declares for what is in the cart.
+    const paired = cart.items
+      .flatMap((i) => i.product.pairsWith ?? [])
+      .map(getProduct)
+      .filter((p): p is NonNullable<typeof p> => !!p && p.format !== "supply");
 
-  const set = (k: string, v: string) => setValues((p) => ({ ...p, [k]: v }));
+    const relevant = paired.filter(affordable).sort((a, b) => a.basePrice - b.basePrice)[0];
+    if (relevant) return relevant;
 
-  async function placeOrder() {
-    setTouched(true);
-    if (missing.length) {
-      setError("Please complete the required fields above.");
-      document.querySelector<HTMLElement>("[data-invalid='true']")?.focus();
-      return;
-    }
+    // Nothing paired is in range: fall back to a compound sharing a research
+    // goal, which is still a reason rather than a coincidence.
+    const goals = new Set(cart.items.flatMap((i) => i.product.goals));
+    const sameGoal = compounds()
+      .filter((p) => affordable(p) && p.goals.some((g) => goals.has(g)))
+      .sort((a, b) => a.basePrice - b.basePrice)[0];
+    if (sameGoal) return sameGoal;
+
+    return compounds().filter(affordable).sort((a, b) => a.basePrice - b.basePrice)[0];
+  })();
+
+  /** The drawer no longer posts to a payment processor: details and method are
+   *  collected on /checkout, which is the only place that knows whether this
+   *  is a card order or a transfer. */
+  function goToCheckout() {
     setBusy(true);
-    setError(null);
-
-    const customer = { ...values, notes };
-    const payload = {
-      lines: cart.lines,
-      promoCode: cart.promoInput,
-      customer,
-      paymentMethod: method,
-      shippingMethod: shipId,
-    };
-
-    try {
-      // One endpoint for every method: the order is always recorded here.
-      const res = await fetch("/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error ?? "Something went wrong. Please try again.");
-        setBusy(false);
-        return;
-      }
-
-      if (data.paymentUrl) {
-        // Off to the payment site. The cart is deliberately NOT cleared yet -
-        // the customer has not paid, and someone who backs out of the payment
-        // page should find their cart where they left it. /thank-you clears it
-        // once they come back.
-        window.location.href = data.paymentUrl;
-        return;
-      }
-
-      if (data.orderNumber) {
-        // A transfer: nothing more to pay online, so the cart is done.
-        cart.clear();
-        window.location.href = `/order/pending?ref=${encodeURIComponent(data.orderNumber)}&method=${method}`;
-        return;
-      }
-
-      setError("Something went wrong. Please try again.");
-      setBusy(false);
-    } catch {
-      setError("Could not reach the server. Please try again.");
-      setBusy(false);
-    }
+    setOpen(false);
+    window.location.href = "/checkout";
   }
 
-  if (cart.items.length === 0) {
+  return (
+    <AnimatePresence>
+      {open && (
+        <>
+          <motion.div
+            className="fixed inset-0 z-50 bg-[rgba(5,46,67,0.35)]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setOpen(false)}
+          />
+          <motion.aside
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Your order"
+            className="fixed inset-y-0 right-0 z-50 flex w-full max-w-[420px] flex-col bg-surface shadow-pop"
+            initial={reduce ? { opacity: 0 } : { x: "100%" }}
+            animate={reduce ? { opacity: 1 } : { x: 0 }}
+            exit={reduce ? { opacity: 0 } : { x: "100%" }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <header className="flex items-center justify-between border-b border-line-soft px-5 py-4">
+              <h2 className="t-title">
+                your order{" "}
+                <span className="font-mono text-[14px] text-muted">({cart.count})</span>
+              </h2>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                aria-label="Close cart"
+                className="rounded-full p-2 text-muted hover:bg-surface-2 hover:text-ink"
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden>
+                  <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                </svg>
+              </button>
+            </header>
+
+            {cart.items.length === 0 ? (
+              <div className="flex flex-1 flex-col items-center justify-center gap-4 px-8 text-center">
+                <p className="t-title">Nothing here yet.</p>
+                <p className="text-[15px] text-muted">
+                  Every batch is third-party tested and the COA is published before you buy.
+                </p>
+                <Link href="/shop" onClick={() => setOpen(false)} className="btn-primary">
+                  Browse All Peptides
+                </Link>
+              </div>
+            ) : (
+              <>
+                <div className="flex-1 overflow-y-auto">
+                  {/* 1. Reward ladder. One bar across all three thresholds
+                      rather than a single free-shipping goal: the customer can
+                      see the next two rewards, which is the whole point of
+                      having them. */}
+                  <div className="border-b border-line-soft bg-surface-2 px-5 py-4">
+                    {cart.totals.nextReward ? (
+                      <p className="text-[14px]">
+                        You&apos;re{" "}
+                        <span className="data font-semibold">
+                          {money(cart.totals.nextReward.remaining)}
+                        </span>{" "}
+                        from {cart.totals.nextReward.label.toLowerCase()}
+                      </p>
+                    ) : (
+                      <motion.p
+                        initial={reduce ? false : { scale: 0.96 }}
+                        animate={{ scale: 1 }}
+                        transition={{ duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
+                        className="text-[14px] font-semibold text-success"
+                      >
+                        All rewards unlocked ✓
+                      </motion.p>
+                    )}
+
+                    <div
+                      className="relative mt-3 h-2 rounded-full bg-line-soft"
+                      role="progressbar"
+                      aria-valuenow={ladderPct}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-label="Progress toward order rewards"
+                    >
+                      <motion.div
+                        className="h-full rounded-full bg-teal"
+                        animate={{ width: `${ladderPct}%` }}
+                        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                      />
+                      {/* Markers sit on the bar so the thresholds are legible
+                          as positions, not just as a list underneath. */}
+                      {REWARDS.map((r) => (
+                        <span
+                          key={r.id}
+                          aria-hidden
+                          className="absolute top-1/2 h-[10px] w-[10px] -translate-y-1/2 rounded-full border-2 border-surface-2"
+                          style={{
+                            left: `calc(${(r.threshold / TOP_REWARD) * 100}% - 5px)`,
+                            background: cart.totals.unlocked[r.id]
+                              ? "var(--color-teal)"
+                              : "var(--color-line)",
+                          }}
+                        />
+                      ))}
+                    </div>
+
+                    <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5">
+                      {REWARDS.map((r) => {
+                        const on = cart.totals.unlocked[r.id];
+                        return (
+                          <li
+                            key={r.id}
+                            className="flex items-center gap-1.5 text-[12.5px]"
+                            style={{ color: on ? "var(--color-teal-dark)" : "var(--color-faint)" }}
+                          >
+                            <span aria-hidden>{on ? "✓" : "○"}</span>
+                            <span className={on ? "font-semibold" : undefined}>
+                              {money(r.threshold)} · {r.label}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+
+                    {/* Unlocked but not taken: one tap to claim it. */}
+                    {cart.totals.unlocked["free-bac"] && !hasBump && bump && (
+                      <button
+                        type="button"
+                        onClick={() => cart.add(BUMP_SLUG)}
+                        className="mt-3 w-full rounded-sm border-2 border-dashed border-teal bg-wash px-3 py-2.5 text-[13.5px] font-semibold text-teal-dark"
+                      >
+                        + Claim your free {bump.name} &rarr;
+                      </button>
+                    )}
+
+                    {cart.totals.nextReward && gapFiller && (
+                      <button
+                        type="button"
+                        onClick={() => cart.add(gapFiller.slug)}
+                        className="mt-2.5 block text-left text-[13.5px] text-teal-dark underline underline-offset-2"
+                      >
+                        + add {gapFiller.name} · {money(gapFiller.basePrice)} &rarr;
+                      </button>
+                    )}
+                  </div>
+
+                  {/* 2. Bundle ladder. Suppressed entirely while a code is
+                      applied: prompting for "1 more compound to save 20%" when
+                      that 20% cannot be taken on top of a 25% code would be
+                      selling an upsell that does not exist. */}
+                  {cart.distinctCompounds >= 1 && cart.discountSource !== "promo" && (
+                    <div className="border-b border-line-soft px-5 py-3">
+                      {cart.discountRate > 0 ? (
+                        <p className="text-[13.5px] font-semibold text-teal-dark">
+                          Bundle Discount −{Math.round(cart.discountRate * 100)}% Applied
+                        </p>
+                      ) : null}
+                      {cart.distinctCompounds === 1 && (
+                        <p className="text-[13.5px] text-muted">
+                          Add 1 More Compound &rarr; Save 15%
+                        </p>
+                      )}
+                      {cart.distinctCompounds === 2 && (
+                        <p className="text-[13.5px] text-muted">
+                          Add 1 More Compound &rarr; Save 20%
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* 3. Line items */}
+                  <ul className="divide-y divide-line-soft">
+                    {cart.items.map(({ product, qty, unit, total, size, key }) => (
+                      <li key={key} className="flex gap-3 px-5 py-4">
+                        <Link
+                          href={`/product/${product.slug}`}
+                          onClick={() => setOpen(false)}
+                          className="relative h-16 w-16 shrink-0 overflow-hidden rounded-sm bg-surface-2"
+                        >
+                          <Image
+                            src={product.image}
+                            alt=""
+                            fill
+                            sizes="64px"
+                            className="object-contain p-1"
+                          />
+                        </Link>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-start justify-between gap-2">
+                            <Link
+                              href={`/product/${product.slug}`}
+                              onClick={() => setOpen(false)}
+                              className="text-[15px] font-semibold leading-tight hover:text-teal-dark"
+                            >
+                              {product.name}
+                            </Link>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                trackEcommerce("remove_from_cart", {
+                                  ecommerce: {
+                                    currency: "USD",
+                                    value: unit * qty,
+                                    items: [
+                                      {
+                                        item_id: product.slug,
+                                        item_name: product.name,
+                                        price: unit,
+                                        quantity: qty,
+                                      },
+                                    ],
+                                  },
+                                });
+                                cart.remove(product.slug, size);
+                              }}
+                              aria-label={`Remove ${product.name}${size ? `, ${size}` : ""}`}
+                              className="shrink-0 text-muted hover:text-ink"
+                            >
+                              <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden>
+                                <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+                              </svg>
+                            </button>
+                          </div>
+                          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                            <FormatChip format={product.format} />
+                            {/* Two fills of one compound are two lines, so the
+                                fill has to be visible or they look identical. */}
+                            {size && (
+                              <span className="label rounded-full bg-surface-2 px-2 py-1 text-muted">
+                                {size}
+                              </span>
+                            )}
+                          </div>
+                          <div className="mt-2 flex items-center justify-between gap-2">
+                            <div className="flex items-center rounded-full border border-line">
+                              <button
+                                type="button"
+                                onClick={() => cart.setQty(product.slug, qty - 1, size)}
+                                aria-label={`Decrease ${product.name} quantity`}
+                                className="px-2.5 py-1 text-muted hover:text-ink"
+                              >
+                                −
+                              </button>
+                              <span className="min-w-6 text-center font-mono text-[13px]">
+                                {qty}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => cart.setQty(product.slug, qty + 1, size)}
+                                aria-label={`Increase ${product.name} quantity`}
+                                className="px-2.5 py-1 text-muted hover:text-ink"
+                              >
+                                +
+                              </button>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-mono text-[14px] font-semibold">
+                                {money(total)}
+                              </p>
+                              {qty > 1 && (
+                                <p className="font-mono text-[11.5px] text-faint">
+                                  {money(unit)} ea
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+
+                  {/* 4. Order bump - exactly one */}
+                  {hasVial && !hasBump && bump?.inStock && (
+                    <div className="border-t border-line-soft px-5 py-4">
+                      <label className="flex cursor-pointer items-center gap-3 rounded-sm border border-line bg-surface-2 p-3">
+                        <input
+                          type="checkbox"
+                          checked={false}
+                          onChange={() => cart.add(BUMP_SLUG)}
+                          className="h-4 w-4 accent-[var(--color-teal)]"
+                        />
+                        <span className="flex-1 text-[14px]">
+                          + add {bump.name}
+                          <span className="block text-[13px] text-muted">
+                            You need this to reconstitute a lyophilized vial.
+                          </span>
+                        </span>
+                        <span className="font-mono text-[14px]">{money(bump.basePrice)}</span>
+                      </label>
+                    </div>
+                  )}
+                </div>
+
+                {/* 5 + 6. Totals and checkout */}
+                <footer className="border-t border-line-soft px-5 py-4">
+                  <PromoField />
+
+                  <dl className="mt-3 space-y-1.5 font-mono text-[14px]">
+                    <div className="flex justify-between">
+                      <dt className="text-muted">Subtotal</dt>
+                      <dd>{money(cart.subtotal)}</dd>
+                    </div>
+                    {cart.discount > 0 && (
+                      <div className="flex justify-between text-teal-dark">
+                        <dt>
+                          {cart.discountSource === "promo"
+                            ? `${cart.promo?.code} (−${Math.round(cart.discountRate * 100)}%)`
+                            : `Bundle Discount (−${Math.round(cart.discountRate * 100)}%)`}
+                        </dt>
+                        <dd>−{money(cart.discount)}</dd>
+                      </div>
+                    )}
+                    <div className="flex justify-between">
+                      <dt className="text-muted">Shipping</dt>
+                      <dd>{cart.shipping === 0 ? "free" : money(cart.shipping)}</dd>
+                    </div>
+                    <div className="flex justify-between border-t border-line-soft pt-2 text-[16px] font-semibold">
+                      <dt>Total</dt>
+                      <dd>{money(cart.total)}</dd>
+                    </div>
+                  </dl>
+                  <button
+                    type="button"
+                    onClick={goToCheckout}
+                    disabled={busy}
+                    className="btn-primary mt-4 w-full"
+                  >
+                    {busy ? "Loading..." : `Checkout · ${money(cart.total)}`}{" "}
+                    {!busy && <span aria-hidden>&rarr;</span>}
+                  </button>
+                  <p className="mt-2.5 text-center text-[12px] text-faint">
+                    Research use only. Not for human or veterinary consumption.
+                  </p>
+                </footer>
+              </>
+            )}
+          </motion.aside>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/**
+ * Promotion code entry.
+ *
+ * The messaging is the important part. A first-order code and the bundle
+ * discount are mutually exclusive, so a customer who has both in play needs to
+ * be told which one they got and why the other vanished - otherwise the cart
+ * looks like it silently dropped a discount they had already earned.
+ */
+function PromoField() {
+  const cart = useCart();
+  const [draft, setDraft] = useState("");
+  const [error, setError] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  if (cart.promo) {
     return (
-      <div className="container-site py-20 text-center">
-        <h1 className="t-display-md">Your Cart Is Empty</h1>
-        <p className="mt-3 text-[16px] text-muted">
-          Add a compound and it will show up here.
-        </p>
-        <Link href="/shop" className="btn-primary mt-7">
-          Browse All Peptides
-        </Link>
+      <div className="rounded-sm border border-teal/40 bg-wash px-3.5 py-2.5">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-[13.5px] font-semibold text-teal-dark">
+            {cart.promo.code} applied · {Math.round(cart.promo.rate * 100)}% off
+          </p>
+          <button
+            type="button"
+            onClick={() => cart.clearPromo()}
+            className="text-[13px] text-muted underline underline-offset-2 hover:text-ink"
+          >
+            Remove
+          </button>
+        </div>
+
+        {cart.bundleSuperseded && (
+          <p className="mt-1.5 text-[12.5px] leading-snug text-muted">
+            This replaces your {Math.round(cart.bundleRate * 100)}% bundle
+            discount rather than adding to it. You are getting the larger of the
+            two. Quantity pricing still applies.
+          </p>
+        )}
+        {cart.promoSuperseded && (
+          <p className="mt-1.5 text-[12.5px] leading-snug text-muted">
+            Your {Math.round(cart.bundleRate * 100)}% bundle discount is larger,
+            so we have kept that one. The two do not combine.
+          </p>
+        )}
       </div>
     );
   }
 
-  const invalid = (name: string) =>
-    touched && !(values[name] ?? "").trim() ? "true" : undefined;
-
-  const input =
-    "w-full rounded-sm border bg-surface px-3.5 py-2.5 text-[15px] text-ink placeholder:text-faint focus:border-teal focus:outline-none";
-  const borderFor = (name: string) =>
-    invalid(name) ? "var(--color-warn)" : "var(--color-line)";
-
   return (
-    <div className="container-site py-10">
-      <h1 className="t-display-lg">Checkout</h1>
-
-      <div className="mt-8 grid gap-10 lg:grid-cols-[1.15fr_.85fr] lg:items-start">
-        {/* ------------------------------------------------ details */}
-        <section aria-labelledby="details-heading">
-          <h2 id="details-heading" className="t-title">
-            Shipping &amp; Billing Details
-          </h2>
-
-          <div className="mt-5 space-y-4">
-            {FIELDS.map((row) => (
-              <div
-                key={row.map((f) => f.name).join()}
-                className="grid gap-4"
-                style={{ gridTemplateColumns: `repeat(${row.length}, minmax(0,1fr))` }}
-              >
-                {row.map((f) => (
-                  <div key={f.name}>
-                    <label htmlFor={f.name} className="label mb-1.5 block text-muted">
-                      {f.label} {f.required && <span aria-hidden>*</span>}
-                    </label>
-                    <input
-                      id={f.name}
-                      name={f.name}
-                      type={f.type ?? "text"}
-                      autoComplete={f.auto}
-                      required={f.required}
-                      aria-required={f.required}
-                      data-invalid={invalid(f.name)}
-                      value={values[f.name] ?? ""}
-                      onChange={(e) => set(f.name, e.target.value)}
-                      className={input}
-                      style={{ borderColor: borderFor(f.name) }}
-                    />
-                  </div>
-                ))}
-              </div>
-            ))}
-
-            {/* Country is fixed: the store ships domestically only, so a
-                one-option dropdown would be a decision with no alternatives. */}
-            <div>
-              <span className="label mb-1.5 block text-muted">Country / Region</span>
-              <p className="rounded-sm border border-line-soft bg-surface-2 px-3.5 py-2.5 text-[15px] text-muted">
-                United States <span className="text-faint">— we ship domestically only</span>
-              </p>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label htmlFor="state" className="label mb-1.5 block text-muted">
-                  State <span aria-hidden>*</span>
-                </label>
-                <select
-                  id="state"
-                  required
-                  aria-required
-                  data-invalid={invalid("state")}
-                  value={values.state ?? ""}
-                  onChange={(e) => set("state", e.target.value)}
-                  className={input}
-                  style={{ borderColor: borderFor("state") }}
-                >
-                  <option value="" disabled>
-                    Select state
-                  </option>
-                  {US_STATES.map((s) => (
-                    <option key={s.code} value={s.code}>
-                      {s.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label htmlFor="zip" className="label mb-1.5 block text-muted">
-                  ZIP Code <span aria-hidden>*</span>
-                </label>
-                <input
-                  id="zip"
-                  inputMode="numeric"
-                  autoComplete="postal-code"
-                  required
-                  aria-required
-                  data-invalid={invalid("zip")}
-                  value={values.zip ?? ""}
-                  onChange={(e) => set("zip", e.target.value)}
-                  className={input}
-                  style={{ borderColor: borderFor("zip") }}
-                />
-              </div>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label htmlFor="phone" className="label mb-1.5 block text-muted">
-                  Phone
-                </label>
-                <input
-                  id="phone"
-                  type="tel"
-                  autoComplete="tel"
-                  value={values.phone ?? ""}
-                  onChange={(e) => set("phone", e.target.value)}
-                  className={input}
-                  style={{ borderColor: "var(--color-line)" }}
-                />
-              </div>
-              <div>
-                <label htmlFor="email" className="label mb-1.5 block text-muted">
-                  Email address <span aria-hidden>*</span>
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  aria-required
-                  data-invalid={invalid("email")}
-                  value={values.email ?? ""}
-                  onChange={(e) => set("email", e.target.value)}
-                  className={input}
-                  style={{ borderColor: borderFor("email") }}
-                />
-                <p className="mt-1.5 text-[12.5px] text-faint">
-                  Your receipt and tracking go here.
-                </p>
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="notes" className="label mb-1.5 block text-muted">
-                Order Notes (Optional)
-              </label>
-              <textarea
-                id="notes"
-                rows={3}
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                className={input}
-                style={{ borderColor: "var(--color-line)" }}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="heardAbout" className="label mb-1.5 block text-muted">
-                How did you hear about us? (Optional)
-              </label>
-              <select
-                id="heardAbout"
-                value={values.heardAbout ?? ""}
-                onChange={(e) => set("heardAbout", e.target.value)}
-                className={input}
-                style={{ borderColor: "var(--color-line)" }}
-              >
-                <option value="">Select one</option>
-                <option value="Google Search">Google Search</option>
-                <option value="Social Media">Social Media</option>
-                <option value="Word of Mouth">Word of Mouth</option>
-                <option value="Previous Customer">Previous Customer</option>
-                <option value="Online Advertisement">Online Advertisement</option>
-                <option value="Event / Trade Show">Event / Trade Show</option>
-                <option value="Rep.">Rep.</option>
-                <option value="Other">Other</option>
-              </select>
-
-              {/* Rep. and Other both need a name/specifics - same free-text
-                  follow-up, just a different prompt, so one field covers
-                  both rather than two near-identical inputs. */}
-              {(values.heardAbout === "Other" || values.heardAbout === "Rep.") && (
-                <input
-                  id="heardAboutDetail"
-                  type="text"
-                  value={values.heardAboutDetail ?? ""}
-                  onChange={(e) => set("heardAboutDetail", e.target.value)}
-                  placeholder={values.heardAbout === "Rep." ? "Rep's name" : "Please specify"}
-                  aria-label={values.heardAbout === "Rep." ? "Rep's name" : "Please specify how you heard about us"}
-                  className={`${input} mt-2`}
-                  style={{ borderColor: "var(--color-line)" }}
-                />
-              )}
-            </div>
-          </div>
-        </section>
-
-        {/* ------------------------------------------------ order */}
-        <section aria-labelledby="order-heading" className="lg:sticky lg:top-[100px]">
-          <div className="rounded-md border border-line-soft bg-surface p-5">
-            <h2 id="order-heading" className="t-title">
-              Your Order
-            </h2>
-
-            <ul className="mt-4 divide-y divide-line-soft border-y border-line-soft">
-              {cart.items.map((i) => (
-                <li key={i.key} className="flex gap-3 py-3">
-                  <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-sm bg-surface-2">
-                    <Image
-                      src={i.product.image}
-                      alt=""
-                      fill
-                      sizes="48px"
-                      className="object-contain p-1"
-                    />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[14px] font-semibold leading-tight">
-                      {i.product.name}
-                      {i.size ? ` — ${i.size}` : ""}
-                    </p>
-                    <p className="data mt-0.5 text-faint">
-                      {money(i.unit)} × {i.qty}
-                    </p>
-                  </div>
-                  <p className="data shrink-0 text-[14px]">{money(i.total)}</p>
-                </li>
-              ))}
-            </ul>
-
-            {/* Coupon. Same field as the cart drawer, repeated here because
-                this is where people look for it at the last step. */}
-            {cart.promo ? (
-              <div className="mt-4 flex items-center justify-between gap-3 rounded-sm border border-teal/40 bg-wash px-3.5 py-2.5">
-                <p className="text-[13.5px] font-semibold text-teal-dark">
-                  {cart.promo.code} applied · {Math.round(cart.promo.rate * 100)}% off
-                </p>
-                <button
-                  type="button"
-                  onClick={() => cart.clearPromo()}
-                  className="text-[13px] text-muted underline underline-offset-2 hover:text-ink"
-                >
-                  Remove
-                </button>
-              </div>
-            ) : (
-              <div className="mt-4 flex flex-wrap gap-2">
-                <label htmlFor="coupon" className="sr-only">
-                  Discount code
-                </label>
-                <input
-                  id="coupon"
-                  value={promoDraft}
-                  onChange={(e) => {
-                    setPromoDraft(e.target.value);
-                    setPromoError(false);
-                  }}
-                  placeholder="Discount code"
-                  autoComplete="off"
-                  className={`${input} uppercase placeholder:normal-case`}
-                  style={{ borderColor: promoError ? "var(--color-warn)" : "var(--color-line)" }}
-                />
-                <button
-                  type="button"
-                  disabled={!promoDraft.trim()}
-                  onClick={async () => {
-                    const res = await cart.applyPromo(promoDraft);
-                    setPromoError(!res.ok);
-                    if (res.ok) setPromoDraft("");
-                  }}
-                  className="btn-ghost shrink-0 px-4 py-2.5 text-[14px] disabled:opacity-40"
-                >
-                  Apply
-                </button>
-                {promoError && cart.promoError && (
-                  <p role="alert" className="w-full text-[12.5px] leading-snug text-warn">
-                    {cart.promoError}
-                  </p>
-                )}
-              </div>
-            )}
-
-            <dl className="mt-4 space-y-1.5 font-mono text-[14px]">
-              <div className="flex justify-between">
-                <dt className="text-muted">Subtotal</dt>
-                <dd>{money(cart.subtotal)}</dd>
-              </div>
-              {cart.discount > 0 && (
-                <div className="flex justify-between text-teal-dark">
-                  <dt>
-                    {cart.discountSource === "promo"
-                      ? `${cart.promo?.code} (−${Math.round(cart.discountRate * 100)}%)`
-                      : `Bundle Discount (−${Math.round(cart.discountRate * 100)}%)`}
-                  </dt>
-                  <dd>−{money(cart.discount)}</dd>
-                </div>
-              )}
-              <div className="flex justify-between">
-                <dt className="text-muted">{ship.label}</dt>
-                <dd>{shippingPrice === 0 ? "Free" : money(shippingPrice)}</dd>
-              </div>
-              {methodDiscount > 0 && (
-                <div className="flex justify-between text-teal-dark">
-                  <dt>{active.id === "zelle" ? "Zelle" : "CashApp"} Discount</dt>
-                  <dd>−{money(methodDiscount)}</dd>
-                </div>
-              )}
-              <div className="flex justify-between border-t border-line-soft pt-2 text-[16px] font-semibold">
-                <dt>Total</dt>
-                <dd>{money(total)}</dd>
-              </div>
-            </dl>
-
-            {ship.freeOverThreshold && shippingPrice > 0 && (
-              <p className="mt-2 text-[12.5px] text-faint">
-                Free standard ground on orders over {money(SHIPPING_THRESHOLD)}.
-              </p>
-            )}
-
-            {/* -------------------------------------- shipping method */}
-            <h3 className="t-title mt-6">Shipping Method</h3>
-            <div role="radiogroup" aria-label="Shipping method" className="mt-3 space-y-2">
-              {SHIPPING_METHODS.map((m) => {
-                const on = m.id === shipId;
-                const cost = shippingCost(m, afterDiscount);
-                return (
-                  <button
-                    key={m.id}
-                    type="button"
-                    role="radio"
-                    aria-checked={on}
-                    onClick={() => {
-                      setShipId(m.id);
-                      trackEcommerce("add_shipping_info", {
-                        currency: "USD",
-                        value: cart.total,
-                        shipping_tier: m.label,
-                        items: cart.items.map((i) => ({
-                          item_id: i.product.slug,
-                          item_name: i.product.name,
-                          price: i.unit,
-                          quantity: i.qty,
-                        })),
-                      });
-                    }}
-                    className="flex w-full items-center gap-3 rounded-sm px-3.5 py-3 text-left transition-colors"
-                    style={{
-                      border: on
-                        ? "2px solid var(--color-teal)"
-                        : "1px solid var(--color-line)",
-                      background: on ? "var(--color-wash)" : "var(--color-surface)",
-                    }}
-                  >
-                    <span
-                      aria-hidden
-                      className="grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full border-2"
-                      style={{ borderColor: on ? "var(--color-teal)" : "var(--color-line)" }}
-                    >
-                      {on && <span className="block h-[9px] w-[9px] rounded-full bg-teal" />}
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-[14.5px] font-medium">{m.label}</span>
-                      {/* The delivery window sits under the name: it is the
-                          thing being bought, not the carrier's brand. */}
-                      <span className="block text-[13px] text-muted">{m.eta}</span>
-                    </span>
-                    <span className="data shrink-0 text-[14px] font-semibold">
-                      {cost === 0 ? "Free" : money(cost)}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* -------------------------------------- payment method */}
-            <h3 className="t-title mt-6">Payment Method</h3>
-            <div role="radiogroup" aria-label="Payment method" className="mt-3 space-y-2">
-              {methods.map((m) => {
-                const on = m.id === method;
-                return (
-                  <div key={m.id}>
-                    <button
-                      type="button"
-                      role="radio"
-                      aria-checked={on}
-                      onClick={() => {
-                        setMethod(m.id);
-                        trackEcommerce("add_payment_info", {
-                          currency: "USD",
-                          value: cart.total,
-                          payment_type: m.id,
-                          items: cart.items.map((i) => ({
-                            item_id: i.product.slug,
-                            item_name: i.product.name,
-                            price: i.unit,
-                            quantity: i.qty,
-                          })),
-                        });
-                      }}
-                      className="flex w-full items-center gap-3 rounded-sm px-3.5 py-3 text-left transition-colors"
-                      style={{
-                        border: on
-                          ? "2px solid var(--color-teal)"
-                          : "1px solid var(--color-line)",
-                        background: on ? "var(--color-wash)" : "var(--color-surface)",
-                      }}
-                    >
-                      <span
-                        aria-hidden
-                        className="grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full border-2"
-                        style={{
-                          borderColor: on ? "var(--color-teal)" : "var(--color-line)",
-                        }}
-                      >
-                        {on && (
-                          <span className="block h-[9px] w-[9px] rounded-full bg-teal" />
-                        )}
-                      </span>
-                      <span className="text-[14.5px] font-medium">{m.label}</span>
-                      {m.id === "card" && <CardBrandIcons />}
-                    </button>
-                    {on && (
-                      <p className="mt-1.5 px-1 text-[13px] leading-relaxed text-muted">
-                        {m.description}
-                        {!m.instant && (
-                          <>
-                            {" "}
-                            Your order number is shown as soon as you place the
-                            order, and we ship once payment clears.
-                          </>
-                        )}
-                      </p>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {error && (
-              <p role="alert" className="mt-4 text-[13.5px] font-medium text-warn">
-                {error}
-              </p>
-            )}
-
-            <button
-              type="button"
-              onClick={placeOrder}
-              disabled={busy}
-              className="btn-primary mt-5 w-full"
-            >
-              {busy ? "Placing Order..." : `Place Order · ${money(total)}`}
-            </button>
-
-            <p className="mt-3 text-center text-[12px] text-faint">
-              Your payment information is secure. SSL encryption protects your data.
-            </p>
-            <p className="mt-2 text-center text-[12px] text-faint">
-              Research use only. Not for human or veterinary consumption. Questions?{" "}
-              <a href={`mailto:${SITE.email}`} className="text-teal-dark hover:underline">
-                {SITE.email}
-              </a>
-            </p>
-          </div>
-        </section>
-      </div>
-    </div>
+    <form
+      onSubmit={async (e) => {
+        e.preventDefault();
+        setBusy(true);
+        const res = await cart.applyPromo(draft);
+        setBusy(false);
+        setError(!res.ok);
+        if (res.ok) setDraft("");
+      }}
+      className="flex flex-wrap gap-2"
+    >
+      <label htmlFor="promo" className="sr-only">
+        Discount code
+      </label>
+      <input
+        id="promo"
+        value={draft}
+        onChange={(e) => {
+          setDraft(e.target.value);
+          setError(false);
+        }}
+        placeholder="Discount code"
+        autoComplete="off"
+        autoCapitalize="characters"
+        spellCheck={false}
+        aria-invalid={error || undefined}
+        aria-describedby={error ? "promo-error" : undefined}
+        className="min-w-0 flex-1 rounded-sm border border-line bg-surface px-3 py-2 text-[14px] uppercase text-ink placeholder:normal-case placeholder:text-faint focus:border-teal focus:outline-none"
+      />
+      <button
+        type="submit"
+        disabled={!draft.trim()}
+        className="btn-ghost shrink-0 px-4 py-2 text-[14px] disabled:opacity-40"
+      >
+        Apply
+      </button>
+      {error && (
+        <p id="promo-error" className="sr-only" role="alert">
+          That code is not recognized.
+        </p>
+      )}
+      {error && cart.promoError && (
+        <p role="alert" className="w-full text-[12.5px] leading-snug text-warn">
+          {cart.promoError}
+        </p>
+      )}
+    </form>
   );
 }
