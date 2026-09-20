@@ -14,17 +14,19 @@ export default function ViewItemTracker({ product }: { product: Product }) {
   useEffect(() => {
     const goal = product.goals[0];
     trackEcommerce("view_item", {
-      currency: "USD",
-      value: product.basePrice,
-      items: [
-        {
-          item_id: product.slug,
-          item_name: product.name,
-          price: product.basePrice,
-          item_brand: SITE.name,
-          item_category: goal ? GOAL_META[goal]?.title : product.format,
-        },
-      ],
+      ecommerce: {
+        currency: "USD",
+        value: product.basePrice,
+        items: [
+          {
+            item_id: product.slug,
+            item_name: product.name,
+            price: product.basePrice,
+            item_brand: SITE.name,
+            item_category: goal ? GOAL_META[goal]?.title : product.format,
+          },
+        ],
+      },
     });
     // Only re-fire if the shopper somehow lands on a different product
     // without a full navigation (shouldn't normally happen, but slug is the
