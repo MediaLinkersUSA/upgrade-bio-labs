@@ -287,16 +287,18 @@ export default function BuyBox({ product: p }: { product: Product }) {
           onClick={() => {
             add(p.slug, qty, activeSize?.label);
             trackEcommerce("add_to_cart", {
-              currency: "USD",
-              value: lineTotal,
-              items: [
-                {
-                  item_id: p.slug,
-                  item_name: p.name,
-                  price: tier.unitPrice,
-                  quantity: qty,
-                },
-              ],
+              ecommerce: {
+                currency: "USD",
+                value: lineTotal,
+                items: [
+                  {
+                    item_id: p.slug,
+                    item_name: p.name,
+                    price: tier.unitPrice,
+                    quantity: qty,
+                  },
+                ],
+              },
             });
           }}
           disabled={awaitingSize}
