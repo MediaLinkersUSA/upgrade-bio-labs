@@ -136,6 +136,23 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-P52QJ8W4');`,
           }}
         />
+        {/* BlackHat Strategy dynamic optimization tag - separate from the
+            GTM/Stape setup above, added at the agency's request.
+            nowprocket/nitro-exclude aren't real React/HTML prop names
+            TypeScript knows about (they're cache-exclusion markers some
+            WordPress caching plugins look for by exact attribute name -
+            irrelevant on this Next.js site, but kept as-is rather than
+            second-guess the agency's snippet). Spread through a loosely
+            typed object instead of passing them as normal JSX props, or
+            TypeScript fails the build over two attribute names it doesn't
+            recognize. */}
+        <script
+          {...({ nowprocket: "", "nitro-exclude": "" } as Record<string, string>)}
+          type="text/javascript"
+          id="sa-dynamic-optimization"
+          data-uuid="8e8f072a-ca8f-4e3a-9a3e-610a0da55695"
+          src="https://dashboard.blackhatstrategy.com/scripts/dynamic_optimization.js"
+        />
         {/* Must run before paint: it decides whether the redesign notice is
             visible, and deciding that after hydration shifts the page. */}
         <script dangerouslySetInnerHTML={{ __html: redesignAckScript }} />
