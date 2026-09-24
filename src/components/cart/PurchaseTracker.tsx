@@ -11,20 +11,28 @@ import type { StoredOrder } from "@/lib/order-store";
  * it - cheap, and correct for the overwhelmingly common case of a customer
  * looking at their own confirmation page more than once.
  *
- * Only fires once `order.status === "paid"`. Firing on arrival regardless of
- * payment status would report Zelle/CashApp reservations - which the
- * customer may never actually pay - as completed sales. The tradeoff: a card
- * order whose payment webhook hasn't landed yet by the time this page first
- * renders won't fire here either. That's judged the safer failure mode for
- * ad-spend optimization (a slightly late/missed purchase ping over a
- * fabricated one), not a guarantee every paid order is caught the instant it
- * pays - a server-side conversion event, if one exists downstream, is what
- * would close that gap.
+ * Fires on arrival at either order-confirmation page (thank-you for
+ * card/instant payments, order/pending for Zelle/CashApp), regardless of
+ * exact payment status - per the agency's spec, the trigger is "Successful
+ * completed order / thank-you page", not a later payment-webhook
+ * confirmation. This was originally gated on `order.status === "paid"`,
+ * which was too strict: the payment site's webhook and the browser's
+ * redirect back to this page are two independent things with no guaranteed
+ * ordering, so status was frequently still "pending" at the exact moment
+ * this page first rendered even for card orders - and Zelle/CashApp orders
+ * are *never* "paid" at this point by design, so the old gate meant this
+ * event effectively never fired for either payment path. Confirmed by the
+ * agency's own test order and their workaround of triggering off the page
+ * URL instead.
+ *
+ * Tradeoff, stated plainly: a Zelle/CashApp order the customer never
+ * actually pays still reports as a "purchase" to Meta/Google. Standard
+ * practice industry-wide (most stores fire purchase at order-placed, not at
+ * a later async payment confirmation), and what the agency's spec and their
+ * own workaround both already assume.
  */
 export default function PurchaseTracker({ order }: { order: StoredOrder }) {
   useEffect(() => {
-    if (order.status !== "paid") return;
-
     const flag = `ubl_purchase_tracked_${order.id}`;
     try {
       if (sessionStorage.getItem(flag)) return;
@@ -71,7 +79,7 @@ export default function PurchaseTracker({ order }: { order: StoredOrder }) {
     });
     // Runs once per mount by design - order.id is this page's whole identity.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [order.id, order.status]);
+  }, [order.id]);
 
   return null;
 }
