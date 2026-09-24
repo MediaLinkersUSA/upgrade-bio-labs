@@ -262,24 +262,15 @@ export type StoredOrder = {
  *
  * Selects `*` because which columns exist depends on whether 0004 has run.
  */
-export async function getOrder(id: string): Promise<StoredOrder | null> {
-  // A malformed uuid makes Postgres raise rather than return no rows, so it is
-  // rejected before it reaches the query.
-  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
-    return null;
-  }
-
-  const db = getSupabaseAdmin();
-  if (!db) return null;
-
-  const { data, error } = await db
-    .from("orders")
-    .select("*, order_items(*)")
-    .eq("id", id)
-    .maybeSingle();
-
-  if (error || !data) return null;
-
+/**
+ * Shared by getOrder and getOrderByNumber - one row shape, two lookup keys.
+ * `data` matches whatever the untyped Supabase row previously was here
+ * (unchanged from before this was split out) - not narrowed to
+ * Record<string, unknown>, since several fields below are assigned directly
+ * to StoredOrder's typed properties with no per-field cast.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mapOrderRow(data: any): StoredOrder {
   const addr = (data.shipping_address ?? null) as Record<string, string> | null;
 
   return {
@@ -313,4 +304,48 @@ export async function getOrder(id: string): Promise<StoredOrder | null> {
       })
     ),
   };
+}
+
+export async function getOrder(id: string): Promise<StoredOrder | null> {
+  // A malformed uuid makes Postgres raise rather than return no rows, so it is
+  // rejected before it reaches the query.
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+    return null;
+  }
+
+  const db = getSupabaseAdmin();
+  if (!db) return null;
+
+  const { data, error } = await db
+    .from("orders")
+    .select("*, order_items(*)")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return mapOrderRow(data);
+}
+
+/**
+ * Same as getOrder, keyed by the customer-facing order number (e.g.
+ * "UBL-72CP-6SNS") instead of the database id - what order/pending has
+ * available in its URL (?ref=...), since a Zelle/CashApp order never gets
+ * the database id exposed to the browser the way a card order's return_url
+ * does.
+ */
+export async function getOrderByNumber(orderNumber: string): Promise<StoredOrder | null> {
+  const trimmed = orderNumber.trim();
+  if (!trimmed) return null;
+
+  const db = getSupabaseAdmin();
+  if (!db) return null;
+
+  const { data, error } = await db
+    .from("orders")
+    .select("*, order_items(*)")
+    .eq("order_number", trimmed)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return mapOrderRow(data);
 }
