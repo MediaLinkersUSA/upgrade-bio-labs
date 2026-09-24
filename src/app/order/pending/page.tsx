@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { paymentMethod, OFFLINE_DISCOUNT } from "@/lib/checkout";
 import { SITE, SHIP_CUTOFF } from "@/lib/config";
+import { getOrderByNumber } from "@/lib/order-store";
+import PurchaseTracker from "@/components/cart/PurchaseTracker";
 
 export const metadata: Metadata = {
   title: "Order placed - payment pending",
@@ -22,8 +24,11 @@ export default async function PendingPage({
 }) {
   const { ref, method } = await searchParams;
   const pm = paymentMethod(String(method ?? ""));
+  const order = ref ? await getOrderByNumber(ref) : null;
 
   return (
+    <>
+      {order && <PurchaseTracker order={order} />}
     <div className="container-site max-w-[680px] py-16">
       <p className="label text-teal-dark">Order Placed</p>
       <h1 className="t-display-lg mt-2">Now send your payment.</h1>
@@ -96,5 +101,6 @@ export default async function PendingPage({
         </Link>
       </div>
     </div>
+    </>
   );
 }
