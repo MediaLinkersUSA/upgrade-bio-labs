@@ -51,6 +51,11 @@ export type OrderInput = {
   /** "How did you hear about us?" - optional at checkout, both null if skipped. */
   heardAbout: string | null;
   heardAboutDetail: string | null;
+  /** True if the ubl_research_ref cookie was present at checkout - see
+   *  lib/research-ref.ts. Always a real boolean, never null - "was this
+   *  visitor referred" has a definite answer even when everything else about
+   *  the order is unknown. */
+  researchRef: boolean;
   items: {
     slug: string;
     name: string;
@@ -94,18 +99,20 @@ export async function createOrder(input: OrderInput): Promise<OrderResult> {
     commission_cents: input.commissionCents,
     heard_about: input.heardAbout,
     heard_about_detail: input.heardAboutDetail,
+    research_ref: input.researchRef,
     ...money,
   };
 
   let { data, error } = await db.from("orders").insert(rich).select("id").single();
   let legacy = false;
 
-  // Affiliate columns (0005) and heard_about columns (0008) can each be
-  // missing independently of the rest of the rich shape - a store that has
-  // run some but not all migrations should still get the order saved, just
-  // without whichever columns aren't there yet, rather than falling all the
-  // way back to the pre-0004 legacy shape. Retried without those five keys
-  // specifically before assuming the whole rich shape is unavailable.
+  // Affiliate columns (0005), heard_about columns (0008) and research_ref
+  // (0009) can each be missing independently of the rest of the rich shape -
+  // a store that has run some but not all migrations should still get the
+  // order saved, just without whichever columns aren't there yet, rather
+  // than falling all the way back to the pre-0004 legacy shape. Retried
+  // without those six keys specifically before assuming the whole rich shape
+  // is unavailable.
   if (isMissingSchema(error)) {
     const {
       ref_code,
@@ -113,9 +120,10 @@ export async function createOrder(input: OrderInput): Promise<OrderResult> {
       commission_cents,
       heard_about,
       heard_about_detail,
+      research_ref,
       ...richWithoutOptional
     } = rich;
-    void ref_code; void affiliate_id; void commission_cents; void heard_about; void heard_about_detail;
+    void ref_code; void affiliate_id; void commission_cents; void heard_about; void heard_about_detail; void research_ref;
     const retry = await db.from("orders").insert(richWithoutOptional).select("id").single();
     if (!isMissingSchema(retry.error)) {
       ({ data, error } = retry);
@@ -143,6 +151,7 @@ export async function createOrder(input: OrderInput): Promise<OrderResult> {
         commission_cents: input.commissionCents,
         heard_about: input.heardAbout ?? "",
         heard_about_detail: input.heardAboutDetail ?? "",
+        research_ref: input.researchRef,
       },
       ...money,
     };
