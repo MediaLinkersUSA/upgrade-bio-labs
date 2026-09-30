@@ -331,7 +331,7 @@ export default function AdminDashboard({
                       status: statusLabel(o.status),
                       tracking: o.tracking_number ?? "",
                       heard_about: heardAboutLabel(o) ?? "",
-                      research_ref: o.research_ref ? "Yes" : "",
+                      research_ref: o.heard_about === "Research Website" || o.research_ref ? "Yes" : "",
                       total: (o.total_cents / 100).toFixed(2),
                       items: (o.order_items ?? [])
                         .map((i) => `${i.quantity}x ${i.product_name}`)
@@ -375,15 +375,20 @@ export default function AdminDashboard({
                       <td className="px-4 py-3">
                         <span className="block font-medium">{o.shipping_name ?? "-"}</span>
                         <span className="block text-[13px] text-muted">{o.email}</span>
-                        {heardAboutLabel(o) && (
-                          <span className="mt-0.5 block text-[12px] text-faint">
-                            Heard about us: {heardAboutLabel(o)}
+                        {/* Either signal - the manual dropdown pick or the
+                            (less reliable) referrer cookie - means the same
+                            underlying fact, so both render as one clear,
+                            unmissable line rather than two separate ones. */}
+                        {o.heard_about === "Research Website" || o.research_ref ? (
+                          <span className="mt-0.5 inline-block rounded-full border border-success/40 bg-success/10 px-2 py-0.5 text-[11.5px] font-semibold text-success">
+                            Heard about us: Research Website
                           </span>
-                        )}
-                        {o.research_ref && (
-                          <span className="mt-0.5 inline-block rounded-full border border-teal/40 bg-wash px-2 py-0.5 text-[11.5px] font-medium text-teal-dark">
-                            Research Ref: Yes
-                          </span>
+                        ) : (
+                          heardAboutLabel(o) && (
+                            <span className="mt-0.5 block text-[12px] text-faint">
+                              Heard about us: {heardAboutLabel(o)}
+                            </span>
+                          )
                         )}
                       </td>
                       <td className="px-4 py-3 text-muted">
