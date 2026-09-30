@@ -27,6 +27,8 @@ type Order = {
   /** Present after migration 0008. */
   heard_about?: string | null;
   heard_about_detail?: string | null;
+  /** Present after migration 0009. */
+  research_ref?: boolean | null;
   order_items?: { product_name: string; quantity: number; line_cents: number }[];
 };
 
@@ -329,6 +331,7 @@ export default function AdminDashboard({
                       status: statusLabel(o.status),
                       tracking: o.tracking_number ?? "",
                       heard_about: heardAboutLabel(o) ?? "",
+                      research_ref: o.research_ref ? "Yes" : "",
                       total: (o.total_cents / 100).toFixed(2),
                       items: (o.order_items ?? [])
                         .map((i) => `${i.quantity}x ${i.product_name}`)
@@ -375,6 +378,11 @@ export default function AdminDashboard({
                         {heardAboutLabel(o) && (
                           <span className="mt-0.5 block text-[12px] text-faint">
                             Heard about us: {heardAboutLabel(o)}
+                          </span>
+                        )}
+                        {o.research_ref && (
+                          <span className="mt-0.5 inline-block rounded-full border border-teal/40 bg-wash px-2 py-0.5 text-[11.5px] font-medium text-teal-dark">
+                            Research Ref: Yes
                           </span>
                         )}
                       </td>
