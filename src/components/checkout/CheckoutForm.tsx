@@ -354,6 +354,7 @@ export default function CheckoutForm({
                 <option value="Previous Customer">Previous Customer</option>
                 <option value="Online Advertisement">Online Advertisement</option>
                 <option value="Event / Trade Show">Event / Trade Show</option>
+                <option value="Research Website">Research Website</option>
                 <option value="Rep.">Rep.</option>
                 <option value="Other">Other</option>
               </select>
