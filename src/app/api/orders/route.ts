@@ -221,12 +221,20 @@ export async function POST(req: Request) {
     );
   }
 
-  // Notify the team when this order came from a peptideswellnessresearch.com
-  // referral. Awaited so a failure is logged against the request that caused
-  // it, but never allowed to fail the order itself - same resilience
-  // pattern as the WooCommerce mirror below: the sale is already recorded,
-  // and an email provider outage must not cost it.
-  if (researchRef) {
+  // Notify the team when this order is connected to
+  // peptideswellnessresearch.com, by either signal: the Referer-header
+  // cookie (automatic, but easily lost - many sites' own referrer-policy
+  // stops the header from ever reaching us, entirely outside our control),
+  // or the customer explicitly picking "Research Website" in the "How did
+  // you hear about us?" dropdown (manual, but far more dependable). Either
+  // one alone is enough to notify - they are not required to agree.
+  //
+  // Awaited so a failure is logged against the request that caused it, but
+  // never allowed to fail the order itself - same resilience pattern as the
+  // WooCommerce mirror below: the sale is already recorded, and an email
+  // provider outage must not cost it.
+  const isResearchReferral = researchRef || heardAbout === "Research Website";
+  if (isResearchReferral) {
     try {
       await sendResearchRefNotification({
         orderNumber,
