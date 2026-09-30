@@ -19,6 +19,8 @@ import { paymentUrlFor, originFromRequest } from "@/lib/payment";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
 import { mirrorOrderToWoo } from "@/lib/woocommerce";
 import { REF_COOKIE, findAffiliate, computeCommissionCents } from "@/lib/affiliates";
+import { RESEARCH_REF_COOKIE } from "@/lib/research-ref";
+import { sendResearchRefNotification } from "@/lib/email";
 
 /**
  * Creates an order. This is the only way an order comes into existence.
@@ -139,6 +141,7 @@ export async function POST(req: Request) {
   // or made-up code simply credits nobody instead of recording a commission
   // against an affiliate that does not exist.
   const refCode = jar.get(REF_COOKIE)?.value ?? null;
+  const researchRef = !!jar.get(RESEARCH_REF_COOKIE)?.value;
   const affiliate = await findAffiliate(refCode);
   const commissionCents = affiliate
     ? computeCommissionCents(cents(totals.total), cents(totals.shipping), affiliate.commissionBps)
@@ -199,6 +202,7 @@ export async function POST(req: Request) {
     commissionCents,
     heardAbout,
     heardAboutDetail,
+    researchRef,
     items: items.map((i) => ({
       slug: i.product.slug,
       name: i.product.name,
@@ -215,6 +219,24 @@ export async function POST(req: Request) {
       { error: "We could not record that order. Please contact us." },
       { status: 500 }
     );
+  }
+
+  // Notify the team when this order came from a peptideswellnessresearch.com
+  // referral. Awaited so a failure is logged against the request that caused
+  // it, but never allowed to fail the order itself - same resilience
+  // pattern as the WooCommerce mirror below: the sale is already recorded,
+  // and an email provider outage must not cost it.
+  if (researchRef) {
+    try {
+      await sendResearchRefNotification({
+        orderNumber,
+        email: String(c.email).trim().toLowerCase(),
+        totalCents: cents(totals.total),
+        items: items.map((i) => `${i.qty}x ${i.product.name}`),
+      });
+    } catch (e) {
+      console.error("[research-ref] notification failed", e);
+    }
   }
 
   // Mirror into WooCommerce, where ShipStation, UPS Labels and UBL Invoices
