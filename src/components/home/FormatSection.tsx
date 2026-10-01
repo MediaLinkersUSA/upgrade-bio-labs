@@ -64,10 +64,15 @@ export default function FormatSection() {
                     </p>
                     <p className="mt-1.5 hidden flex-1 text-[15px] leading-relaxed text-muted sm:block">
                       {/* First sentence only on this compact homepage card -
-                          the full description (with the "no reconstitution,
-                          no needles, no BAC water" detail) still shows in
-                          full on /formats, where there's room for it. */}
-                      {meta.sub.split(". ")[0]}.
+                          the full description still shows in full on
+                          /formats, where there's room for it. Only adds a
+                          period back if splitting actually removed one (a
+                          single-sentence sub, with nothing to split off,
+                          already ends in its own period). */}
+                      {(() => {
+                        const first = meta.sub.split(". ")[0];
+                        return first.endsWith(".") ? first : `${first}.`;
+                      })()}
                     </p>
                     <span
                       className="mt-2 inline-flex items-center gap-1.5 text-[12.5px] font-semibold sm:mt-5 sm:gap-2 sm:text-[15px]"
