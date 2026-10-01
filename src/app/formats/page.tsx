@@ -82,13 +82,13 @@ export default function FormatsPage() {
                   >
                     {DETAIL[f].needs && (
                       <div>
-                        <dt className="label text-muted">What You Also Need</dt>
+                        {f !== "capsule" && <dt className="label text-muted">What You Also Need</dt>}
                         <dd className="mt-1 text-[14px] text-ink">{DETAIL[f].needs}</dd>
                       </div>
                     )}
                     {DETAIL[f].handling && (
                       <div>
-                        <dt className="label text-muted">Handling</dt>
+                        {f !== "capsule" && <dt className="label text-muted">Handling</dt>}
                         <dd className="mt-1 text-[14px] text-ink">{DETAIL[f].handling}</dd>
                       </div>
                     )}
