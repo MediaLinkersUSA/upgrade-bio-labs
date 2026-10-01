@@ -232,7 +232,7 @@ export const products: Product[] = [
   },
   {
     "slug": "bac-water-hospira-brand",
-    "name": "BAC Water - Hospira",
+    "name": "BAC Water",
     "format": "supply",
     "goals": [],
     "doseLabel": "30 ML",
@@ -246,8 +246,8 @@ export const products: Product[] = [
       }
     ],
     "inStock": true,
-    "short": "30ml bacteriostatic water. Hospira brand, benzyl alcohol preserved.",
-    "description": "Bacteriostatic water for reconstitution, Hospira brand, 30ml multi-dose vial preserved with 0.9% benzyl alcohol. The preservative is what allows repeated withdrawals from a single vial without microbial growth, which is why it is the standard diluent for lyophilized research peptides.",
+    "short": "30ml bacteriostatic water, benzyl alcohol preserved.",
+    "description": "Bacteriostatic water for reconstitution, 30ml multi-dose vial preserved with 0.9% benzyl alcohol. The preservative is what allows repeated withdrawals from a single vial without microbial growth, which is why it is the standard diluent for lyophilized research peptides.",
     "researchAreas": [],
     "pairsWith": [
       "bpc-157",
