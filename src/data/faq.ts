@@ -20,14 +20,6 @@ export const faqs = [
     a: "Check these fields. Identity confirms the compound is what the label says. Purity is the HPLC percentage, which should be at or above 99%. Net peptide content tells you how much actual peptide is in the vial as opposed to salts and residual water. On vials you will also see an endotoxin figure, which should read below 0.5 EU/mg, and a heavy-metals screen.",
   },
   {
-    q: "What's the difference between vials, sprays, and capsules?",
-    a: "Vials contain lyophilized powder that you reconstitute yourself, which gives the widest compound selection and the lowest cost per mg. Sprays arrive pre-mixed with a measured actuation, so there is no reconstitution and no bacteriostatic water needed. Capsules are pre-dosed oral format, the simplest to handle and store.",
-  },
-  {
-    q: "Do I need BAC water and how much?",
-    a: "You need bacteriostatic water for any lyophilized vial. Sprays and capsules need none. Volume depends on the concentration your protocol calls for; a 30ml multi-dose vial covers many reconstitutions, and a 3ml vial suits a single one.",
-  },
-  {
     q: "What's your return policy?",
     a: "All sprays are final sale. Unopened vials and capsules can be returned if unused within 14 days of delivery. If a shipment arrives damaged, lost, or does not arrive at all, we reship at no cost.",
   },
