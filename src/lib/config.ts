@@ -83,7 +83,7 @@ export const FORMAT_META = {
   capsule: {
     label: "Capsules",
     title: "Capsules",
-    sub: "Pre-dosed oral. The simplest to handle and the simplest to store.",
+    sub: "The simplest to handle and the simplest to store.",
     color: "var(--color-capsule)",
     text: "var(--color-capsule-text)",
     wash: "var(--color-capsule-wash)",
