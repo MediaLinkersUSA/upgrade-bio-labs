@@ -11,13 +11,6 @@ import type { Format } from "@/data/types";
 import { useLivePrices } from "@/lib/use-live-prices";
 import { applyLivePricing } from "@/lib/apply-live-pricing";
 
-const PRESETS = [
-  { label: "Recovery Stack", slugs: ["bpc-157", "tb-500", "kpv"] },
-  { label: "Longevity Stack", slugs: ["nad", "ss-31", "epithalon"] },
-  { label: "Metabolic Stack", slugs: ["rt-3", "tesamorelin-ipamorelin-blend", "mots-c"] },
-  { label: "Beauty Stack", slugs: ["glow-blendbpc-157-tb-500-ghk-cu", "mots-c", "glutathione"] },
-];
-
 const FORMATS: Format[] = ["vial", "spray", "capsule"];
 
 export default function StackBuilder() {
@@ -256,27 +249,6 @@ export default function StackBuilder() {
                 : `add stack to cart · ${money(pay)}`}
             </button>
           </div>
-        </div>
-
-        {/* Presets: most people will use these. */}
-        <div className="mt-6">
-          <p className="label mb-3 text-white/60">Or Start From A Preset</p>
-          <ul className="flex flex-wrap gap-2">
-            {PRESETS.map((preset) => (
-              <li key={preset.label}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSlots(preset.slugs.map((s) => (getProduct(s) ? s : null)));
-                    setPicking(null);
-                  }}
-                  className="rounded-full border border-white/25 px-4 py-2.5 text-[14px] font-medium text-white/90 transition-colors hover:border-[var(--color-teal-on-navy)] hover:text-white"
-                >
-                  {preset.label}
-                </button>
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
     </section>
