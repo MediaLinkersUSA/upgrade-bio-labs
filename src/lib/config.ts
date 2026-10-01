@@ -91,7 +91,7 @@ export const FORMAT_META = {
   supply: {
     label: "Supplies",
     title: "Supplies",
-    sub: "Bacteriostatic water and reconstitution consumables.",
+    sub: "Bacteriostatic water.",
     color: "var(--color-supply)",
     text: "#4B7185",
     wash: "var(--color-supply-wash)",
