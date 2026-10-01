@@ -66,7 +66,7 @@ export const FORMAT_META = {
   vial: {
     label: "Vials",
     title: "Lyophilized Vials",
-    sub: "Reconstitute to your own protocol. Widest compound selection, lowest cost per mg.",
+    sub: "Robust Compound Selection, lowest cost per mg.",
     color: "var(--color-vial)",
     text: "var(--color-vial)",
     wash: "var(--color-vial-wash)",
