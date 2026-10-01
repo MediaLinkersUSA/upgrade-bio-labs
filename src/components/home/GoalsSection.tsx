@@ -11,7 +11,7 @@ export default function GoalsSection() {
     <section className="section-pad section-round bg-surface">
       <div className="container-site">
         <Reveal className="mb-9 max-w-[54ch]">
-          <h2 className="t-display-lg">Start With The Outcome</h2>
+          <h2 className="t-display-lg">Areas Of Research</h2>
           <p className="mt-3 text-[17px] leading-relaxed text-muted">
             Not sure which compound? Pick the research area and we will narrow
             the catalog for you.
