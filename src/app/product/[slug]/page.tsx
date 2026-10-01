@@ -198,7 +198,10 @@ export default async function ProductPage({
 
       <div className="container-site grid gap-14 pb-20 lg:grid-cols-[1fr_480px]">
         <div className="max-w-[70ch]">
-          {/* What's inside / mechanism */}
+          {/* What's inside / mechanism - omitted entirely when there's
+              nothing to say (e.g. BAC water, where the section was removed
+              on request rather than just left visually empty). */}
+          {(p.blend?.length || p.description.trim()) && (
           <section className="section-pad !pt-12 !pb-0">
             <h2 className="t-display-md">
               {p.blend?.length ? "What's Inside" : "About This Compound"}
@@ -229,6 +232,7 @@ export default async function ProductPage({
               </p>
             ))}
           </section>
+          )}
 
           {/* Research areas */}
           {p.researchAreas.length > 0 && (
