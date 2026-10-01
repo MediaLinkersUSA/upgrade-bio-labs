@@ -99,12 +99,12 @@ export const FORMAT_META = {
 } as const;
 
 export const GOAL_META = {
-  recovery: { title: "Recovery & Repair", sub: "tendon, ligament, gut lining", tint: "var(--color-goal-recovery)" },
-  metabolic: { title: "Weight & Metabolic", sub: "incretin pathways, body composition", tint: "var(--color-goal-metabolic)" },
-  cognitive: { title: "Focus & Mood", sub: "nootropic, anxiolytic, sleep", tint: "var(--color-goal-cognitive)" },
-  longevity: { title: "Longevity & Energy", sub: "mitochondrial, cellular, NAD", tint: "var(--color-goal-longevity)" },
-  skin: { title: "Skin & Hair", sub: "collagen, dermal, follicle", tint: "var(--color-goal-skin)" },
-  immune: { title: "Immune & Gut", sub: "modulation, barrier integrity", tint: "var(--color-goal-immune)" },
+  recovery: { title: "Tissue & Cellular Research", sub: "tendon, ligament, gut lining", tint: "var(--color-goal-recovery)" },
+  metabolic: { title: "Metabolic Signaling Research", sub: "incretin pathways, body composition", tint: "var(--color-goal-metabolic)" },
+  cognitive: { title: "Neurological Research", sub: "nootropic, anxiolytic, sleep", tint: "var(--color-goal-cognitive)" },
+  longevity: { title: "Cellular Aging Research", sub: "mitochondrial, cellular, NAD", tint: "var(--color-goal-longevity)" },
+  skin: { title: "Dermal & Matrix Research", sub: "collagen, dermal, follicle", tint: "var(--color-goal-skin)" },
+  immune: { title: "Immune Signaling Research", sub: "modulation, barrier integrity", tint: "var(--color-goal-immune)" },
 } as const;
 
 export const GOAL_ORDER = ["recovery", "metabolic", "cognitive", "longevity", "skin", "immune"] as const;
