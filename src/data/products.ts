@@ -247,7 +247,7 @@ export const products: Product[] = [
     ],
     "inStock": true,
     "short": "30ml bacteriostatic water, benzyl alcohol preserved.",
-    "description": "Bacteriostatic water for reconstitution, 30ml multi-dose vial preserved with 0.9% benzyl alcohol. The preservative is what allows repeated withdrawals from a single vial without microbial growth, which is why it is the standard diluent for lyophilized research peptides.",
+    "description": "",
     "researchAreas": [],
     "pairsWith": [
       "bpc-157",
