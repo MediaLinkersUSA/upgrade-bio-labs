@@ -23,8 +23,7 @@ export default function FormatSection() {
         <Reveal className="mb-9 max-w-[54ch]">
           <h2 className="t-display-lg">Three Formats, One Catalog</h2>
           <p className="mt-3 text-[17px] leading-relaxed text-muted">
-            The same tested compounds, presented three ways. Pick the handling
-            that fits your protocol.
+            The same tested compounds, presented three ways.
           </p>
         </Reveal>
 
