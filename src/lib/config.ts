@@ -74,7 +74,7 @@ export const FORMAT_META = {
   spray: {
     label: "Sprays",
     title: "Sprays",
-    sub: "Pre-mixed, measured actuation. No reconstitution, no needles, no BAC water.",
+    sub: "Pre-mixed, measured actuation.",
     color: "var(--color-spray)",
     // brand teal measures 3.02 on white, so text uses the darkened step
     text: "var(--color-teal-dark)",
