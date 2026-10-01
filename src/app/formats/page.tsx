@@ -15,9 +15,9 @@ export const metadata: Metadata = {
 
 const ORDER: Format[] = ["vial", "spray", "capsule", "supply"];
 
-const DETAIL: Record<string, { needs: string; handling: string }> = {
+const DETAIL: Record<string, { needs: string | null; handling: string }> = {
   vial: {
-    needs: "Bacteriostatic water, a syringe, and cold storage after reconstitution.",
+    needs: null,
     handling: "Stable at room temperature while sealed and lyophilized. Refrigerate once reconstituted.",
   },
   spray: {
@@ -74,11 +74,13 @@ export default function FormatsPage() {
                 <p className="mt-2 max-w-[52ch] text-[15px] leading-relaxed text-muted">
                   {meta.sub}
                 </p>
-                <dl className="mt-4 grid gap-3 sm:grid-cols-2">
-                  <div>
-                    <dt className="label text-muted">What You Also Need</dt>
-                    <dd className="mt-1 text-[14px] text-ink">{DETAIL[f].needs}</dd>
-                  </div>
+                <dl className={`mt-4 grid gap-3 ${DETAIL[f].needs ? "sm:grid-cols-2" : "sm:grid-cols-1"}`}>
+                  {DETAIL[f].needs && (
+                    <div>
+                      <dt className="label text-muted">What You Also Need</dt>
+                      <dd className="mt-1 text-[14px] text-ink">{DETAIL[f].needs}</dd>
+                    </div>
+                  )}
                   <div>
                     <dt className="label text-muted">Handling</dt>
                     <dd className="mt-1 text-[14px] text-ink">{DETAIL[f].handling}</dd>
