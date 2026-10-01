@@ -15,14 +15,14 @@ export const metadata: Metadata = {
 
 const ORDER: Format[] = ["vial", "spray", "capsule", "supply"];
 
-const DETAIL: Record<string, { needs: string | null; handling: string }> = {
+const DETAIL: Record<string, { needs: string | null; handling: string | null }> = {
   vial: {
     needs: null,
     handling: "Stable at room temperature while sealed and lyophilized. Refrigerate once reconstituted.",
   },
   spray: {
-    needs: "Nothing. Arrives pre-mixed with a measured actuation.",
-    handling: "Stable at room temperature. Best used within 30 days of first use. No reconstitution, no needles, no BAC water.",
+    needs: null,
+    handling: null,
   },
   capsule: {
     needs: "Nothing. Pre-dosed oral format.",
@@ -74,18 +74,26 @@ export default function FormatsPage() {
                 <p className="mt-2 max-w-[52ch] text-[15px] leading-relaxed text-muted">
                   {meta.sub}
                 </p>
-                <dl className={`mt-4 grid gap-3 ${DETAIL[f].needs ? "sm:grid-cols-2" : "sm:grid-cols-1"}`}>
-                  {DETAIL[f].needs && (
-                    <div>
-                      <dt className="label text-muted">What You Also Need</dt>
-                      <dd className="mt-1 text-[14px] text-ink">{DETAIL[f].needs}</dd>
-                    </div>
-                  )}
-                  <div>
-                    <dt className="label text-muted">Handling</dt>
-                    <dd className="mt-1 text-[14px] text-ink">{DETAIL[f].handling}</dd>
-                  </div>
-                </dl>
+                {(DETAIL[f].needs || DETAIL[f].handling) && (
+                  <dl
+                    className={`mt-4 grid gap-3 ${
+                      DETAIL[f].needs && DETAIL[f].handling ? "sm:grid-cols-2" : "sm:grid-cols-1"
+                    }`}
+                  >
+                    {DETAIL[f].needs && (
+                      <div>
+                        <dt className="label text-muted">What You Also Need</dt>
+                        <dd className="mt-1 text-[14px] text-ink">{DETAIL[f].needs}</dd>
+                      </div>
+                    )}
+                    {DETAIL[f].handling && (
+                      <div>
+                        <dt className="label text-muted">Handling</dt>
+                        <dd className="mt-1 text-[14px] text-ink">{DETAIL[f].handling}</dd>
+                      </div>
+                    )}
+                  </dl>
+                )}
                 <Link
                   href={`/shop?format=${f}`}
                   className="mt-5 inline-block font-semibold"
