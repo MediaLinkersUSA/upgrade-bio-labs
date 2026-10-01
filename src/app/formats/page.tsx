@@ -30,7 +30,7 @@ const DETAIL: Record<string, { needs: string | null; handling: string | null }> 
   },
   supply: {
     needs: "Pairs with any lyophilized vial.",
-    handling: "Benzyl-alcohol preserved, so a multi-dose vial tolerates repeated withdrawals.",
+    handling: null,
   },
 };
 
@@ -82,7 +82,7 @@ export default function FormatsPage() {
                   >
                     {DETAIL[f].needs && (
                       <div>
-                        {f !== "capsule" && <dt className="label text-muted">What You Also Need</dt>}
+                        {f !== "capsule" && f !== "supply" && <dt className="label text-muted">What You Also Need</dt>}
                         <dd className="mt-1 text-[14px] text-ink">{DETAIL[f].needs}</dd>
                       </div>
                     )}
