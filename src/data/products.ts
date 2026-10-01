@@ -275,7 +275,7 @@ export const products: Product[] = [
     ],
     "inStock": true,
     "short": "3ml bacteriostatic water for single-vial reconstitution.",
-    "description": "Bacteriostatic water for reconstitution in a 3ml vial, preserved with benzyl alcohol. Sized for single-vial reconstitution where a 30ml multi-dose vial would exceed the working volume needed.",
+    "description": "",
     "researchAreas": [],
     "pairsWith": [
       "bac-water-hospira-brand",
