@@ -81,7 +81,7 @@ export default function StackBuilder() {
   return (
     <section id="build-your-stack" className="section-pad section-round bg-navy text-white">
       <div className="container-site">
-        <h2 className="t-display-md">Build Your Stack. Save Up To 20%.</h2>
+        <h2 className="t-display-md">Create Research Bundle. Save Up To 20%.</h2>
         <p className="mt-2 text-[15px] text-white/70">
           Any 2 compounds, 15% off. Any 3, 20% off. No code, applied at cart.
         </p>
