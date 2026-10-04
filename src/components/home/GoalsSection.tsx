@@ -10,12 +10,11 @@ export default function GoalsSection() {
   return (
     <section className="section-pad section-round bg-surface">
       <div className="container-site">
-        <Reveal className="mb-9 max-w-[54ch]">
+        {/* Heading only now (no subtitle underneath), so the gap down to the
+            cards is tighter than the mb-9 that was sized for heading plus a
+            two-line paragraph. */}
+        <Reveal className="mb-6 max-w-[54ch]">
           <h2 className="t-display-lg">Areas Of Research</h2>
-          <p className="mt-3 text-[17px] leading-relaxed text-muted">
-            Not sure which compound? Pick the research area and we will narrow
-            the catalog for you.
-          </p>
         </Reveal>
 
         <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
