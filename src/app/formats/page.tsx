@@ -18,7 +18,7 @@ const ORDER: Format[] = ["vial", "spray", "capsule", "supply"];
 const DETAIL: Record<string, { needs: string | null; handling: string | null }> = {
   vial: {
     needs: null,
-    handling: "Stable at room temperature while sealed and lyophilized. Refrigerate once reconstituted.",
+    handling: null,
   },
   spray: {
     needs: null,
