@@ -25,8 +25,8 @@ const DETAIL: Record<string, { needs: string | null; handling: string | null }> 
     handling: null,
   },
   capsule: {
-    needs: "Nothing. Pre-dosed oral format.",
-    handling: "Room temperature. The simplest format to store.",
+    needs: null,
+    handling: null,
   },
   supply: {
     needs: "Pairs with any lyophilized vial.",
