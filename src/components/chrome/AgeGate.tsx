@@ -14,6 +14,7 @@ const KEY = "ubl_age_ok";
 export default function AgeGate() {
   const [show, setShow] = useState(false);
   const [agreed, setAgreed] = useState(false);
+  const [qualified, setQualified] = useState(false);
 
   useEffect(() => {
     try {
@@ -41,7 +42,7 @@ export default function AgeGate() {
       aria-labelledby="age-gate-title"
       className="fixed inset-0 z-[70] flex items-center justify-center bg-[rgba(5,46,67,0.45)] p-5 backdrop-blur-md"
     >
-      <div className="w-full max-w-[460px] rounded-lg border border-line-soft bg-surface p-7 text-center shadow-pop">
+      <div className="max-h-[calc(100dvh-2.5rem)] w-full max-w-[460px] overflow-y-auto rounded-lg border border-line-soft bg-surface p-7 text-center shadow-pop">
         <p className="label text-teal-dark">Research Use Only</p>
         <h2 id="age-gate-title" className="t-display-md mt-3 text-balance">
           Researcher Verification
@@ -74,9 +75,30 @@ export default function AgeGate() {
           </span>
         </label>
 
+        {/* Second, separate affirmation: that the buyer is a qualified
+            researcher. Kept as its own checkbox rather than folded into the
+            one above so each statement is a distinct, deliberate action. */}
+        <label
+          htmlFor="age-gate-researcher"
+          className="mt-3 flex cursor-pointer items-start gap-3 rounded-md border border-line bg-surface-2 p-4 text-left"
+        >
+          <input
+            id="age-gate-researcher"
+            type="checkbox"
+            checked={qualified}
+            onChange={(e) => setQualified(e.target.checked)}
+            className="mt-0.5 h-[19px] w-[19px] shrink-0 accent-[var(--color-teal)]"
+          />
+          <span className="text-[14.5px] leading-relaxed text-ink">
+            I confirm I am a{" "}
+            <strong className="font-semibold">qualified researcher</strong>{" "}
+            purchasing for research only, not for human or veterinary use.
+          </span>
+        </label>
+
         <button
           type="button"
-          disabled={!agreed}
+          disabled={!agreed || !qualified}
           onClick={() => {
             try {
               sessionStorage.setItem(KEY, "1");
