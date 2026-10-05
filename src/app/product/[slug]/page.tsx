@@ -234,8 +234,11 @@ export default async function ProductPage({
           </section>
           )}
 
-          {/* Research areas */}
-          {p.researchAreas.length > 0 && (
+          {/* Research areas - not shown on capsules or sprays, by request.
+              Decided here by format rather than by clearing each product's
+              researchAreas data, so a capsule or spray added later is covered
+              automatically. The text itself stays in products.ts. */}
+          {p.researchAreas.length > 0 && p.format !== "capsule" && p.format !== "spray" && (
             <section className="section-pad !pb-0">
               <h2 className="t-display-md">Research Areas</h2>
               <ul className="mt-5 grid gap-x-8 gap-y-5 sm:grid-cols-2">
