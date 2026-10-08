@@ -136,6 +136,19 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-P52QJ8W4');`,
           }}
         />
+        {/* Google Analytics 4 (gtag.js), stream G-QQ1S6WKM4V. Shares the
+            same window.dataLayer GTM created above, which is safe. If the
+            GTM container ever also fires a GA4 config tag for this ID,
+            pageviews will be counted twice - keep only one of the two. */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-QQ1S6WKM4V" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-QQ1S6WKM4V');`,
+          }}
+        />
         {/* BlackHat Strategy dynamic optimization tag - separate from the
             GTM/Stape setup above, added at the agency's request.
             nowprocket/nitro-exclude aren't real React/HTML prop names
