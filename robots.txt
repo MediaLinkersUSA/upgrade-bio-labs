@@ -1,0 +1,16 @@
+# Upgrade BioLabs - production website
+User-agent: *
+# Transactional and account pages
+Disallow: /cart
+Disallow: /checkout
+Disallow: /my-account
+Disallow: /account/
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /register
+Disallow: /wishlist
+Disallow: /track-order
+Disallow: /affiliate-account
+Disallow: /kyc-verification-dashboard
+# Allow public pages, products, images, JavaScript and CSS
+Allow: /
