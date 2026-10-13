@@ -14,3 +14,4 @@ Disallow: /affiliate-account
 Disallow: /kyc-verification-dashboard
 # Allow public pages, products, images, JavaScript and CSS
 Allow: /
+
