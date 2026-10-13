@@ -13,6 +13,8 @@ import StickyMobileBar from "@/components/product/StickyMobileBar";
 import RelatedProducts from "@/components/product/RelatedProducts";
 import ShippingAccordion from "@/components/product/ShippingAccordion";
 import CoaViewer from "@/components/product/CoaViewer";
+import ProductProfileSection from "@/components/product/ProductProfile";
+import { PROFILES } from "@/data/product-profiles";
 
 export const dynamicParams = false;
 
@@ -234,23 +236,11 @@ export default async function ProductPage({
           </section>
           )}
 
-          {/* Research areas - not shown on capsules or sprays, by request.
-              Decided here by format rather than by clearing each product's
-              researchAreas data, so a capsule or spray added later is covered
-              automatically. The text itself stays in products.ts. */}
-          {p.researchAreas.length > 0 && p.format !== "capsule" && p.format !== "spray" && (
-            <section className="section-pad !pb-0">
-              <h2 className="t-display-md">Research Areas</h2>
-              <ul className="mt-5 grid gap-x-8 gap-y-5 sm:grid-cols-2">
-                {p.researchAreas.map((a) => (
-                  <li key={a.title}>
-                    <h3 className="t-title">{a.title}</h3>
-                    <p className="mt-1 text-[14.5px] leading-relaxed text-muted">{a.body}</p>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
+          {/* Product profile: the client's own spec tables (molecular profile,
+              etc.), shown in place of the old "Research Areas" section. The
+              researchAreas text stays in products.ts but is no longer shown on
+              any product. A product with no entry in PROFILES shows nothing. */}
+          {PROFILES[p.slug] && <ProductProfileSection profile={PROFILES[p.slug]} />}
 
           {/* Literature */}
           {p.refs?.length ? (
