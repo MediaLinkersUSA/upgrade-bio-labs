@@ -202,6 +202,14 @@ gtag('config', 'G-QQ1S6WKM4V');`,
           <AgeGate />
           <ExitIntent />
         </CartProvider>
+        {/* OptinMonster (user 391402, account 415159). Last thing in <body>,
+            as requested. Its own snippet appends the loader to <head>, so it
+            works the same from here. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(d,u,ac){var s=d.createElement('script');s.type='text/javascript';s.src='https://a.omappapi.com/app/js/api.min.js';s.async=true;s.dataset.user=u;s.dataset.account=ac;d.getElementsByTagName('head')[0].appendChild(s);})(document,391402,415159);`,
+          }}
+        />
       </body>
     </html>
   );
