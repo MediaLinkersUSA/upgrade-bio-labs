@@ -468,14 +468,20 @@ export default function CheckoutForm({
                 <dt className="text-muted">Subtotal</dt>
                 <dd>{money(cart.subtotal)}</dd>
               </div>
-              {cart.discount > 0 && (
+              {cart.totals.freeSprayCredit > 0 && (
+                <div className="flex justify-between text-teal-dark">
+                  <dt>Free Nasal Spray</dt>
+                  <dd>−{money(cart.totals.freeSprayCredit)}</dd>
+                </div>
+              )}
+              {cart.discount - cart.totals.freeSprayCredit > 0.005 && (
                 <div className="flex justify-between text-teal-dark">
                   <dt>
                     {cart.discountSource === "promo"
                       ? `${cart.promo?.code} (−${Math.round(cart.discountRate * 100)}%)`
                       : `Bundle Discount (−${Math.round(cart.discountRate * 100)}%)`}
                   </dt>
-                  <dd>−{money(cart.discount)}</dd>
+                  <dd>−{money(cart.discount - cart.totals.freeSprayCredit)}</dd>
                 </div>
               )}
               <div className="flex justify-between">
