@@ -13,6 +13,7 @@ import StickyMobileBar from "@/components/product/StickyMobileBar";
 import RelatedProducts from "@/components/product/RelatedProducts";
 import ShippingAccordion from "@/components/product/ShippingAccordion";
 import CoaViewer from "@/components/product/CoaViewer";
+import NasalSprayOffer from "@/components/product/NasalSprayOffer";
 import ProductProfileSection from "@/components/product/ProductProfile";
 import { PROFILES } from "@/data/product-profiles";
 
@@ -190,6 +191,8 @@ export default async function ProductPage({
             <li className="text-ink">{p.name}</li>
           </ol>
         </nav>
+
+        {p.format === "spray" && <NasalSprayOffer />}
 
         <div id="pdp-hero" className="grid items-start gap-14 lg:grid-cols-[1fr_480px]">
           <ViewItemTracker product={p} />
