@@ -8,7 +8,7 @@ import { useCart } from "./CartProvider";
 import { trackEcommerce } from "@/lib/analytics";
 import { getProduct, compounds } from "@/data/products";
 import { money } from "@/lib/pricing";
-import { REWARDS } from "@/lib/totals";
+import { REWARDS, SPRAY_OFFER } from "@/lib/totals";
 import FormatChip from "@/components/ui/FormatChip";
 
 const BUMP_SLUG = "bac-water-hospira-brand";
@@ -71,7 +71,10 @@ export default function CartDrawer() {
 
   /** The bar spans zero to the highest reward, so every threshold has a spot. */
   const TOP_REWARD = REWARDS[REWARDS.length - 1].threshold;
-  const spent = Math.max(0, cart.totals.subtotal - cart.totals.rateDiscount);
+  const spent = Math.max(
+    0,
+    cart.totals.subtotal - cart.totals.rateDiscount - cart.totals.freeSprayCredit
+  );
   const ladderPct = Math.min(100, Math.round((spent / TOP_REWARD) * 100));
   const bump = getProduct(BUMP_SLUG);
   const hasBump = cart.items.some((i) => i.product.slug === BUMP_SLUG);
@@ -267,6 +270,34 @@ export default function CartDrawer() {
                     )}
                   </div>
 
+                  {/* Nasal spray offer. An odd number of sprays means one is
+                      still waiting for its free partner; an even number means
+                      the offer is fully used. Nothing shows with no sprays. */}
+                  {cart.totals.sprayUnits % 2 === 1 && (
+                    <div className="border-b border-line-soft bg-wash px-5 py-3">
+                      <p className="text-[13.5px] font-semibold text-teal-dark">
+                        You can add another nasal spray for free.{" "}
+                        <Link
+                          href={SPRAY_OFFER.href}
+                          onClick={() => setOpen(false)}
+                          className="underline underline-offset-2"
+                        >
+                          Click here
+                        </Link>
+                      </p>
+                      <p className="mt-0.5 text-[12.5px] text-muted">
+                        Same spray or a different one. The lower-priced spray is the free one.
+                      </p>
+                    </div>
+                  )}
+                  {cart.totals.freeSprayUnits > 0 && cart.totals.sprayUnits % 2 === 0 && (
+                    <div className="border-b border-line-soft bg-wash px-5 py-3">
+                      <p className="text-[13.5px] font-semibold text-teal-dark">
+                        Free nasal spray applied ✓
+                      </p>
+                    </div>
+                  )}
+
                   {/* 2. Bundle ladder. Suppressed entirely while a code is
                       applied: prompting for "1 more compound to save 20%" when
                       that 20% cannot be taken on top of a 25% code would be
@@ -421,14 +452,20 @@ export default function CartDrawer() {
                       <dt className="text-muted">Subtotal</dt>
                       <dd>{money(cart.subtotal)}</dd>
                     </div>
-                    {cart.discount > 0 && (
+                    {cart.totals.freeSprayCredit > 0 && (
+                      <div className="flex justify-between text-teal-dark">
+                        <dt>Free Nasal Spray</dt>
+                        <dd>−{money(cart.totals.freeSprayCredit)}</dd>
+                      </div>
+                    )}
+                    {cart.discount - cart.totals.freeSprayCredit > 0.005 && (
                       <div className="flex justify-between text-teal-dark">
                         <dt>
                           {cart.discountSource === "promo"
                             ? `${cart.promo?.code} (−${Math.round(cart.discountRate * 100)}%)`
                             : `Bundle Discount (−${Math.round(cart.discountRate * 100)}%)`}
                         </dt>
-                        <dd>−{money(cart.discount)}</dd>
+                        <dd>−{money(cart.discount - cart.totals.freeSprayCredit)}</dd>
                       </div>
                     )}
                     <div className="flex justify-between">
