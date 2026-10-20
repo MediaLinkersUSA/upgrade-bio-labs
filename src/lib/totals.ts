@@ -33,6 +33,19 @@ export const REWARDS = [
 
 export type RewardId = (typeof REWARDS)[number]["id"];
 
+/**
+ * Nasal spray offer: buy any nasal spray, get the same or another one free.
+ * Units are paired up and the cheaper unit in each pair is the free one, so
+ * the customer always pays for the higher-priced spray.
+ */
+export const SPRAY_OFFER = {
+  title: "Buy Any Nasal Spray, Get a Second One Free",
+  detail: "Pick the same spray or a different one. You pay for the higher-priced spray and the lower-priced one is free.",
+  href: "/shop?format=spray",
+} as const;
+
+export const isSprayOfferItem = (p: Product) => p.format === "spray";
+
 /** The SKU given away at the $250 tier. */
 export const FREE_BAC_SLUG = "bac-water-hospira-brand";
 
@@ -69,6 +82,12 @@ export function discountableSubtotal(items: CartLine[]): number {
 }
 
 export type Totals = {
+  /** Nasal spray units in the cart, counting quantities. */
+  sprayUnits: number;
+  /** How many of them are free (one per pair). */
+  freeSprayUnits: number;
+  /** Value of the free sprays: the cheaper unit of each pair, at the price shown. */
+  freeSprayCredit: number;
   /** What the goods would cost with no discount of any kind. */
   listSubtotal: number;
   /** What the goods cost at the quantity prices actually shown. */
@@ -124,13 +143,29 @@ export function computeTotals({
   const bundleRate = stackDiscount(distinctCompounds);
   const resolved = resolveDiscount(promoRate ?? 0, bundleRate);
 
+  // Nasal spray offer: expand to single units, most expensive first, and make
+  // the cheaper half free (floor(n/2) units). The price used is the one the
+  // customer is actually charged for that line, so a quantity break is honoured.
+  const sprayPrices = items
+    .filter((i) => isSprayOfferItem(i.product))
+    .flatMap((i) => Array<number>(i.qty).fill(unitPriceAt(i.product, i.qty, i.size)))
+    .sort((a, b) => b - a);
+  const sprayUnits = sprayPrices.length;
+  const freeSprayUnits = Math.floor(sprayUnits / 2);
+  const freeSprayCredit = +sprayPrices
+    .slice(sprayUnits - freeSprayUnits)
+    .reduce((s, n) => s + n, 0)
+    .toFixed(2);
+
   // Supplies are excluded from the discountable base as well as the count.
-  const discountable = discountableSubtotal(items);
+  // The free sprays are excluded too, so a percentage code is never taken off
+  // a price that has already been waived.
+  const discountable = Math.max(0, discountableSubtotal(items) - freeSprayCredit);
   const rateDiscount = +(discountable * resolved.rate).toFixed(2);
 
   // Reward thresholds are measured on what the customer actually pays for
   // goods, so a discount cannot bootstrap itself into a bigger reward.
-  const afterProductDiscounts = subtotal - rateDiscount;
+  const afterProductDiscounts = subtotal - rateDiscount - freeSprayCredit;
   const unlocked = Object.fromEntries(
     REWARDS.map((r) => [r.id, afterProductDiscounts >= r.threshold])
   ) as Record<RewardId, boolean>;
@@ -142,7 +177,7 @@ export function computeTotals({
       ? +listUnitPrice(bacLine.product, bacLine.size).toFixed(2)
       : 0;
 
-  const rawProductDiscount = tierSavings + rateDiscount + methodCredit;
+  const rawProductDiscount = tierSavings + rateDiscount + methodCredit + freeSprayCredit;
   const totalDiscount = +(rawProductDiscount + freeItemCredit).toFixed(2);
 
   // --- shipping --------------------------------------------------------
@@ -156,6 +191,9 @@ export function computeTotals({
 
   const next = REWARDS.find((r) => !unlocked[r.id]);
   return {
+    sprayUnits,
+    freeSprayUnits,
+    freeSprayCredit,
     listSubtotal: +listSubtotal.toFixed(2),
     subtotal: +subtotal.toFixed(2),
     tierSavings,
