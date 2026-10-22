@@ -41,6 +41,9 @@
   --color-capsule: #2e7d6e;
   --color-capsule-wash: #e3f2ed;
   --color-capsule-text: #2c786a; /* 4.55 on --capsule-wash */
+  --color-tablet: #7b5ea7;
+  --color-tablet-wash: #f0ebf7;
+  --color-tablet-text: #6b4c96; /* 5.79 on --tablet-wash */
   --color-supply: #6e93a6;
   --color-supply-wash: #eef3f5;
 
