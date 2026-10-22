@@ -18,6 +18,7 @@ const COLUMNS = [
       ["Vials", "/shop?format=vial"],
       ["Sprays", "/shop?format=spray"],
       ["Capsules", "/shop?format=capsule"],
+      ["Tablets", "/shop?format=tablet"],
       ["Supplies", "/shop?format=supply"],
     ],
   },
