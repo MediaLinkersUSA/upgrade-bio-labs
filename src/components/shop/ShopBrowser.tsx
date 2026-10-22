@@ -8,7 +8,7 @@ import { FORMAT_META, GOAL_META, GOAL_ORDER } from "@/lib/config";
 import ProductCard from "@/components/product/ProductCard";
 import FormatIcon from "@/components/ui/FormatIcon";
 
-const FORMATS: Format[] = ["vial", "spray", "capsule", "supply"];
+const FORMATS: Format[] = ["vial", "spray", "capsule", "tablet", "supply"];
 
 const SORTS = {
   bestselling: "bestselling",
@@ -141,7 +141,7 @@ export default function ShopBrowser({ products }: { products: Product[] }) {
       <header className="mb-7">
         <h1 className="t-display-lg">All Peptides</h1>
         <p className="mt-2 text-[15px] text-muted">
-          {products.length} compounds across vials, sprays, and capsules.
+          {products.length} compounds across vials, sprays, capsules, and tablets.
           Every batch third-party tested.
         </p>
       </header>
