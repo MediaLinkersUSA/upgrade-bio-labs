@@ -88,6 +88,14 @@ export const FORMAT_META = {
     text: "var(--color-capsule-text)",
     wash: "var(--color-capsule-wash)",
   },
+  tablet: {
+    label: "Tablets",
+    title: "Sublingual Tablets",
+    sub: "Pre-dosed, dissolves under the tongue.",
+    color: "var(--color-tablet)",
+    text: "var(--color-tablet-text)",
+    wash: "var(--color-tablet-wash)",
+  },
   supply: {
     label: "Supplies",
     title: "Supplies",
