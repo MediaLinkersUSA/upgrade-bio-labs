@@ -19,10 +19,11 @@ const NAV = [
   { href: "/contact", label: "Contact" },
 ];
 
-const COLUMNS = (["vial", "spray", "capsule"] as const).map((f) => ({
+const COLUMNS = (["vial", "spray", "capsule", "tablet"] as const).map((f) => ({
   format: f,
   href: `/shop?format=${f}`,
-  title: f === "vial" ? "Vials" : f === "spray" ? "Sprays" : "Capsules",
+  title:
+    f === "vial" ? "Vials" : f === "spray" ? "Sprays" : f === "capsule" ? "Capsules" : "Tablets",
   items: byFormat(f)
     .filter((p) => p.inStock)
     .sort((a, b) => Number(!!b.bestseller) - Number(!!a.bestseller))
@@ -210,7 +211,7 @@ export default function Nav() {
           onMouseEnter={openMega}
           onMouseLeave={closeMega}
         >
-          <div className="container-site grid grid-cols-4 gap-8 py-8">
+          <div className="container-site grid grid-cols-5 gap-8 py-8">
             {COLUMNS.map((col) => (
               <div key={col.format}>
                 <Link
@@ -270,7 +271,7 @@ export default function Nav() {
                 </li>
               ))}
             </ul>
-            <div className="mt-5 grid grid-cols-3 gap-2">
+            <div className="mt-5 grid grid-cols-4 gap-2">
               {COLUMNS.map((c) => (
                 <Link
                   key={c.format}
