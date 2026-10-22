@@ -5,6 +5,7 @@ const STYLE: Record<Format, { bg: string; fg: string; label: string }> = {
   vial: { bg: "var(--color-vial-wash)", fg: "var(--color-vial)", label: "vial" },
   spray: { bg: "var(--color-spray-wash)", fg: "var(--color-teal-dark)", label: "spray" },
   capsule: { bg: "var(--color-capsule-wash)", fg: "var(--color-capsule-text)", label: "capsule" },
+  tablet: { bg: "var(--color-tablet-wash)", fg: "var(--color-tablet-text)", label: "tablet" },
   supply: { bg: "var(--color-supply-wash)", fg: "#4B7185", label: "supply" },
 };
 
