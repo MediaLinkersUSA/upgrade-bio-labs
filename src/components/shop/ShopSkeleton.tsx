@@ -14,14 +14,14 @@ export default function ShopSkeleton() {
       <header className="mb-7">
         <h1 className="t-display-lg">All Peptides</h1>
         <p className="mt-2 text-[15px] text-muted">
-          {products.length} compounds across vials, sprays, and capsules.
+          {products.length} compounds across vials, sprays, capsules, and tablets.
           Every batch third-party tested.
         </p>
       </header>
 
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <ul className="flex flex-wrap gap-2">
-          {["all", "vials", "sprays", "capsules", "supplies"].map((t) => (
+          {["all", "vials", "sprays", "capsules", "tablets", "supplies"].map((t) => (
             <li
               key={t}
               className="rounded-full border border-line px-4 py-2 text-[14px] font-medium text-transparent"
