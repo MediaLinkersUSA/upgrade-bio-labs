@@ -1884,5 +1884,10 @@ export const WOO_PRODUCTS: Record<string, WooProduct> = {
     "id": 4352,
     "name": "Vial Storage Case",
     "variations": []
+  },
+  "nad-sublingual-tablets": {
+    "id": 4600,
+    "name": "NAD+ Sublingual Dissolvable Tablets (Mint Flavor)",
+    "variations": []
   }
 };
