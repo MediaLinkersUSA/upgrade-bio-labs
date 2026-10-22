@@ -46,6 +46,15 @@ export default function FormatIcon({
       </svg>
     );
 
+  if (format === "tablet")
+    return (
+      <svg {...common}>
+        <circle cx="8" cy="8" r="5.6" />
+        <path d="M2.8 8h10.4" />
+        <path d="M5 5.4c.8-.6 1.7-.9 3-.9" />
+      </svg>
+    );
+
   if (format === "supply")
     return (
       <svg {...common}>
