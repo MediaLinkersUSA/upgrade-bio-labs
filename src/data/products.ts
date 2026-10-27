@@ -2494,7 +2494,7 @@ export const products: Product[] = [
     "inStock": true,
     "bestseller": true,
     "short": "Research-grade triple receptor agonist for metabolic study designs.",
-    "description": "RT-3 is supplied as a research-grade triple receptor agonist, acting at the glucagon-like peptide-1, glucose-dependent insulinotropic polypeptide, and glucagon receptors. Triple-agonist research examines whether adding glucagon-receptor activity to combined incretin signaling produces effects on energy expenditure and body composition beyond what dual agonism achieves.",
+    "description": "RT-3 is supplied as a research-grade triple receptor agonist, acting at the glucagon-like peptide-1, glucose-dependent insulinotropic polypeptide, and glucagon receptors.",
     "researchAreas": [
       {
         "title": "Triple Receptor Signaling",
