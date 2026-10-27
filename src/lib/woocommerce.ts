@@ -356,7 +356,8 @@ export type WooMirrorInput = {
    * dashboard never shows a coupon that did not change the total.
    */
   couponCode?: string | null;
-  /** What that code took off, for the coupon line's amount. */
+  /** What that code took off. Sent on the coupon line and subtracted from the
+   *  fee line, so it is never counted in both. */
   couponDiscountCents?: number;
   /** Affiliate attribution, if any. Meta-only - Woo's own totals are untouched;
    *  the commission is tracked in our own database, not deducted here. */
@@ -421,9 +422,10 @@ export async function mirrorOrderToWoo(
         total: dollars(input.shippingCents),
       },
     ],
-    // Shows under "Coupon(s)" on the order screen in WP Admin. Informational:
-    // the money is already carried by the line totals and the fee line below,
-    // so this does not discount the order a second time.
+    // Shows under "Coupon(s)" on the order screen in WP Admin. WooCommerce
+    // applies a coupon line to the order itself, so the coupon's amount is
+    // deliberately NOT included in the fee line below - sending it in both
+    // places counted it twice and understated the order total.
     ...(input.couponCode
       ? {
           coupon_lines: [
@@ -434,12 +436,16 @@ export async function mirrorOrderToWoo(
           ],
         }
       : {}),
-    ...(input.orderDiscountCents > 0
+    // The order-level discount minus the coupon's share (payment-method credit,
+    // free BAC water). Omitted entirely when nothing is left.
+    ...(input.orderDiscountCents - (input.couponCode ? input.couponDiscountCents ?? 0 : 0) > 0
       ? {
           fee_lines: [
             {
               name: "Discount",
-              total: `-${dollars(input.orderDiscountCents)}`,
+              total: `-${dollars(
+                input.orderDiscountCents - (input.couponCode ? input.couponDiscountCents ?? 0 : 0)
+              )}`,
               tax_status: "none",
             },
           ],
