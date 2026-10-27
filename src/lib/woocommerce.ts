@@ -349,6 +349,15 @@ export type WooMirrorInput = {
    * subtracts the tier saving twice and understates the order.
    */
   orderDiscountCents: number;
+  /**
+   * The discount code that actually priced this order, if any - set only when
+   * the code was valid, the customer was eligible, and it beat the bundle
+   * rate. A code that was entered but did not apply is left null, so the Woo
+   * dashboard never shows a coupon that did not change the total.
+   */
+  couponCode?: string | null;
+  /** What that code took off, for the coupon line's amount. */
+  couponDiscountCents?: number;
   /** Affiliate attribution, if any. Meta-only - Woo's own totals are untouched;
    *  the commission is tracked in our own database, not deducted here. */
   refCode?: string | null;
@@ -412,6 +421,19 @@ export async function mirrorOrderToWoo(
         total: dollars(input.shippingCents),
       },
     ],
+    // Shows under "Coupon(s)" on the order screen in WP Admin. Informational:
+    // the money is already carried by the line totals and the fee line below,
+    // so this does not discount the order a second time.
+    ...(input.couponCode
+      ? {
+          coupon_lines: [
+            {
+              code: input.couponCode,
+              discount: dollars(input.couponDiscountCents ?? 0),
+            },
+          ],
+        }
+      : {}),
     ...(input.orderDiscountCents > 0
       ? {
           fee_lines: [

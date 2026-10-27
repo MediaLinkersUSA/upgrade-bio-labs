@@ -136,6 +136,13 @@ export async function POST(req: Request) {
   });
   const ship = shippingMethod(String(body.shippingMethod ?? "standard"));
 
+  // The code that genuinely priced this order. Not just "was one typed": it
+  // must have resolved, survived the first-order check, and won against the
+  // bundle rate (the two never stack - see lib/promo.ts). Otherwise the Woo
+  // order would list a coupon that took nothing off.
+  const appliedCouponCode =
+    requested && promoRate > 0 && totals.resolved.source === "promo" ? requested.code : null;
+
   // Affiliate attribution, if the visit that led here carried ?ref=. Looked
   // up here rather than trusted from the cookie value alone, so an inactive
   // or made-up code simply credits nobody instead of recording a commission
@@ -282,6 +289,8 @@ export async function POST(req: Request) {
     // Tier savings are carried per line; only the order-level portion of the
     // discount becomes a fee line, or it would be subtracted twice.
     orderDiscountCents: cents(totals.totalDiscount - totals.tierSavings),
+    couponCode: appliedCouponCode,
+    couponDiscountCents: appliedCouponCode ? cents(totals.rateDiscount) : 0,
     refCode: affiliate?.code ?? null,
     affiliateName: affiliate?.name ?? null,
     commissionCents,
