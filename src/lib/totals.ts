@@ -76,10 +76,19 @@ export type TotalsInput = {
  * calculated from, rather than a second, slightly different subtotal.
  */
 export function discountableSubtotal(items: CartLine[]): number {
+  // While the nasal spray offer is in use (a free spray in the cart), the
+  // sprays are left out of the base: no coupon or bundle discount is taken off
+  // them. Every other product is discounted exactly as before.
+  const sprayOfferOn = sprayUnitCount(items) >= 2;
   return items
     .filter((i) => i.product.format !== "supply")
+    .filter((i) => !(sprayOfferOn && isSprayOfferItem(i.product)))
     .reduce((s, i) => s + unitPriceAt(i.product, i.qty, i.size) * i.qty, 0);
 }
+
+/** Nasal spray units in the cart, counting quantities. */
+export const sprayUnitCount = (items: CartLine[]) =>
+  items.filter((i) => isSprayOfferItem(i.product)).reduce((s, i) => s + i.qty, 0);
 
 export type Totals = {
   /** Nasal spray units in the cart, counting quantities. */
@@ -135,14 +144,6 @@ export function computeTotals({
   );
   const tierSavings = +(listSubtotal - subtotal).toFixed(2);
 
-  // Distinct COMPOUNDS, so three BAC waters never trigger a bundle discount.
-  const distinctCompounds = new Set(
-    items.filter((i) => !isSupply(i.product)).map((i) => i.product.slug)
-  ).size;
-
-  const bundleRate = stackDiscount(distinctCompounds);
-  const resolved = resolveDiscount(promoRate ?? 0, bundleRate);
-
   // Nasal spray offer: expand to single units, most expensive first, and make
   // the cheaper half free (floor(n/2) units). The price used is the one the
   // customer is actually charged for that line, so a quantity break is honoured.
@@ -157,10 +158,23 @@ export function computeTotals({
     .reduce((s, n) => s + n, 0)
     .toFixed(2);
 
-  // Supplies are excluded from the discountable base as well as the count.
-  // The free sprays are excluded too, so a percentage code is never taken off
-  // a price that has already been waived.
-  const discountable = Math.max(0, discountableSubtotal(items) - freeSprayCredit);
+  // Distinct COMPOUNDS, so three BAC waters never trigger a bundle discount.
+  // While the nasal spray offer is in use the sprays do not count: they take
+  // no bundle or coupon discount, and they should not lift the bundle tier of
+  // the other products either.
+  const distinctCompounds = new Set(
+    items
+      .filter((i) => !isSupply(i.product))
+      .filter((i) => !(freeSprayUnits > 0 && isSprayOfferItem(i.product)))
+      .map((i) => i.product.slug)
+  ).size;
+
+  const bundleRate = stackDiscount(distinctCompounds);
+  const resolved = resolveDiscount(promoRate ?? 0, bundleRate);
+
+  // Supplies, and the nasal sprays while their offer is in use, are excluded
+  // from the discountable base (see discountableSubtotal).
+  const discountable = discountableSubtotal(items);
   const rateDiscount = +(discountable * resolved.rate).toFixed(2);
 
   // Reward thresholds are measured on what the customer actually pays for
