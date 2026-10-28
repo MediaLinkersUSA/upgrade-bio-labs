@@ -290,6 +290,14 @@ export default function CartDrawer() {
                       </p>
                     </div>
                   )}
+                  {cart.totals.freeSprayUnits > 0 && cart.promo && (
+                    <div className="border-b border-line-soft px-5 py-2.5">
+                      <p className="text-[12.5px] text-muted">
+                        Discount codes and the bundle discount don&apos;t apply to nasal sprays
+                        while the free nasal spray offer is in your cart.
+                      </p>
+                    </div>
+                  )}
                   {cart.totals.freeSprayUnits > 0 && cart.totals.sprayUnits % 2 === 0 && (
                     <div className="border-b border-line-soft bg-wash px-5 py-3">
                       <p className="text-[13.5px] font-semibold text-teal-dark">
