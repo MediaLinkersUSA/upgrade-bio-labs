@@ -21,6 +21,7 @@ import { SITE } from "@/lib/config";
 const CartDrawer = dynamic(() => import("@/components/cart/CartDrawer"));
 const AgeGate = dynamic(() => import("@/components/chrome/AgeGate"));
 const ExitIntent = dynamic(() => import("@/components/chrome/ExitIntent"));
+const SprayBogoModal = dynamic(() => import("@/components/chrome/SprayBogoModal"));
 
 // UI face: preloaded, since almost every element above the fold uses it.
 const instrument = Instrument_Sans({
@@ -201,6 +202,7 @@ gtag('config', 'G-QQ1S6WKM4V');`,
           <CartDrawer />
           <AgeGate />
           <ExitIntent />
+          <SprayBogoModal />
         </CartProvider>
         {/* OptinMonster (user 391402, account 415159). Last thing in <body>,
             as requested. Its own snippet appends the loader to <head>, so it
