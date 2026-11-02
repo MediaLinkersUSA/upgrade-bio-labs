@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { money } from "@/lib/pricing";
 import {
   ORDER_STATUSES,
@@ -29,7 +29,22 @@ type Order = {
   heard_about_detail?: string | null;
   /** Present after migration 0009. */
   research_ref?: boolean | null;
-  order_items?: { product_name: string; quantity: number; line_cents: number }[];
+  /** Present after migration 0004; before it these ride inside shipping_address. */
+  phone?: string | null;
+  order_notes?: string | null;
+  subtotal_cents?: number | null;
+  discount_cents?: number | null;
+  shipping_cents?: number | null;
+  ref_code?: string | null;
+  commission_cents?: number | null;
+  order_items?: {
+    product_name: string;
+    product_slug?: string | null;
+    size?: string | null;
+    quantity: number;
+    unit_cents?: number | null;
+    line_cents: number;
+  }[];
 };
 
 /**
@@ -54,6 +69,148 @@ const heardAboutLabel = (o: Order) =>
   o.heard_about
     ? `${o.heard_about}${o.heard_about_detail ? ` (${o.heard_about_detail})` : ""}`
     : null;
+const phoneOf = (o: Order) => o.phone || o.shipping_address?.phone || "";
+const notesOf = (o: Order) => o.order_notes || o.shipping_address?.order_notes || "";
+
+/** The ship-to block as separate lines, skipping anything empty. */
+function addressLines(o: Order): string[] {
+  const a = o.shipping_address ?? {};
+  const cityLine = [a.city, [a.state, a.postal_code].filter(Boolean).join(" ")]
+    .filter(Boolean)
+    .join(", ");
+  return [o.shipping_name ?? "", a.line1 ?? "", a.line2 ?? "", cityLine, a.country ?? ""].filter(Boolean);
+}
+
+const cents = (n?: number | null) => (n == null ? "-" : money(n / 100));
+
+/** Everything about one order as plain text, for pasting into WooCommerce, an
+ *  email or a packing note. */
+function orderText(o: Order): string {
+  return [
+    `Order ${orderRef(o)}  (${date(o.created_at)})`,
+    `Payment: ${METHOD_LABEL[payMethod(o)] ?? payMethod(o)}   Status: ${statusLabel(o.status)}`,
+    "",
+    "SHIP TO",
+    ...addressLines(o),
+    phoneOf(o) ? `Phone: ${phoneOf(o)}` : "",
+    o.email ? `Email: ${o.email}` : "",
+    "",
+    "ITEMS",
+    ...(o.order_items ?? []).map(
+      (i) =>
+        `${i.quantity} x ${i.product_name}${i.size ? ` (${i.size})` : ""}` +
+        (i.unit_cents != null ? ` @ ${cents(i.unit_cents)}` : "") +
+        ` = ${cents(i.line_cents)}`
+    ),
+    "",
+    `Subtotal: ${cents(o.subtotal_cents)}`,
+    `Discount: -${cents(o.discount_cents ?? 0)}`,
+    `Shipping: ${cents(o.shipping_cents)}`,
+    `TOTAL: ${cents(o.total_cents)}`,
+    notesOf(o) ? `\nNotes: ${notesOf(o)}` : "",
+    heardAboutLabel(o) ? `Heard about us: ${heardAboutLabel(o)}` : "",
+    o.ref_code ? `Affiliate: ${o.ref_code}` : "",
+  ]
+    .filter((l, i, arr) => !(l === "" && arr[i - 1] === ""))
+    .join("\n");
+}
+
+function OrderDetails({ order: o }: { order: Order }) {
+  const [copied, setCopied] = useState(false);
+  const lines = addressLines(o);
+  return (
+    <div className="grid gap-6 bg-surface-2 px-5 py-5 text-[14px] md:grid-cols-3">
+      <div>
+        <h3 className="label mb-2 text-muted">Ship to</h3>
+        {lines.length ? (
+          lines.map((l, i) => (
+            <p key={i} className={i === 0 ? "font-semibold" : ""}>
+              {l}
+            </p>
+          ))
+        ) : (
+          <p className="text-muted">No address on this order.</p>
+        )}
+        <p className="mt-3">
+          <span className="text-muted">Phone: </span>
+          {phoneOf(o) || "-"}
+        </p>
+        <p>
+          <span className="text-muted">Email: </span>
+          {o.email || "-"}
+        </p>
+      </div>
+
+      <div>
+        <h3 className="label mb-2 text-muted">Items</h3>
+        <ul className="space-y-1.5">
+          {(o.order_items ?? []).map((i, idx) => (
+            <li key={idx} className="flex justify-between gap-3">
+              <span>
+                {i.quantity} × {i.product_name}
+                {i.size ? <span className="text-muted"> ({i.size})</span> : null}
+                {i.unit_cents != null && (
+                  <span className="block text-[12.5px] text-muted">{cents(i.unit_cents)} each</span>
+                )}
+              </span>
+              <span className="data shrink-0">{cents(i.line_cents)}</span>
+            </li>
+          ))}
+          {!(o.order_items ?? []).length && <li className="text-muted">No items recorded.</li>}
+        </ul>
+      </div>
+
+      <div>
+        <h3 className="label mb-2 text-muted">Payment</h3>
+        <dl className="data space-y-1">
+          <div className="flex justify-between"><dt className="text-muted">Subtotal</dt><dd>{cents(o.subtotal_cents)}</dd></div>
+          <div className="flex justify-between"><dt className="text-muted">Discount</dt><dd>−{cents(o.discount_cents ?? 0)}</dd></div>
+          <div className="flex justify-between"><dt className="text-muted">Shipping</dt><dd>{cents(o.shipping_cents)}</dd></div>
+          <div className="flex justify-between border-t border-line-soft pt-1 font-semibold"><dt>Total</dt><dd>{cents(o.total_cents)}</dd></div>
+        </dl>
+        <p className="mt-3 text-muted">
+          {METHOD_LABEL[payMethod(o)] ?? payMethod(o)} · {statusLabel(o.status)}
+          {o.tracking_number ? ` · Tracking ${o.tracking_number}` : ""}
+        </p>
+        {notesOf(o) && (
+          <p className="mt-2">
+            <span className="text-muted">Notes: </span>
+            {notesOf(o)}
+          </p>
+        )}
+        {heardAboutLabel(o) && (
+          <p className="mt-1">
+            <span className="text-muted">Heard about us: </span>
+            {heardAboutLabel(o)}
+          </p>
+        )}
+        {o.ref_code && (
+          <p className="mt-1">
+            <span className="text-muted">Affiliate: </span>
+            {o.ref_code}
+            {o.commission_cents ? ` (${cents(o.commission_cents)} commission)` : ""}
+          </p>
+        )}
+        <button
+          type="button"
+          className="btn-ghost mt-4"
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(orderText(o));
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2000);
+            } catch {
+              /* clipboard blocked: nothing to do */
+            }
+          }}
+        >
+          {copied ? "Copied ✓" : "Copy order details"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 type Sub = { email: string; source: string; created_at: string };
 type StockReq = { email: string; product_slug: string; created_at: string };
 type CoaDoc = { product_slug: string; batch: string | null; uploaded_at: string; original_name: string | null };
@@ -196,6 +353,7 @@ export default function AdminDashboard({
   const [refreshing, setRefreshing] = useState(false);
   const [refreshedAt, setRefreshedAt] = useState<string | null>(null);
   const [refreshError, setRefreshError] = useState<string | null>(null);
+  const [openOrder, setOpenOrder] = useState<string | null>(null);
 
   const updatePrices = async () => {
     setRefreshing(true);
@@ -326,6 +484,16 @@ export default function AdminDashboard({
                       payment_method: payMethod(o),
                       email: o.email,
                       name: o.shipping_name,
+                      phone: phoneOf(o),
+                      address_1: o.shipping_address?.line1 ?? "",
+                      address_2: o.shipping_address?.line2 ?? "",
+                      city: o.shipping_address?.city ?? "",
+                      state: o.shipping_address?.state ?? "",
+                      zip: o.shipping_address?.postal_code ?? "",
+                      notes: notesOf(o),
+                      subtotal: o.subtotal_cents != null ? (o.subtotal_cents / 100).toFixed(2) : "",
+                      discount: o.discount_cents != null ? (o.discount_cents / 100).toFixed(2) : "",
+                      shipping: o.shipping_cents != null ? (o.shipping_cents / 100).toFixed(2) : "",
                       // The label, not the id: this file gets opened in
                       // Excel by someone who never sees the codebase.
                       status: statusLabel(o.status),
@@ -364,13 +532,22 @@ export default function AdminDashboard({
                 </thead>
                 <tbody className="divide-y divide-line-soft">
                   {orders.map((o) => (
-                    <tr key={o.id}>
+                    <Fragment key={o.id}>
+                    <tr>
                       <td className="whitespace-nowrap px-4 py-3 text-muted">{date(o.created_at)}</td>
                       <td className="px-4 py-3">
                         <span className="data block font-semibold">{orderRef(o)}</span>
                         <span className="block text-[12.5px] text-muted">
                           {METHOD_LABEL[payMethod(o)] ?? payMethod(o)}
                         </span>
+                        <button
+                          type="button"
+                          onClick={() => setOpenOrder(openOrder === o.id ? null : o.id)}
+                          aria-expanded={openOrder === o.id}
+                          className="mt-1 text-[12.5px] font-semibold text-teal-dark hover:underline"
+                        >
+                          {openOrder === o.id ? "Hide details ▴" : "Details ▾"}
+                        </button>
                       </td>
                       <td className="px-4 py-3">
                         <span className="block font-medium">{o.shipping_name ?? "-"}</span>
@@ -401,6 +578,14 @@ export default function AdminDashboard({
                         {money(o.total_cents / 100)}
                       </td>
                     </tr>
+                    {openOrder === o.id && (
+                      <tr>
+                        <td colSpan={6} className="p-0">
+                          <OrderDetails order={o} />
+                        </td>
+                      </tr>
+                    )}
+                    </Fragment>
                   ))}
                 </tbody>
               </table>
