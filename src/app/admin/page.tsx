@@ -27,7 +27,7 @@ export default async function AdminPage() {
           // `*` rather than a column list: the order reference lives in order_number
           // after migration 0004 and in stripe_session_id before it, and naming a
           // column that does not exist fails the whole query.
-          .select("*,order_items(product_name,quantity,line_cents)")
+          .select("*,order_items(*)")
           .order("created_at", { ascending: false })
           .limit(100),
         db.from("subscribers").select("email,source,created_at").order("created_at", { ascending: false }).limit(200),
