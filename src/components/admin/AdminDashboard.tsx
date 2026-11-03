@@ -2,6 +2,7 @@
 
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { money } from "@/lib/pricing";
+import InvoiceModal, { type InvoiceData } from "./InvoiceModal";
 import {
   ORDER_STATUSES,
   SHIPPED_STATUSES,
@@ -79,6 +80,36 @@ function addressLines(o: Order): string[] {
     .filter(Boolean)
     .join(", ");
   return [o.shipping_name ?? "", a.line1 ?? "", a.line2 ?? "", cityLine, a.country ?? ""].filter(Boolean);
+}
+
+/** Maps an order to what the printable invoice shows. */
+function invoiceOf(o: Order): InvoiceData {
+  const items = (o.order_items ?? []).map((i) => ({
+    name: i.product_name,
+    size: i.size ?? "",
+    qty: i.quantity,
+    unitCents: i.unit_cents ?? Math.round(i.line_cents / Math.max(i.quantity, 1)),
+  }));
+  const lines = (o.order_items ?? []).reduce((n, i) => n + i.line_cents, 0);
+  const subtotal = o.subtotal_cents ?? lines;
+  const shipping = o.shipping_cents ?? 0;
+  return {
+    ref: orderRef(o),
+    createdAt: o.created_at,
+    name: o.shipping_name ?? "",
+    address: addressLines(o).slice(o.shipping_name ? 1 : 0),
+    email: o.email ?? "",
+    phone: phoneOf(o),
+    method: METHOD_LABEL[payMethod(o)] ?? payMethod(o),
+    status: statusLabel(o.status),
+    notes: notesOf(o),
+    items,
+    subtotalCents: subtotal,
+    // Whatever is left between the lines and the total, so the invoice always adds up.
+    discountCents: o.discount_cents ?? Math.max(0, subtotal + shipping - o.total_cents),
+    shippingCents: shipping,
+    totalCents: o.total_cents,
+  };
 }
 
 const cents = (n?: number | null) => (n == null ? "-" : money(n / 100));
@@ -374,6 +405,7 @@ export default function AdminDashboard({
   const [refreshedAt, setRefreshedAt] = useState<string | null>(null);
   const [refreshError, setRefreshError] = useState<string | null>(null);
   const [openOrder, setOpenOrder] = useState<string | null>(null);
+  const [invoiceFor, setInvoiceFor] = useState<Order | null>(null);
 
   const updatePrices = async () => {
     setRefreshing(true);
@@ -602,6 +634,13 @@ export default function AdminDashboard({
                         >
                           {openOrder === o.id ? "Hide details ▴" : "Details ▾"}
                         </button>
+                        <button
+                          type="button"
+                          onClick={() => setInvoiceFor(o)}
+                          className="ml-3 mt-1 text-[12.5px] font-semibold text-teal-dark hover:underline"
+                        >
+                          Invoice
+                        </button>
                       </td>
                       <td className="px-4 py-3">
                         <span className="block font-medium">{o.shipping_name ?? "-"}</span>
@@ -646,6 +685,10 @@ export default function AdminDashboard({
             </div>
           )}
         </section>
+      )}
+
+      {invoiceFor && (
+        <InvoiceModal invoice={invoiceOf(invoiceFor)} onClose={() => setInvoiceFor(null)} />
       )}
 
       {/* ------------------------------------------------------- affiliates */}
