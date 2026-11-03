@@ -410,7 +410,7 @@ export default function AdminDashboard({
   }, [coaDocs]);
 
   return (
-    <div className="container-site py-10">
+    <div className="w-full px-4 py-10 sm:px-6 lg:px-8 2xl:px-12">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="label text-teal-dark">Upgrade Bio Labs</p>
