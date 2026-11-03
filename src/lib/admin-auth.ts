@@ -17,7 +17,11 @@ import { cookies } from "next/headers";
  *    how much of a guess was correct.
  */
 const COOKIE = "ubl_admin";
-const MAX_AGE = 60 * 60 * 8; // 8 hours
+// Stays signed in until "Sign Out" is clicked. 400 days is the longest a
+// browser will keep a cookie (Chrome caps it there), so in practice the
+// session only ends on sign-out, a changed ADMIN_PASSWORD (which invalidates
+// every existing cookie), or cleared browser data.
+const MAX_AGE = 60 * 60 * 24 * 400;
 
 const secret = () => process.env.ADMIN_PASSWORD ?? "";
 
