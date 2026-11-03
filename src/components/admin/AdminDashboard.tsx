@@ -574,7 +574,7 @@ export default function AdminDashboard({
                 <thead className="border-b border-line-soft">
                   <tr className="label text-muted">
                     <th className="px-4 py-3">Date</th>
-                    <th className="px-4 py-3">Order #</th>
+                    <th className="whitespace-nowrap px-4 py-3">Order #</th>
                     <th className="px-4 py-3">Customer</th>
                     <th className="px-4 py-3">Items</th>
                     <th className="px-4 py-3">Status</th>
@@ -590,7 +590,7 @@ export default function AdminDashboard({
                         <span className="block text-[12.5px]">{timeET(o.created_at)} ET</span>
                       </td>
                       <td className="px-4 py-3">
-                        <span className="data block font-semibold">{orderRef(o)}</span>
+                        <span className="data block whitespace-nowrap font-semibold">{orderRef(o)}</span>
                         <span className="block text-[12.5px] text-muted">
                           {METHOD_LABEL[payMethod(o)] ?? payMethod(o)}
                         </span>
