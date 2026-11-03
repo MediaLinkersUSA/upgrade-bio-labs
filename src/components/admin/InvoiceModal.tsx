@@ -27,6 +27,8 @@ export type InvoiceData = {
 
 const TZ = "America/New_York";
 
+const CONTACT = { web: "www.upgradebiolabs.com", email: "support@upgradebiolabs.com" };
+
 const fmt = (c: number) => money(c / 100);
 
 /**
@@ -99,8 +101,15 @@ export default function InvoiceModal({
       <div className="invoice-sheet mx-auto w-full max-w-[900px] rounded-2xl bg-white p-5 text-[#111] shadow-xl sm:p-8">
         {/* header */}
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="scale-125 origin-left pt-2">
-            <Logo />
+          <div>
+            <div className="origin-left scale-125 pt-2">
+              <Logo />
+            </div>
+            <p className="mt-3 text-[12.5px] leading-[1.5] text-[#555]">
+              {CONTACT.web}
+              <br />
+              {CONTACT.email}
+            </p>
           </div>
           <div className="text-right">
             <span className="inline-block rounded-full bg-black px-4 py-1.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-white">
@@ -199,7 +208,10 @@ export default function InvoiceModal({
             Close
           </button>
         </div>
-        <p className="mt-6 text-center text-[12px] text-[#999]">
+        <p className="mt-6 text-center text-[12.5px] text-[#555]">
+          Questions about this order? {CONTACT.web} &middot; {CONTACT.email}
+        </p>
+        <p className="mt-1 text-center text-[12px] text-[#999]">
           &copy; {d.getFullYear()} {SITE.name}. All Rights Reserved.
         </p>
       </div>
