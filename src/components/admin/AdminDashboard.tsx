@@ -611,6 +611,7 @@ export default function AdminDashboard({
                     <th className="px-4 py-3">Items</th>
                     <th className="px-4 py-3">Status</th>
                     <th className="px-4 py-3 text-right">Total</th>
+                    <th className="px-4 py-3 text-center">Invoice</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-line-soft">
@@ -634,13 +635,7 @@ export default function AdminDashboard({
                         >
                           {openOrder === o.id ? "Hide details ▴" : "Details ▾"}
                         </button>
-                        <button
-                          type="button"
-                          onClick={() => setInvoiceFor(o)}
-                          className="ml-3 mt-1 text-[12.5px] font-semibold text-teal-dark hover:underline"
-                        >
-                          Invoice
-                        </button>
+
                       </td>
                       <td className="px-4 py-3">
                         <span className="block font-medium">{o.shipping_name ?? "-"}</span>
@@ -670,10 +665,19 @@ export default function AdminDashboard({
                       <td className="data px-4 py-3 text-right font-semibold">
                         {money(o.total_cents / 100)}
                       </td>
+                      <td className="px-4 py-3 text-center">
+                        <button
+                          type="button"
+                          onClick={() => setInvoiceFor(o)}
+                          className="whitespace-nowrap rounded-sm border border-line px-3 py-1.5 text-[13px] font-semibold text-teal-dark hover:bg-wash"
+                        >
+                          Invoice
+                        </button>
+                      </td>
                     </tr>
                     {openOrder === o.id && (
                       <tr>
-                        <td colSpan={6} className="p-0">
+                        <td colSpan={7} className="p-0">
                           <OrderDetails order={o} />
                         </td>
                       </tr>
