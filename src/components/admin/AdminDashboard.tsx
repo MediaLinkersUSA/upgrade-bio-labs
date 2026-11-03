@@ -71,6 +71,12 @@ const heardAboutLabel = (o: Order) =>
     ? `${o.heard_about}${o.heard_about_detail ? ` (${o.heard_about_detail})` : ""}`
     : null;
 const phoneOf = (o: Order) => o.phone || o.shipping_address?.phone || "";
+/** The discount code the customer used, if the order recorded one. Orders
+ *  placed before codes were saved have none, so "" is not the same as "no
+ *  discount": see couponLabel. */
+const couponOf = (o: Order) => (o.shipping_address?.promo_code ?? "").trim();
+const couponLabel = (o: Order) =>
+  couponOf(o) || ((o.discount_cents ?? 0) > 0 ? "Not recorded (discount applied)" : "None");
 const notesOf = (o: Order) => o.order_notes || o.shipping_address?.order_notes || "";
 
 /** The ship-to block as separate lines, skipping anything empty. */
@@ -106,6 +112,7 @@ function invoiceOf(o: Order): InvoiceData {
     items,
     subtotalCents: subtotal,
     // Whatever is left between the lines and the total, so the invoice always adds up.
+    coupon: couponOf(o),
     discountCents: o.discount_cents ?? Math.max(0, subtotal + shipping - o.total_cents),
     shippingCents: shipping,
     totalCents: o.total_cents,
@@ -119,7 +126,8 @@ const cents = (n?: number | null) => (n == null ? "-" : money(n / 100));
 function orderText(o: Order): string {
   return [
     `Order ${orderRef(o)}  (${date(o.created_at)}, ${timeET(o.created_at)} ET)`,
-    `Payment: ${METHOD_LABEL[payMethod(o)] ?? payMethod(o)}   Status: ${statusLabel(o.status)}`,
+    `Payment method: ${METHOD_LABEL[payMethod(o)] ?? payMethod(o)}   Status: ${statusLabel(o.status)}`,
+    `Coupon: ${couponLabel(o)}`,
     "",
     "SHIP TO",
     ...addressLines(o),
@@ -193,6 +201,16 @@ function OrderDetails({ order: o }: { order: Order }) {
 
       <div>
         <h3 className="label mb-2 text-muted">Payment</h3>
+        <dl className="mb-3 space-y-1">
+          <div className="flex justify-between gap-3">
+            <dt className="text-muted">Payment method</dt>
+            <dd className="font-semibold">{METHOD_LABEL[payMethod(o)] ?? payMethod(o)}</dd>
+          </div>
+          <div className="flex justify-between gap-3">
+            <dt className="text-muted">Coupon</dt>
+            <dd className={couponOf(o) ? "data font-semibold" : "text-muted"}>{couponLabel(o)}</dd>
+          </div>
+        </dl>
         <dl className="data space-y-1">
           <div className="flex justify-between"><dt className="text-muted">Subtotal</dt><dd>{cents(o.subtotal_cents)}</dd></div>
           <div className="flex justify-between"><dt className="text-muted">Discount</dt><dd>−{cents(o.discount_cents ?? 0)}</dd></div>
@@ -200,7 +218,7 @@ function OrderDetails({ order: o }: { order: Order }) {
           <div className="flex justify-between border-t border-line-soft pt-1 font-semibold"><dt>Total</dt><dd>{cents(o.total_cents)}</dd></div>
         </dl>
         <p className="mt-3 text-muted">
-          {METHOD_LABEL[payMethod(o)] ?? payMethod(o)} · {statusLabel(o.status)}
+          {statusLabel(o.status)}
           {o.tracking_number ? ` · Tracking ${o.tracking_number}` : ""}
         </p>
         {notesOf(o) && (
@@ -558,6 +576,7 @@ export default function AdminDashboard({
                       time_et: timeET(o.created_at),
                       order_number: orderRef(o),
                       payment_method: payMethod(o),
+                      coupon: couponOf(o),
                       email: o.email,
                       name: o.shipping_name,
                       phone: phoneOf(o),
