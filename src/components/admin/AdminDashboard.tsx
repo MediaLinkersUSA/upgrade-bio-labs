@@ -87,7 +87,7 @@ const cents = (n?: number | null) => (n == null ? "-" : money(n / 100));
  *  email or a packing note. */
 function orderText(o: Order): string {
   return [
-    `Order ${orderRef(o)}  (${date(o.created_at)})`,
+    `Order ${orderRef(o)}  (${date(o.created_at)}, ${timeET(o.created_at)} ET)`,
     `Payment: ${METHOD_LABEL[payMethod(o)] ?? payMethod(o)}   Status: ${statusLabel(o.status)}`,
     "",
     "SHIP TO",
@@ -219,8 +219,26 @@ type Cat = { slug: string; name: string; format: string; hasLegacyCoa: boolean }
 const TABS = ["Orders", "Affiliates", "Emails", "COAs"] as const;
 type Tab = (typeof TABS)[number];
 
+// Always Eastern Time. Vercel runs in UTC, so without a fixed zone an order
+// placed at 9 PM Eastern would show tomorrow's date, and the server render
+// would disagree with the browser's.
+const TZ = "America/New_York";
+
 const date = (s: string) =>
-  new Date(s).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  new Date(s).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: TZ,
+  });
+
+/** "2:33 PM" in Eastern Time. */
+const timeET = (s: string) =>
+  new Date(s).toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: TZ,
+  });
 
 function toCsv(rows: Record<string, unknown>[]) {
   if (!rows.length) return "";
@@ -341,8 +359,10 @@ export default function AdminDashboard({
   stockRequests,
   coaDocs,
   catalog,
+  searchQuery = "",
 }: {
   supabaseReady: boolean;
+  searchQuery?: string;
   orders: Order[];
   subscribers: Sub[];
   stockRequests: StockReq[];
@@ -471,7 +491,30 @@ export default function AdminDashboard({
       {/* ---------------------------------------------------------- orders */}
       {tab === "Orders" && (
         <section className="mt-6">
-          <div className="mb-3 flex justify-end">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+            {/* A plain GET form: the server does the searching, so it can
+                reach orders older than the 100 shown by default. */}
+            <form method="get" action="/admin" className="flex flex-1 items-center gap-2 sm:max-w-[520px]">
+              <input
+                type="search"
+                name="q"
+                defaultValue={searchQuery}
+                placeholder="Search name, email, phone or order #"
+                aria-label="Search orders"
+                className="w-full rounded-sm border border-line bg-surface px-3 py-2 text-[14px] placeholder:text-faint focus:border-teal focus:outline-none"
+              />
+              <button
+                type="submit"
+                className="rounded-sm bg-navy px-4 py-2 text-[14px] font-semibold text-white"
+              >
+                Search
+              </button>
+              {searchQuery && (
+                <a href="/admin" className="whitespace-nowrap text-[14px] font-semibold text-teal-dark hover:underline">
+                  Clear
+                </a>
+              )}
+            </form>
             <button
               type="button"
               onClick={() =>
@@ -479,7 +522,8 @@ export default function AdminDashboard({
                   "orders.csv",
                   toCsv(
                     orders.map((o) => ({
-                      date: o.created_at,
+                      date: date(o.created_at),
+                      time_et: timeET(o.created_at),
                       order_number: orderRef(o),
                       payment_method: payMethod(o),
                       email: o.email,
@@ -513,9 +557,16 @@ export default function AdminDashboard({
               Export CSV
             </button>
           </div>
+          {searchQuery && (
+            <p className="mb-3 text-[13.5px] text-muted">
+              {orders.length} {orders.length === 1 ? "order" : "orders"} matching &ldquo;{searchQuery}&rdquo;
+            </p>
+          )}
           {orders.length === 0 ? (
             <p className="rounded-md border border-line-soft bg-surface p-8 text-center text-[15px] text-muted">
-              No orders yet. Every order placed on the site lands here automatically.
+              {searchQuery
+                ? "No orders match that search. Try part of the name, the email, the phone digits or the order number."
+                : "No orders yet. Every order placed on the site lands here automatically."}
             </p>
           ) : (
             <div className="overflow-x-auto rounded-md border border-line-soft bg-surface">
@@ -534,7 +585,10 @@ export default function AdminDashboard({
                   {orders.map((o) => (
                     <Fragment key={o.id}>
                     <tr>
-                      <td className="whitespace-nowrap px-4 py-3 text-muted">{date(o.created_at)}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-muted">
+                        {date(o.created_at)}
+                        <span className="block text-[12.5px]">{timeET(o.created_at)} ET</span>
+                      </td>
                       <td className="px-4 py-3">
                         <span className="data block font-semibold">{orderRef(o)}</span>
                         <span className="block text-[12.5px] text-muted">
