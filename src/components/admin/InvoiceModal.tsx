@@ -21,6 +21,8 @@ export type InvoiceData = {
   items: { name: string; size: string; qty: number; unitCents: number }[];
   subtotalCents: number;
   discountCents: number;
+  /** Discount code used, "" if none was recorded. */
+  coupon: string;
   shippingCents: number;
   totalCents: number;
 };
@@ -171,7 +173,7 @@ export default function InvoiceModal({
           </div>
           {inv.discountCents > 0 && (
             <div className="flex justify-between py-1">
-              <span className="text-[#555]">Discount</span>
+              <span className="text-[#555]">Discount{inv.coupon ? ` (${inv.coupon})` : ""}</span>
               <span>-{fmt(inv.discountCents)}</span>
             </div>
           )}
