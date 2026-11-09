@@ -21,7 +21,6 @@ import { SITE } from "@/lib/config";
 const CartDrawer = dynamic(() => import("@/components/cart/CartDrawer"));
 const AgeGate = dynamic(() => import("@/components/chrome/AgeGate"));
 const ExitIntent = dynamic(() => import("@/components/chrome/ExitIntent"));
-const SprayBogoModal = dynamic(() => import("@/components/chrome/SprayBogoModal"));
 
 // UI face: preloaded, since almost every element above the fold uses it.
 const instrument = Instrument_Sans({
@@ -150,6 +149,17 @@ gtag('js', new Date());
 gtag('config', 'G-QQ1S6WKM4V');`,
           }}
         />
+        {/* Constant Contact sign-up popup. Loaded ahead of the other
+            third-party scripts so it is ready first and can appear before the
+            nasal spray offer. Its display delay/trigger is set inside
+            Constant Contact (Sign-up Forms > the popup > Display settings). */}
+        <script dangerouslySetInnerHTML={{ __html: `var _ctct_m = "2a0200c72ac88cc5bc8b780a2adbfc33";` }} />
+        <script
+          id="signupScript"
+          src="//static.ctctcdn.com/js/signup-form-widget/current/signup-form-widget.min.js"
+          async
+          defer
+        />
         {/* BlackHat Strategy dynamic optimization tag - separate from the
             GTM/Stape setup above, added at the agency's request.
             nowprocket/nitro-exclude aren't real React/HTML prop names
@@ -202,16 +212,7 @@ gtag('config', 'G-QQ1S6WKM4V');`,
           <CartDrawer />
           <AgeGate />
           <ExitIntent />
-          <SprayBogoModal />
         </CartProvider>
-        {/* OptinMonster (user 391402, account 415159). Last thing in <body>,
-            as requested. Its own snippet appends the loader to <head>, so it
-            works the same from here. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(d,u,ac){var s=d.createElement('script');s.type='text/javascript';s.src='https://a.omappapi.com/app/js/api.min.js';s.async=true;s.dataset.user=u;s.dataset.account=ac;d.getElementsByTagName('head')[0].appendChild(s);})(document,391402,415159);`,
-          }}
-        />
       </body>
     </html>
   );
