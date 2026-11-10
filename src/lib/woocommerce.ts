@@ -359,6 +359,10 @@ export type WooMirrorInput = {
   /** What that code took off. Sent on the coupon line and subtracted from the
    *  fee line, so it is never counted in both. */
   couponDiscountCents?: number;
+  /** What the customer owes, per our own database. After the order is created
+   *  WooCommerce's total is compared with this and the fee line is nudged so the
+   *  two always agree (see reconcileTotal). */
+  totalCents?: number;
   /** Affiliate attribution, if any. Meta-only - Woo's own totals are untouched;
    *  the commission is tracked in our own database, not deducted here. */
   refCode?: string | null;
@@ -367,6 +371,47 @@ export type WooMirrorInput = {
 };
 
 const dollars = (cents: number) => (cents / 100).toFixed(2);
+
+/**
+ * WooCommerce re-prices a coupon line with its own rules (it discounts every
+ * line, including BAC Water, and measures a percent coupon on the list price
+ * rather than the quantity-tier price), so its total can drift from the one the
+ * customer was quoted. Our database is the source of truth for the amount, so
+ * when the two differ the fee line absorbs the gap and the order ends up at
+ * exactly our total. Failure here is logged and ignored, like the mirror itself.
+ */
+async function reconcileTotal(
+  created: { id: number; total?: string; fee_lines?: { id: number; name?: string; total?: string }[] },
+  ourTotalCents: number,
+  orderNumber: string
+) {
+  const wooTotalCents = Math.round(Number(created.total) * 100);
+  if (!Number.isFinite(wooTotalCents)) return;
+  const diff = ourTotalCents - wooTotalCents; // + : Woo is too low, - : too high
+  if (diff === 0) return;
+
+  const fee = created.fee_lines?.[0];
+  const currentFeeCents = fee ? Math.round(Number(fee.total) * 100) || 0 : 0;
+  const newFeeCents = currentFeeCents + diff;
+  console.warn(`[woo] ${orderNumber} total ${dollars(wooTotalCents)} != ${dollars(ourTotalCents)}; adjusting fee`);
+
+  const feeLine = {
+    ...(fee ? { id: fee.id, name: fee.name } : { name: newFeeCents < 0 ? "Discount" : "Adjustment" }),
+    total: (newFeeCents / 100).toFixed(2),
+    tax_status: "none",
+  };
+  try {
+    const res = await fetch(`${BASE}/wp-json/wc/v3/orders/${created.id}`, {
+      method: "PUT",
+      headers: { Authorization: authHeader(), "Content-Type": "application/json" },
+      body: JSON.stringify({ fee_lines: [feeLine] }),
+      signal: AbortSignal.timeout(8_000),
+    });
+    if (!res.ok) console.error("[woo] total reconcile failed", orderNumber, res.status);
+  } catch (e) {
+    console.error("[woo] total reconcile threw", orderNumber, e);
+  }
+}
 
 export async function mirrorOrderToWoo(
   input: WooMirrorInput
@@ -480,6 +525,9 @@ export async function mirrorOrderToWoo(
     if (!res.ok) {
       console.error("[woo] create failed", res.status, data?.message ?? data);
       return { ok: false, error: data?.message ?? `http-${res.status}` };
+    }
+    if (input.totalCents != null) {
+      await reconcileTotal(data, input.totalCents, input.orderNumber);
     }
     return { ok: true, wooId: data.id };
   } catch (e) {
