@@ -291,6 +291,7 @@ export async function POST(req: Request) {
     orderDiscountCents: cents(totals.totalDiscount - totals.tierSavings),
     couponCode: appliedCouponCode,
     couponDiscountCents: appliedCouponCode ? cents(totals.rateDiscount) : 0,
+    totalCents: cents(totals.total),
     refCode: affiliate?.code ?? null,
     affiliateName: affiliate?.name ?? null,
     commissionCents,
